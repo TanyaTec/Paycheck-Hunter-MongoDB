@@ -1,6 +1,6 @@
 // --- CONFIGURACIÓN GLOBAL ---
-const BASE_URL = 'http://localhost:3000';
-const SECRET_TOKEN = "TANYA-CEO-2026"; 
+const BASE_URL = '';
+const SECRET_TOKEN = "tanya123"; 
 let currentMode = 'ventas'; 
 let editId = null;
 
