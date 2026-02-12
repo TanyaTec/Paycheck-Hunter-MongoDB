@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paycheck Hunter V7.5</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            --primary-color: #6366f1;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        body { 
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            background-size: 20px 20px, 100% 100%;
+            background-attachment: fixed;
+            font-family: 'Inter', sans-serif; 
+            color: #f8fafc;
+            padding-bottom: 80px;
+        }
+
+        /* Glassmorphism Cards */
+        .card-custom, .login-card, .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Cohete Metálico */
+        .rocket-icon {
+            background: linear-gradient(180deg, #0f172a 0%, #1e40af 40%, #60a5fa 50%, #1d4ed8 60%, #172554 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 10px 15px rgba(30, 58, 138, 0.5));
+            font-size: 3.5rem;
+            display: inline-block;
+        }
+
+        .spotlight {
+            background: radial-gradient(circle, rgba(219, 234, 254, 0.8) 0%, rgba(255, 255, 255, 0) 70%);
+            border-radius: 50%;
+            width: 100px; height: 100px;
+            display: flex; align-items: center; justify-content: center; margin: 0 auto;
+        }
+
+        @keyframes float { 
+            0% { transform: translateY(0px); } 
+            50% { transform: translateY(-15px); } 
+            100% { transform: translateY(0px); } 
+        }
+        .animate-float { 
+            animation: float 4s ease-in-out infinite; 
+        }
+
+        /* Inputs y Botones */
+        .login-input {
+            background-color: rgba(241, 245, 249, 0.8);
+            letter-spacing: 3px; border: 2px solid transparent; border-radius: 12px;
+        }
+        .login-input:focus {
+            background-color: white; border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15); outline: none;
+        }
+
+        .form-control, .form-select {
+            border-radius: 12px; padding: 10px 15px; border: 1px solid #e2e8f0; font-size: 0.95rem; color: var(--text-main);
+        }
+        .form-control:focus, .form-select:focus {
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15); border-color: var(--primary-color);
+        }
+
+        .btn-gradient {
+            background: var(--primary-gradient); color: white; border: none; font-weight: 700; transition: transform 0.2s;
+        }
+        .btn-gradient:hover {
+            transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4); color: white;
+        }
+
+        .brand-text {
+            background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;
+        }
+        
+        label {
+            font-weight: 700; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;
+        }
+
+        .d-none { display: none !important; }
+        .nav-tabs .nav-link { color: #64748b; font-weight: 600; border: none; }
+        .nav-tabs .nav-link.active { color: #6366f1; border-bottom: 3px solid #6366f1; background: transparent; }
+        
+        .modal-header { border-bottom: 1px solid #e2e8f0; }
+        .modal-footer { border-top: 1px solid #e2e8f0; }
+        .detail-card { background-color: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px; }
+        .detail-label { font-weight: 600; color: #64748b; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .detail-value { font-weight: 700; color: #1e293b; font-size: 0.95rem; }
+    </style>
+</head>
+<body>
+
+    <div id="loginScreen" class="vh-100 w-100 d-flex align-items-center justify-content-center py-5" style="position: fixed; top: 0; left: 0; z-index: 9999; overflow-y: auto;">
+        
+        <div class="container d-flex flex-column flex-md-row align-items-center justify-content-center gap-5">
+            
+            <div class="text-center">
+                <img src="img/TanyaTec-Lab-removebg.png" alt="TanyaTec Lab" class="img-fluid" style="max-width: 220px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));">
+            </div>
+
+            <div class="card login-card p-4 shadow-lg border-0 text-center" style="max-width: 380px; width: 100%;">
+                
+                <div class="mb-2"><span class="brand-text fw-bold fs-4">Paycheck Hunter</span></div>
+                
+                <div class="mt-2 mb-3 animate-float">
+                    <div class="spotlight"><i class="bi bi-rocket-takeoff-fill rocket-icon"></i></div>
+                </div>
+                
+                <div class="mb-3">
+                    <h3 class="fw-bold text-dark mb-1 fs-4">Hola, Closer.</h3>
+                    <p class="text-muted small" style="font-size: 0.85rem;">Tus metas financieras están esperando.<br>¿Vamos por más hoy?</p>
+                </div>
+                
+                <div class="form-floating mb-3">
+                    <input type="password" id="txtPassword" class="form-control login-input text-center fw-bold fs-5" id="floatingPassword" placeholder="Password" style="height: 50px;">
+                    <label for="floatingPassword" class="w-100 text-center text-uppercase small fw-bold pt-2">Contraseña</label>
+                </div>
+                <button onclick="login()" class="btn btn-gradient w-100 py-2 rounded-pill fw-bold shadow-sm fs-6 d-flex align-items-center justify-content-center gap-2">ENTRAR <i class="bi bi-arrow-right-circle-fill fs-5"></i></button>
+                <p id="loginError" class="text-danger fw-bold bg-danger-subtle p-2 rounded mt-3 small d-none">Contraseña Incorrecta</p>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="appContent" class="container py-5 d-none">
+        
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h1 class="display-6 fw-bold text-white mb-0">
+                    <i class="bi bi-rocket-takeoff-fill text-info me-2"></i>Paycheck Hunter
+                </h1>
+                <p class="text-white-50 mb-0">Gestión de Comisiones</p>
+            </div>
+            <div class="d-flex flex-column align-items-center gap-2">
+                <img src="img/TanyaTec-Lab-removebg.png" alt="TanyaTec" style="height: 75px; width: auto; opacity: 0.9;">
+                <button onclick="cerrarSesion()" class="btn btn-outline-light rounded-pill px-4 btn-sm"><i class="bi bi-box-arrow-right me-2"></i>Salir</button>
+            </div>
+        </div>
+
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card card-custom p-4">
+                    
+                    <ul class="nav nav-tabs mb-4">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" onclick="switchTab('ventas')">⏱️ Tiempo Compartido</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="switchTab('maquila')">🏭 Servicios Extra (Maquila)</a>
+                        </li>
+                    </ul>
+
+                    <div id="tabVentas">
+                        <form id="frmVenta" onsubmit="return false;">
+                            
+                            <div class="row g-3 mb-3 bg-light p-3 rounded mx-1 border border-primary-subtle">
+                                <div class="col-md-2">
+                                    <label class="form-label text-primary fw-bold"># Vendedores</label>
+                                    <select class="form-select border-primary" id="cmbNumVendedores" onchange="renderVendedoresInputs()">
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-5" id="containerVendedores">
+                                    <label class="form-label text-muted small">Nombre Vendedor 1</label>
+                                    <input type="text" class="form-control mb-2 form-control-sm" id="vend_1" placeholder="Nombre...">
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="d-flex gap-3 align-items-start mt-4">
+                                        <div><div class="form-check"><input class="form-check-input" type="checkbox" id="chkLiner" onchange="toggleLiner()"><label class="form-check-label fw-bold text-dark small">Liner (-3.5%)</label></div><input type="text" class="form-control form-control-sm mt-1 d-none" id="txtLinerName" placeholder="Nombre Liner"></div>
+                                        <div><div class="form-check"><input class="form-check-input" type="checkbox" id="chkCasado" onchange="toggleCasado()"><label class="form-check-label fw-bold text-dark small">Casado (/2)</label></div><input type="text" class="form-control form-control-sm mt-1 d-none" id="txtCasadoName" placeholder="Nombre Casado"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-2"><label class="form-label">Fecha</label><input type="date" class="form-control" id="txtFecha" required></div>
+                                <div class="col-md-2"><label class="form-label">Contrato</label><input type="text" class="form-control fw-bold" id="txtContrato" required></div>
+                                <div class="col-md-4"><label class="form-label">Cliente</label><input type="text" class="form-control" id="txtCliente" required>
+                                    <div class="d-flex gap-4 mt-2 align-items-center"><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="nacionalidad" id="nacExtranjero" value="Extranjero" checked><label class="form-check-label small text-dark">Extranjero</label></div><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="nacionalidad" id="nacMexicano" value="Mexicano"><label class="form-check-label small text-dark">Mexicano</label></div></div>
+                                </div>
+                                <div class="col-md-4"><label class="form-label text-dark">Socio</label><div class="d-flex gap-3 mt-1"><div class="form-check"><input class="form-check-input" type="radio" name="tipoSocio" id="radioNew" value="New" checked onchange="calcularMatematica()"><label class="form-check-label text-dark">New (9%)</label></div><div class="form-check"><input class="form-check-input" type="radio" name="tipoSocio" id="radioUpgrade" value="Upgrade" onchange="calcularMatematica()"><label class="form-check-label text-dark">Upgrade (8%)</label></div></div></div>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-3"><label class="form-label">Monto Venta (USD)</label><div class="input-group"><span class="input-group-text">$</span><input type="number" class="form-control fw-bold text-success fs-5" id="txtMonto" placeholder="0.00" required oninput="calcularMatematica()"></div></div>
+                                <div class="col-md-3"><label class="form-label text-primary fw-bold" style="font-size: 0.7rem;">Importe Base (-13.793%)</label><div class="input-group"><span class="input-group-text bg-primary-subtle text-primary">$</span><input type="text" class="form-control bg-white fw-bold text-primary" id="txtImporteBase" readonly></div></div>
+                                <div class="col-md-3"><label class="form-label">Status</label><select class="form-select" id="cmbStatus" onchange="togglePendiente('venta')"><option value="Cerrada">✅ Cerrada</option><option value="Pendiente">⏳ Pendiente</option><option value="Caída">❌ Caída</option></select><div id="divFechaPendienteVenta" class="d-none mt-2"><input type="date" class="form-control form-control-sm" id="txtFechaPendienteVenta"></div></div>
+                                
+                                <div class="col-md-3">
+                                    <label class="form-label">Pack</label>
+                                    <select class="form-select" id="cmbPack" onchange="calcularMatematica()">
+                                        <option value="None" selected>None</option>
+                                        <option value="Full">Full</option>
+                                        <option value="1/2">1/2</option>
+                                        <option value="1/3">1/3</option>
+                                        <option value="1/4">1/4</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-3"><div class="col-12"><div class="bg-light p-2 rounded border d-flex gap-5 align-items-center px-4"><span class="text-muted small fw-bold">OPCIONES:</span><div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" id="chkAmex"><label class="form-check-label fw-bold text-primary" for="chkAmex">AMEX</label></div><div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" id="chkMSI" onchange="calcularMatematica()"><label class="form-check-label fw-bold text-info" for="chkMSI">6MSI (-1.5%)</label></div></div></div></div>
+                            
+                            <div class="row g-2 mb-4 bg-light p-3 rounded mx-1 border border-danger-subtle">
+                                <div class="col-12 mb-2"><span class="text-danger fw-bold small text-uppercase"><i class="bi bi-dash-circle me-1"></i>Deducciones (Se reparten)</span></div>
+                                <div class="col"><div class="form-check bg-white border p-2 rounded"><input class="form-check-input" type="checkbox" id="chkReserva" onchange="calcularMatematica()"><label class="form-check-label text-dark small fw-bold">Reserva (-10%)</label></div></div>
+                                <div class="col"><label class="form-label text-muted small fw-bold">Impuestos %</label><input type="number" class="form-control form-control-sm border-danger" id="txtImpuestosPorcentaje" placeholder="Ej. 20" oninput="calcularMatematica()"></div>
+                                <div class="col"><label class="form-label text-muted small">Regalos ($)</label><input type="number" class="form-control form-control-sm" id="txtRegalos" oninput="calcularMatematica()"></div>
+                                <div class="col"><label class="form-label text-muted small">Donativos ($)</label><input type="number" class="form-control form-control-sm" id="txtDonativos" oninput="calcularMatematica()"></div>
+                                <div class="col"><label class="form-label text-muted small">Move In ($)</label><input type="number" class="form-control form-control-sm" id="txtMoveIn" oninput="calcularMatematica()"></div>
+                                <div class="col"><label class="form-label text-success fw-bold small">Bonus Wk</label><select class="form-select form-select-sm border-success" id="cmbBonusWeeks" onchange="calcularMatematica()"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select><div class="text-end small text-muted" style="font-size:0.65rem">-$20 c/u</div></div>
+                            </div>
+
+                            <div class="row g-3 mb-3 mx-1">
+                                <div class="col-12 d-flex gap-4">
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" id="chkMeseros" checked disabled><label class="form-check-label text-dark fw-bold small">Meseros <span class="badge bg-light text-dark border ms-1">-$20</span></label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" id="chkAntilavado" onchange="calcularMatematica()"><label class="form-check-label text-dark small">Antilavado <span class="badge bg-light text-dark border ms-1">-$10</span></label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" id="chkExploreForm" onchange="calcularMatematica()"><label class="form-check-label text-dark small">Explore Form <span class="badge bg-light text-dark border ms-1">-$10</span></label></div>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6 offset-md-6">
+                                    <div class="p-4 bg-success text-white rounded shadow text-center">
+                                        <label class="small fw-bold text-uppercase mb-1" style="letter-spacing: 1px;">Pago Neto Final (Por Persona)</label>
+                                        <div class="input-group input-group-lg justify-content-center">
+                                            <span class="input-group-text bg-white text-success fw-bold border-0">$</span>
+                                            <input type="text" class="form-control fw-bold text-success border-0 text-center fs-2" id="txtPagoTotal" readonly style="max-width: 250px;">
+                                        </div>
+                                        <small class="d-block mt-2 opacity-75 fst-italic">*Calculado después de dividir deducciones</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4"><div class="form-check mt-1"><input class="form-check-input" type="checkbox" id="chkExplore" onchange="toggleExplore()"><label class="form-check-label fw-bold text-primary">¿Explore Package?</label></div><div id="exploreFields" class="d-none bg-info-subtle p-2 rounded mt-2"><div class="d-flex align-items-end gap-2"><div class="flex-grow-1"><label class="small">Fecha Promesa</label><input type="date" class="form-control form-control-sm" id="txtFechaPromesa"></div><div class="form-check mb-1"><input class="form-check-input" type="checkbox" id="chkExploreHoy" onchange="toggleExploreHoy()"><label class="form-check-label small fw-bold">Hoy</label></div></div></div></div>
+                                <div class="col-md-8"><label class="form-label text-muted small fw-bold">Comentarios</label><textarea class="form-control" id="txtComentarios" rows="2"></textarea></div>
+                            </div>
+                            
+                            <div class="mt-2 pb-2 d-flex justify-content-end gap-3">
+                                <button id="btnCancelarEditVenta" onclick="cancelarEdicion('ventas')" class="btn btn-light border-0 text-danger px-4 py-2 rounded-pill fw-bold shadow-sm d-none"><i class="bi bi-x-circle-fill me-1"></i> CANCELAR</button>
+                                <button id="btnGuardarVenta" onclick="guardarVenta()" class="btn-gradient px-5 py-2 rounded-pill fw-bold shadow d-flex align-items-center gap-2"><i class="bi bi-floppy-fill fs-5"></i><span>GUARDAR VENTA</span></button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div id="tabMaquila" class="d-none">
+                        <form id="frmMaquila" onsubmit="return false;">
+                            <div class="alert alert-info border-0 shadow-sm mb-4"><i class="bi bi-info-circle-fill me-2"></i>Registrando Servicio Extra / Maquila</div>
+                            <div class="row g-3 mb-3"><div class="col-md-3"><label class="form-label">Fecha</label><input type="date" class="form-control" id="maqFecha" required></div><div class="col-md-3"><label class="form-label">Contrato</label><input type="text" class="form-control fw-bold" id="maqContrato" required></div><div class="col-md-6"><label class="form-label">Nombre del Socio</label><input type="text" class="form-control" id="maqSocio" required></div></div>
+                            <div class="row g-3 mb-3"><div class="col-md-6"><label class="form-label">Vendedores</label><input type="text" class="form-control" id="maqVendedores"></div><div class="col-md-3"><label class="form-label">Status</label><select class="form-select" id="maqStatus" onchange="togglePendiente('maquila')"><option value="Cerrada">✅ Cerrada</option><option value="Pendiente">⏳ Pendiente</option><option value="Cancelada">🚫 Cancelada</option></select><div id="divFechaPendienteMaq" class="d-none mt-2"><input type="date" class="form-control form-control-sm" id="txtFechaPendienteMaq"></div></div><div class="col-md-3"><label class="form-label">Pack</label><select class="form-select" id="maqPack"><option value="None" selected>None</option><option value="Full">Full</option><option value="1/2">1/2</option><option value="None">None</option></select></div></div>
+                            <div class="row g-3 mb-4"><div class="col-md-4"><label class="form-label text-success fw-bold">Pago Total</label><div class="input-group"><span class="input-group-text bg-success-subtle text-success">$</span><input type="number" class="form-control border-success-subtle fw-bold" id="maqPago" required></div></div></div>
+                            <div class="mt-4 pb-2 d-flex justify-content-end gap-3"><button id="btnCancelarEditMaquila" onclick="cancelarEdicion('maquila')" class="btn btn-light border-0 text-danger px-4 py-2 rounded-pill fw-bold shadow-sm d-none"><i class="bi bi-x-circle-fill me-1"></i> CANCELAR</button><button id="btnGuardarMaquila" onclick="guardarMaquila()" class="btn btn-secondary px-5 py-2 rounded-pill fw-bold shadow d-flex align-items-center gap-2" style="background: linear-gradient(135deg, #64748b 0%, #94a3b8 100%); border:none;"><i class="bi bi-floppy-fill fs-5"></i><span>GUARDAR MAQUILA</span></button></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card card-custom p-4">
+                    <div class="row align-items-end">
+                        <div class="col-md-8"><h6 class="text-primary fw-bold text-uppercase small mb-3">Reporte de Cierre (Unificado)</h6><div class="d-flex gap-2"><div class="flex-grow-1"><label class="form-label small text-muted">Fecha Inicio</label><input type="date" class="form-control" id="filtroInicio"></div><div class="flex-grow-1"><label class="form-label small text-muted">Fecha Fin</label><input type="date" class="form-control" id="filtroFin"></div><div><label class="d-block">&nbsp;</label><button class="btn btn-primary" onclick="aplicarFiltro()"><i class="bi bi-search"></i> Buscar</button></div><div><label class="d-block">&nbsp;</label><button class="btn btn-outline-secondary" onclick="limpiarFiltro()"><i class="bi bi-arrow-counterclockwise"></i></button></div></div></div>
+                        <div class="col-md-4 text-end"><div class="p-3 rounded border border-success-subtle mt-3 mt-md-0"><div class="small text-muted text-uppercase fw-bold">Total a Cobrar</div><div class="display-6 fw-bold text-success" id="lblTotalCobrar">$0.00</div><small class="text-muted fst-italic" id="lblRangoFechas">Últimos registros</small></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row"><div class="col-12"><div class="card card-custom p-4"><div class="table-responsive"><table class="table table-hover align-middle"><thead class="table-light"><tr><th>Fecha / Contrato</th><th>Detalles Principales</th><th>Status</th><th>Venta / Total</th><th class="text-end">Acciones</th></tr></thead><tbody id="tablaResultados"></tbody></table></div><div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top"><small class="text-muted" id="pageInfo">Mostrando 0 - 0 de 0</small><div><button class="btn btn-sm btn-outline-secondary me-2" onclick="cambiarPagina(-1)" id="btnPrev"><i class="bi bi-chevron-left"></i> Anterior</button><button class="btn btn-sm btn-outline-primary" onclick="cambiarPagina(1)" id="btnNext">Siguiente</button></div></div><div id="emptyState" class="text-center py-5 d-none"><i class="bi bi-inbox text-muted display-4 opacity-25"></i><p class="text-muted mt-2 small">No hay registros.</p></div></div></div></div>
+    </div>
+
+    <div class="modal fade" id="modalDetalle" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content"><div class="modal-header bg-light"><h5 class="modal-title fw-bold text-primary" id="modalTitulo">Detalle</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body p-4" id="modalCuerpo"></div><div class="modal-footer border-0"><button class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Cerrar</button></div></div></div></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/app.js"></script>
+    <script>
+        document.getElementById('txtFecha').valueAsDate = new Date();
+        document.getElementById('maqFecha').valueAsDate = new Date();
+        renderVendedoresInputs();
+    </script>
+</body>
+</html>
