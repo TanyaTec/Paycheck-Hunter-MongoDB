@@ -106,7 +106,8 @@
         .detail-label { font-weight: 600; color: #64748b; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; }
         .detail-value { font-weight: 700; color: #1e293b; font-size: 0.95rem; }
 
-        @media (max-width: 576px) { #loginScreen { position: absolute !important; height: auto !important; min-height: 100vh; align-items: flex-start !important; padding-top: 10px !important; overflow-y: auto !important; } #loginScreen .text-center img { max-width: 90px !important; margin-left: auto !important; margin-right: 15px !important; display: block !important; } #loginScreen .text-center { width: 100%; text-align: right !important; } .rocket-icon { font-size: 2rem !important; } .login-card { margin-top: 10px !important; margin-bottom: 30px !important; } }
+       @media (max-width: 576px) { /* 1. Permitir scroll en el fondo */ #loginScreen { position: absolute !important; height: auto !important; min-height: 100vh; overflow-y: auto !important; display: block !important; padding-top: 20px !important; }
+                                }
     </style>
 </head>
 <body>
