@@ -1,9 +1,10 @@
+require('dotenv').config(); // <--- CAMBIO 1: Carga las variables de seguridad
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 
 const app = express();
-const PUERTO = 3000;
+const PUERTO = process.env.PORT || 3000; // Ajuste menor: Permite que Render asigne puerto o usa el 3000
 const SECRET_TOKEN = "TANYA-CEO-2026"; 
 
 app.use(cors());
@@ -11,8 +12,8 @@ app.use(express.json());
 app.use(express.static('public'));
 
 // --- 1. CONEXIÓN A MONGODB ---
-// OJO: Fíjate que ahora está entre comillas dobles "..." y ya no se pone verde lo de adentro.
-const URI_NUBE = "mongodb+srv://tanyatec:87HkuWlgbt@paycheckhunterpersonalv.jzn6fbg.mongodb.net/paycheck_hunter?appName=PaycheckHunterPersonalV2";
+// CAMBIO 2: Ahora leemos la conexión del archivo .env oculto
+const URI_NUBE = process.env.MONGO_URI;
 
 mongoose.connect(URI_NUBE)
     .then(() => console.log('☁️ Conectado a MongoDB ATLAS (Nube)'))
