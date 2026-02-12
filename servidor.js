@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 
 const app = express();
 const PUERTO = process.env.PORT || 3000; // Ajuste menor: Permite que Render asigne puerto o usa el 3000
-const SECRET_TOKEN = "TANYA-CEO-2026"; 
+const SECRET_TOKEN = process.env.PASSWORD_APP;
 
 app.use(cors());
 app.use(express.json());
