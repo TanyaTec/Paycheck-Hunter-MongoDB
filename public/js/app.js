@@ -463,10 +463,12 @@ function iniciarEdicion(type, id) {
     const item = allDataGlobal.find(x => String(x._id || x.id) === String(id) && x.type === type);
     if(!item) return;
 
-    editId = String(item._id || item.id); 
-    
+    // CIRUGÍA: Primero hacemos el cambio de pestaña (si es necesario) para que se limpie la casa
     if (type === 'venta' && currentMode !== 'ventas') switchTab('ventas');
     if (type === 'maquila' && currentMode !== 'maquila') switchTab('maquila');
+
+    // LUEGO guardamos el ID en la memoria (Para que el switchTab no nos lo borre)
+    editId = String(item._id || item.id);
 
     if (type === 'venta') {
         document.getElementById('txtFecha').value = item.fecha;
