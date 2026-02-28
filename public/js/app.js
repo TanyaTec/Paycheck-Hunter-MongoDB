@@ -323,7 +323,9 @@ function renderTable() {
 
         let detalleHTML = '', montosCombinadosPC = '';
         let iconType = item.type === 'venta' ? '<span class="badge bg-primary me-2">T.C.</span>' : '<span class="badge bg-secondary me-2">Paper</span>';
-
+        
+        // CIRUGÍA: Detectar Explore Package y crear la estrellita azul
+        let exploreStar = (item.type === 'venta' && item.es_explore_package === 1) ? '<i class="bi bi-star-fill text-info ms-1" style="font-size: 0.85rem;" title="Explore Package"></i>' : '';
         if (item.type === 'venta') {
             const tipoSocioDisplay = item.tipo_socio ? item.tipo_socio : 'N/A';
             detalleHTML = `
@@ -363,11 +365,11 @@ function renderTable() {
         `;
 
         // BOTONES NEGROS EN ESCRITORIO (btn-dark)
-        const fila = `
+       const fila = `
             <tr>
                 <td class="align-middle">
                     <div class="fw-bold text-dark">${item.fecha || '--'}</div>
-                    <div class="small text-muted">#${item.contrato || 'N/A'}</div>
+                    <div class="small text-muted">#${item.contrato || 'N/A'}${exploreStar}</div>
                     <div class="d-md-none mt-1 small">${iconType}</div>
                 </td>
                 <td class="align-middle d-none d-md-table-cell">${detalleHTML}</td>
