@@ -299,6 +299,42 @@ function limpiarFiltro(recargar = true) {
     if (recargar) actualizarTableroFinanciero();
 }
 
+// --- CIRUGÍA: BÚSQUEDA RÁPIDA DE CONTRATOS ---
+function buscarContrato() {
+    const query = document.getElementById('txtBuscador').value.toLowerCase().trim();
+    
+    if (query === '') {
+        // Si borran la búsqueda, regresamos a mostrar lo que indique el filtro de fechas (si lo hay)
+        if (document.getElementById('filtroInicio').value && document.getElementById('filtroFin').value) {
+            aplicarFiltro();
+        } else {
+            filteredData = allDataGlobal;
+            currentPage = 1;
+            renderTable();
+        }
+        return;
+    }
+
+    // Buscamos en toda la base de datos sin alterar el KPI financiero
+    filteredData = allDataGlobal.filter(item => {
+        const cliente = (item.cliente_nombre || '').toLowerCase();
+        const socio = (item.nombre_socio || '').toLowerCase();
+        const contrato = (item.contrato || '').toLowerCase();
+        const fecha = (item.fecha || '').toLowerCase();
+        
+        return cliente.includes(query) || socio.includes(query) || contrato.includes(query) || fecha.includes(query);
+    });
+    
+    currentPage = 1;
+    renderTable();
+}
+
+function limpiarBuscador() {
+    document.getElementById('txtBuscador').value = '';
+    buscarContrato(); // Vuelve a renderizar la tabla normal
+}
+// ---------------------------------------------
+
 function cambiarPagina(direction) {
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
     const newPage = parseInt(currentPage) + parseInt(direction);
@@ -309,7 +345,7 @@ function cambiarPagina(direction) {
     }
 }
 
-// --- RENDERIZADO: BOTONES NEGROS (CIRUGÍA) ---
+// --- RENDERIZADO: BOTONES NEGROS ---
 function renderTable() {
     const tbody = document.getElementById('tablaResultados');
     if(!tbody) return;
@@ -483,11 +519,9 @@ function iniciarEdicion(type, id) {
     const item = allDataGlobal.find(x => String(x._id || x.id) === String(id) && x.type === type);
     if(!item) return;
 
-    // CIRUGÍA: Primero hacemos el cambio de pestaña (si es necesario) para que se limpie la casa
     if (type === 'venta' && currentMode !== 'ventas') switchTab('ventas');
     if (type === 'maquila' && currentMode !== 'maquila') switchTab('maquila');
 
-    // LUEGO guardamos el ID en la memoria (Para que el switchTab no nos lo borre)
     editId = String(item._id || item.id);
 
     if (type === 'venta') {

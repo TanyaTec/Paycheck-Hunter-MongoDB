@@ -27,7 +27,7 @@
             overflow-x: hidden; 
         }
 
-        .card-custom, .login-card, .modal-content {
+        .card-custom, .modal-content {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
             color: var(--text-main);
@@ -43,7 +43,7 @@
         .border-success { border-color: #166534 !important; }
         .border-success-subtle { border-color: #a7f3d0 !important; }
 
-        /* Estilos base para los botones negros del CRUD (por si acaso Bootstrap falla) */
+        /* Estilos base para los botones negros del CRUD */
         .btn-outline-dark, .btn-light.text-dark { border-color: #0f172a !important; color: #0f172a !important; }
         .btn-outline-dark:hover { background-color: #0f172a !important; color: #ffffff !important; }
 
@@ -53,7 +53,7 @@
             display: inline-block;
         }
 
-        .spotlight { background: radial-gradient(circle, rgba(226, 232, 240, 0.6) 0%, rgba(255, 255, 255, 0) 70%); border-radius: 50%; width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
+        .spotlight { background: radial-gradient(circle, rgba(226, 232, 240, 0.6) 0%, rgba(255, 255, 255, 0) 70%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
         @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-15px); } }
         .animate-float { animation: float 4s ease-in-out infinite; }
 
@@ -70,33 +70,73 @@
         .swal2-popup { font-size: 0.85rem !important; border-radius: 20px !important; width: 90% !important; max-width: 400px !important; }
         #loginScreen.d-none { display: none !important; }
 
+        /* --- CIRUGÍA RESPONSIVA LOGIN --- */
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 420px;
+            padding: 2rem !important; /* Reducido para ahorrar espacio vertical */
+        }
         @media (max-width: 576px) { 
-            #loginScreen { position: fixed !important; min-height: 100vh; display: block !important; padding-top: 50px !important; overflow-y: auto !important; }
-            .login-card { margin: 0 auto !important; width: 92% !important; }
+            .login-card { 
+                padding: 1.5rem !important; 
+            }
         }
     </style>
 </head>
 <body>
 
-    <div id="loginScreen" class="vh-100 w-100 d-flex align-items-center justify-content-center" style="position: fixed; top: 0; left: 0; z-index: 9999;">
-        <div class="d-none d-md-block" style="position: absolute; top: 20px; right: 20px;">
-            <img src="img/TanyaTec-Lab-removebg.png" alt="Branding" style="width: 45px;">
-        </div>
-        <div class="container d-flex justify-content-center">
-            <div class="card login-card p-4 shadow-lg border-0 text-center" style="max-width: 380px; width: 100%;">
-                <div class="mb-2"><span class="brand-text fw-bold fs-4">Paycheck Hunter</span></div>
-                <div class="mt-2 mb-3 animate-float"><div class="spotlight"><i class="bi bi-rocket-takeoff-fill rocket-icon" style="font-size: 3.5rem;"></i></div></div>
-                <h3 class="fw-bold text-dark mb-1 fs-4">Hola, Closer.</h3>
-                <div class="form-floating mb-3 mt-3">
-                    <input type="password" id="txtPassword" class="form-control login-input text-center fw-bold fs-5" placeholder="Password" style="height: 50px;">
-                    <label for="txtPassword" class="w-100 text-center text-uppercase small fw-bold pt-2">Contraseña</label>
-                </div>
-                <button onclick="login()" class="btn btn-gradient w-100 py-2 rounded-pill fw-bold shadow-sm fs-6 d-flex align-items-center justify-content-center gap-2">ENTRAR <i class="bi bi-arrow-right-circle-fill fs-5"></i></button>
-                <p id="loginError" class="text-danger fw-bold bg-danger-subtle p-2 rounded mt-3 small d-none">Contraseña Incorrecta</p>
+    <div id="loginScreen" class="w-100" style="position: fixed; top: 0; bottom: 0; left: 0; right: 0; z-index: 9999; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); overflow-y: auto;">
+        
+        <div class="d-flex flex-column align-items-center justify-content-center h-100 px-3 py-2">
+            
+            <div class="mb-3 text-center">
+                <a href="https://tanyateclab.com" target="_blank" rel="noopener noreferrer">
+                    <img src="img/TanyaTec-Lab-removebg.png" alt="TanyaTec Lab" style="height: 90px; max-width: 100%; filter: drop-shadow(0px 4px 10px rgba(0,0,0,0.4));">
+                </a>
             </div>
+
+            <div class="card login-card shadow-lg border-0 text-center w-100">
+                <div class="mb-0"><span class="brand-text fw-bold fs-4">Paycheck Hunter</span></div>
+                
+                <div class="mt-2 mb-2 animate-float" style="filter: drop-shadow(0px 12px 16px rgba(15, 23, 42, 0.4));">
+                    <div class="spotlight" style="width: 65px; height: 65px;">
+                        <i class="bi bi-rocket-takeoff-fill rocket-icon" style="font-size: 2.2rem;"></i>
+                    </div>
+                </div>
+                
+                <h3 class="fw-bold text-dark mb-0 fs-5">Hola, Closer.</h3>
+                <p class="text-muted small mb-3">Ingresa tu credencial de acceso</p>
+
+                <div class="mb-3">
+                    <label for="txtPassword" class="d-block text-center text-uppercase fw-bold mb-1" style="color: #94a3b8; font-size: 0.7rem; letter-spacing: 1px;">Contraseña Maestra</label>
+                    <input type="password" id="txtPassword" class="form-control login-input text-center fw-bold fs-5 shadow-sm" placeholder="••••••••" style="height: 50px; color: var(--text-main);">
+                </div>
+                
+                <button onclick="login()" class="btn btn-gradient w-100 py-2 rounded-pill fw-bold shadow d-flex align-items-center justify-content-center gap-2" style="font-size: 0.95rem; letter-spacing: 1px; transition: transform 0.2s ease, box-shadow 0.2s ease;">
+                    ENTRAR <i class="bi bi-arrow-right-circle-fill fs-5"></i>
+                </button>
+                
+                <div id="loginError" class="d-none mt-2">
+                    <p class="text-danger fw-bold bg-danger-subtle p-2 rounded small mb-0 border border-danger-subtle d-flex align-items-center justify-content-center gap-1">
+                        <i class="bi bi-exclamation-triangle-fill"></i> Credencial incorrecta
+                    </p>
+                </div>
+            </div>
+            
+            <div class="mt-3 text-center" style="opacity: 0.6;">
+                <small class="text-white fw-bold" style="letter-spacing: 1px; font-size: 0.65rem;">
+                    &copy; 2026 <a href="https://tanyateclab.com" target="_blank" rel="noopener noreferrer" class="text-white text-decoration-none">TANYATEC LAB</a>. ALL RIGHTS RESERVED.
+                </small>
+            </div>
+            
         </div>
     </div>
-
     <div id="appContent" class="container py-4 d-none">
         
         <div class="d-flex justify-content-between align-items-center align-items-md-start mb-4 mt-2">
@@ -207,12 +247,12 @@
                 <div class="card p-3 p-md-4 border border-success-subtle shadow-lg" style="background: #ffffff; border-radius: 24px; color: #0f172a;">
                     <div class="row align-items-center">
                         <div class="col-md-7 mb-4 mb-md-0 border-md-end border-light-subtle">
-                            <label class="small fw-bold text-muted text-uppercase mb-2"><i class="bi bi-funnel-fill me-1"></i>Filtrar Historial</label>
+                            <label class="small fw-bold text-muted text-uppercase mb-2"><i class="bi bi-graph-up-arrow me-1"></i>Reporte Financiero por Fechas</label>
                             <div class="d-flex gap-2 flex-wrap flex-md-nowrap align-items-center">
                                 <input type="date" class="form-control form-control-sm" id="filtroInicio">
                                 <input type="date" class="form-control form-control-sm" id="filtroFin">
                                 <div class="d-flex gap-2 w-100 w-md-auto">
-                                    <button class="btn btn-sm btn-dark flex-grow-1 px-3 fw-bold" onclick="aplicarFiltro()">Buscar</button>
+                                    <button class="btn btn-sm btn-dark flex-grow-1 px-3 fw-bold" onclick="aplicarFiltro()">Calcular</button>
                                     <button class="btn btn-sm btn-outline-secondary px-3" onclick="limpiarFiltro()">Limpiar</button>
                                 </div>
                             </div>
@@ -221,7 +261,7 @@
                             </div>
                         </div>
                         <div class="col-md-5 text-center text-md-end ps-md-4">
-                            <h6 class="text-uppercase text-muted fw-bold small mb-1" style="letter-spacing: 1px;">Rendimiento Financiero</h6>
+                            <h6 class="text-uppercase text-muted fw-bold small mb-1" style="letter-spacing: 1px;">Comisión Total</h6>
                             <h2 class="display-5 fw-bold text-success mb-0" id="lblTotalCobrar">$0.00</h2>
                         </div>
                     </div>
@@ -231,7 +271,21 @@
 
         <div class="row">
             <div class="col-12">
-                <div class="card card-custom p-2 p-md-4">
+                <div class="card card-custom p-3 p-md-4">
+                    
+                    <div class="row mb-3 align-items-center border-bottom pb-3">
+                        <div class="col-md-5 col-12 mb-2 mb-md-0">
+                            <h6 class="fw-bold mb-0 text-dark text-uppercase"><i class="bi bi-search me-2 text-primary"></i>Buscador de Contratos</h6>
+                        </div>
+                        <div class="col-md-7 col-12">
+                            <div class="input-group shadow-sm">
+                                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                                <input type="text" class="form-control border-start-0 ps-0" id="txtBuscador" placeholder="Cliente, socio, # contrato o fecha..." onkeyup="buscarContrato()">
+                                <button class="btn btn-light border text-danger" type="button" onclick="limpiarBuscador()" title="Limpiar"><i class="bi bi-x-circle-fill"></i></button>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="w-100 overflow-hidden">
                         <table class="table table-hover align-middle mb-0 w-100">
                             <thead class="table-light">
