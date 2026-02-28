@@ -1,10 +1,9 @@
 // --- CONFIGURACIÓN GLOBAL ---
 const BASE_URL = '';
-const SECRET_TOKEN = "tanya123"; 
+const SECRET_TOKEN = "Ytbaf1lgbt"; 
 let currentMode = 'ventas'; 
 let editId = null;
 
-// VARIABLES PARA UNIFICACIÓN Y PAGINACIÓN
 let allDataGlobal = []; 
 let filteredData = [];  
 let currentPage = 1;
@@ -25,10 +24,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// --- FUNCIÓN LOGIN (GLOBAL) ---
+// --- FUNCIÓN LOGIN ---
 function login() {
     const pass = document.getElementById('txtPassword').value;
-    if (pass === "tanya123") {
+    if (pass === "Ytbaf1lgbt") {
         localStorage.setItem('paycheckToken', SECRET_TOKEN);
         mostrarDashboard();
     } else {
@@ -53,25 +52,25 @@ function cerrarSesion() {
 }
 
 // --- NAVEGACIÓN Y UI ---
-
 function switchTab(mode) {
     currentMode = mode;
-    cancelarEdicion(mode); 
-    limpiarFiltro(false); 
     
-    const tabs = document.querySelectorAll('.nav-link');
-    tabs.forEach(t => t.classList.remove('active'));
-    
-    const clickedTab = Array.from(tabs).find(t => t.innerText.includes(mode === 'ventas' ? 'Tiempo' : 'Maquila'));
-    if(clickedTab) clickedTab.classList.add('active');
+    document.querySelectorAll('.nav-link').forEach(t => t.classList.remove('active'));
     
     if (mode === 'ventas') {
+        document.getElementById('nav-ventas').classList.add('active');
         document.getElementById('tabVentas').classList.remove('d-none');
         document.getElementById('tabMaquila').classList.add('d-none');
     } else {
+        document.getElementById('nav-maquila').classList.add('active');
         document.getElementById('tabVentas').classList.add('d-none');
         document.getElementById('tabMaquila').classList.remove('d-none');
     }
+
+    try {
+        cancelarEdicion(mode); 
+        limpiarFiltro(false);
+    } catch(e) { console.error("Error reseteando formulario", e); }
 }
 
 function toggleExplore() {
@@ -96,21 +95,13 @@ function toggleExploreHoy() {
 }
 
 function togglePendiente(mode) {
-    if (mode === 'venta') {
-        const val = document.getElementById('cmbStatus').value;
-        const div = document.getElementById('divFechaPendienteVenta');
-        if (val === 'Pendiente') div.classList.remove('d-none');
-        else div.classList.add('d-none');
-    } else {
-        const val = document.getElementById('maqStatus').value;
-        const div = document.getElementById('divFechaPendienteMaq');
-        if (val === 'Pendiente') div.classList.remove('d-none');
-        else div.classList.add('d-none');
-    }
+    const val = mode === 'venta' ? document.getElementById('cmbStatus').value : document.getElementById('maqStatus').value;
+    const div = mode === 'venta' ? document.getElementById('divFechaPendienteVenta') : document.getElementById('divFechaPendienteMaq');
+    if (val === 'Pendiente') div.classList.remove('d-none');
+    else div.classList.add('d-none');
 }
 
-// --- LÓGICA VENDEDORES ---
-
+// --- LÓGICA MATEMÁTICA ---
 function renderVendedoresInputs() {
     const cmb = document.getElementById('cmbNumVendedores');
     if(!cmb) return;
@@ -147,7 +138,6 @@ function toggleCasado() {
     }
 }
 
-// --- LÓGICA MATEMÁTICA (CLIENTE - FORMULARIO) ---
 function calcularMatematica() {
     const txtMonto = document.getElementById('txtMonto');
     if(!txtMonto) return;
@@ -212,20 +202,17 @@ function calcularMatematica() {
     document.getElementById('txtPagoTotal').value = pagoNetoFinal.toFixed(2);
 }
 
-// --- ACTUALIZAR TABLERO FINANCIERO (CONEXIÓN A MONGO ATLAS) ---
-// MODIFICADO: Inicia en $0.00 y solo calcula si hay fechas seleccionadas.
+// --- ACTUALIZAR KPI ---
 async function actualizarTableroFinanciero(inicio = null, fin = null) {
     const lblTotal = document.getElementById('lblTotalCobrar');
     const lblRango = document.getElementById('lblRangoFechas');
 
-    // 1. FRENO DE SEGURIDAD: Si no hay fechas seleccionadas, mostramos $0.00
     if (!inicio || !fin) {
         if (lblTotal) lblTotal.innerText = '$0.00';
         if (lblRango) lblRango.innerText = 'Selecciona un rango de fechas';
-        return; // ¡AQUÍ CORTAMOS! No molestamos al servidor innecesariamente.
+        return; 
     }
 
-    // 2. Si hay fechas, entonces sí pedimos el cálculo al servidor
     try {
         let url = `${BASE_URL}/api/kpi-totales?inicio=${inicio}&fin=${fin}`;
         
@@ -238,14 +225,12 @@ async function actualizarTableroFinanciero(inicio = null, fin = null) {
         if (lblRango) {
             lblRango.innerText = `Del ${inicio} al ${fin}`;
         }
-
     } catch (error) {
         console.error("Error calculando KPIs:", error);
     }
 }
 
 // --- CARGA DE DATOS ---
-
 async function cargarDatosUnificados() {
     try {
         const resVentas = await fetch(`${BASE_URL}/api/ventas`, { headers: { 'Authorization': SECRET_TOKEN } });
@@ -260,35 +245,26 @@ async function cargarDatosUnificados() {
         const maquilasEtiquetadas = dataM.map(m => ({ ...m, type: 'maquila' }));
 
         allDataGlobal = [...ventasEtiquetadas, ...maquilasEtiquetadas];
-        // Ordenamiento por fecha descendente
-        allDataGlobal.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+        allDataGlobal.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
 
         filteredData = allDataGlobal; 
         currentPage = 1;
         
         renderTable(); 
-        
-        // Llamamos sin fechas para que se resetee a $0.00 al inicio
         actualizarTableroFinanciero();
 
     } catch (error) { console.error("Error cargando datos:", error); }
 }
-
-// --- FILTROS Y PAGINACIÓN ---
 
 function aplicarFiltro() {
     const inicio = document.getElementById('filtroInicio').value;
     const fin = document.getElementById('filtroFin').value;
 
     if (inicio && fin) {
-        // Filtramos la tabla visualmente
         filteredData = allDataGlobal.filter(item => item.fecha >= inicio && item.fecha <= fin);
         currentPage = 1; 
         renderTable(); 
-        
-        // AHORA SÍ: Pedimos a Mongo Atlas que calcule el dinero real de este periodo
         actualizarTableroFinanciero(inicio, fin);
-
     } else {
         Swal.fire('Atención', 'Selecciona un rango de fechas.', 'info');
     }
@@ -302,13 +278,12 @@ function limpiarFiltro(recargar = true) {
     currentPage = 1;
     renderTable(); 
     
-    // Al limpiar, volvemos a estado neutro ($0.00)
     if (recargar) actualizarTableroFinanciero();
 }
 
 function cambiarPagina(direction) {
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-    const newPage = currentPage + direction;
+    const newPage = parseInt(currentPage) + parseInt(direction);
 
     if (newPage > 0 && newPage <= totalPages) {
         currentPage = newPage;
@@ -316,8 +291,7 @@ function cambiarPagina(direction) {
     }
 }
 
-// --- RENDERIZADO ---
-
+// --- RENDERIZADO: BOTONES NEGROS (CIRUGÍA) ---
 function renderTable() {
     const tbody = document.getElementById('tablaResultados');
     if(!tbody) return;
@@ -338,57 +312,72 @@ function renderTable() {
     document.getElementById('emptyState').classList.add('d-none');
 
     pageData.forEach(item => {
+        const itemId = item._id || item.id;
+
         let badgeColor = item.status === 'Cerrada' ? 'bg-success' : (item.status === 'Cancelada' || item.status === 'Caída' ? 'bg-danger' : 'bg-warning text-dark');
         
-        let statusDisplay = `<span class="badge ${badgeColor} rounded-pill">${item.status}</span>`;
+        let statusBlockPC = `<span class="badge ${badgeColor} rounded-pill">${item.status}</span>`;
         if(item.status === 'Pendiente' && item.fecha_pendiente) {
-            statusDisplay += `<div class="small text-muted mt-1 fw-bold" style="font-size:0.75rem"><i class="bi bi-clock-history me-1"></i>${item.fecha_pendiente}</div>`;
+            statusBlockPC += `<div class="small text-muted mt-1 fw-bold" style="font-size:0.75rem"><i class="bi bi-clock-history me-1"></i>${item.fecha_pendiente}</div>`;
         }
 
-        let detalleHTML = '', montosCombinadosHTML = '';
-        let iconType = item.type === 'venta' ? '<span class="badge bg-primary me-2">T.C.</span>' : '<span class="badge bg-secondary me-2">Maquila</span>';
+        let detalleHTML = '', montosCombinadosPC = '';
+        let iconType = item.type === 'venta' ? '<span class="badge bg-primary me-2">T.C.</span>' : '<span class="badge bg-secondary me-2">Paper</span>';
 
         if (item.type === 'venta') {
-            let exploreLine = '';
-            if(item.es_explore_package === 1) {
-                let textoFecha = (item.explore_es_hoy === 1) ? '<strong>Hoy</strong>' : (item.promesa_pago || '');
-                exploreLine = `<div class="text-primary mt-1"><i class="bi bi-star-fill me-1"></i>${textoFecha}</div>`;
-            }
-            let msiLine = item.msi_6 === 1 ? '<div class="small fw-bold text-info mt-1">6MSI</div>' : '';
             const tipoSocioDisplay = item.tipo_socio ? item.tipo_socio : 'N/A';
-
             detalleHTML = `
-                <div>${iconType} <span class="fw-bold text-dark">${item.cliente_nombre}</span></div>
-                <div class="small text-muted">${item.nacionalidad} | ${tipoSocioDisplay}</div> 
-                ${exploreLine}
-                ${msiLine}
+                <div>${iconType} <span class="fw-bold text-dark">${item.cliente_nombre || '--'}</span></div>
+                <div class="small text-muted">${item.nacionalidad || ''} | ${tipoSocioDisplay}</div> 
             `;
-            montosCombinadosHTML = `
-                <div class="fw-bold text-success">$${item.monto.toLocaleString()} <span class="small text-muted fw-normal">Venta</span></div>
+            montosCombinadosPC = `
+                <div class="fw-bold text-success">$${(item.monto || 0).toLocaleString()} <span class="small text-muted fw-normal">Venta</span></div>
                 <div class="fw-bold text-primary mt-1 pt-1 border-top" style="font-size:0.95rem">$${(item.pago_total || 0).toLocaleString()} <span class="small text-muted fw-normal">Neto</span></div>
             `;
         } else {
             detalleHTML = `
-                <div>${iconType} <span class="fw-bold text-dark">${item.nombre_socio}</span></div>
-                <div class="small text-muted">Pack: ${item.pack_nivel}</div>
+                <div>${iconType} <span class="fw-bold text-dark">${item.nombre_socio || '--'}</span></div>
+                <div class="small text-muted">Pack: ${item.pack_nivel || '--'}</div>
             `;
-            montosCombinadosHTML = `
+            montosCombinadosPC = `
                 <div class="text-muted small">--</div>
                 <div class="fw-bold text-success mt-1 pt-1 border-top">$${(item.pago_total || 0).toLocaleString()} <span class="small text-muted fw-normal">Total</span></div>
             `;
         }
 
+        // BOTONES NEGROS EN MÓVIL (btn-outline-dark)
+        let mobileCol = `
+            <div class="d-md-none d-flex flex-column align-items-end justify-content-center">
+                ${item.status !== 'Cerrada' ? `<span class="badge ${badgeColor} mb-1" style="font-size:0.65rem;">${item.status}</span>` : ''}
+                <span class="fw-bold text-success" style="font-size: 1.25rem;">$${(item.pago_total || 0).toLocaleString()}</span>
+                
+                <div class="btn-group mt-2">
+                    <button onclick="verDetalle('${item.type}', '${itemId}')" class="btn btn-outline-dark py-1 px-3 shadow-sm"><i class="bi bi-eye-fill"></i></button>
+                    <button onclick="iniciarEdicion('${item.type}', '${itemId}')" class="btn btn-outline-dark py-1 px-3 shadow-sm"><i class="bi bi-pencil-fill"></i></button>
+                    <button onclick="eliminarItem('${item.type}', '${itemId}')" class="btn btn-outline-dark py-1 px-3 shadow-sm"><i class="bi bi-trash-fill"></i></button>
+                </div>
+            </div>
+            <div class="d-none d-md-block">
+                ${montosCombinadosPC}
+            </div>
+        `;
+
+        // BOTONES NEGROS EN ESCRITORIO (btn-dark)
         const fila = `
             <tr>
-                <td><div class="fw-bold">${item.fecha}</div><div class="small text-muted">#${item.contrato || 'N/A'}</div></td>
-                <td>${detalleHTML}</td>
-                <td>${statusDisplay}</td>
-                <td>${montosCombinadosHTML}</td>
-                <td class="text-end">
+                <td class="align-middle">
+                    <div class="fw-bold text-dark">${item.fecha || '--'}</div>
+                    <div class="small text-muted">#${item.contrato || 'N/A'}</div>
+                    <div class="d-md-none mt-1 small">${iconType}</div>
+                </td>
+                <td class="align-middle d-none d-md-table-cell">${detalleHTML}</td>
+                <td class="align-middle d-none d-md-table-cell">${statusBlockPC}</td>
+                <td class="align-middle text-end text-md-start">${mobileCol}</td>
+                <td class="text-end align-middle d-none d-md-table-cell">
                     <div class="btn-group" role="group">
-                        <button onclick="verDetalle('${item.type}', '${item.id}')" class="btn btn-sm btn-light text-primary border"><i class="bi bi-eye-fill"></i></button>
-                        <button onclick="iniciarEdicion('${item.type}', '${item.id}')" class="btn btn-sm btn-light text-warning border"><i class="bi bi-pencil-fill"></i></button>
-                        <button onclick="eliminarItem('${item.type}', '${item.id}')" class="btn btn-sm btn-light text-danger border"><i class="bi bi-trash-fill"></i></button>
+                        <button onclick="verDetalle('${item.type}', '${itemId}')" class="btn btn-sm btn-dark shadow-sm"><i class="bi bi-eye-fill"></i></button>
+                        <button onclick="iniciarEdicion('${item.type}', '${itemId}')" class="btn btn-sm btn-dark shadow-sm border-start border-secondary"><i class="bi bi-pencil-fill"></i></button>
+                        <button onclick="eliminarItem('${item.type}', '${itemId}')" class="btn btn-sm btn-dark shadow-sm border-start border-secondary"><i class="bi bi-trash-fill"></i></button>
                     </div>
                 </td>
             </tr>
@@ -397,9 +386,8 @@ function renderTable() {
     });
 }
 
-// --- CRUD: VISUALIZAR ---
 function verDetalle(type, id) {
-    const item = allDataGlobal.find(x => x.id === id && x.type === type);
+    const item = allDataGlobal.find(x => String(x._id || x.id) === String(id) && x.type === type);
     if(!item) return;
 
     const modalTitle = document.getElementById('modalTitulo');
@@ -421,7 +409,6 @@ function verDetalle(type, id) {
             let textoFecha = (item.explore_es_hoy === 1) ? 'HOY' : (item.promesa_pago || '');
             exploreIndicator = `<div class="alert alert-info py-1 px-2 mb-0 small fw-bold"><i class="bi bi-star-fill me-1"></i>EXPLORE: ${textoFecha}</div>`;
         }
-
         const reservaTxt = (item.es_reserva === 1) ? '10%' : 'No';
 
         html = `
@@ -432,7 +419,7 @@ function verDetalle(type, id) {
                 </div>
                 <div class="row mb-3">
                      <div class="col-md-7"><h6 class="text-primary fw-bold text-uppercase small mb-2">Información del Cliente</h6><div class="detail-card p-3"><div class="fs-5 fw-bold mb-1">${item.cliente_nombre}</div><div class="d-flex gap-2 mb-2"><span class="badge bg-secondary">${item.nacionalidad}</span><span class="badge bg-info text-dark">${item.tipo_socio || '--'}</span><span class="badge bg-light text-dark border">${item.pack_nivel} Pack</span></div></div></div>
-                     <div class="col-md-5"><h6 class="text-primary fw-bold text-uppercase small mb-2">Equipo de Ventas</h6><div class="detail-card p-3"><div class="text-dark fw-bold">${item.vendedores || 'No asignado'}</div><small class="text-muted">Closer: ${item.usuario}</small></div></div>
+                     <div class="col-md-5"><h6 class="text-primary fw-bold text-uppercase small mb-2">Equipo de Ventas</h6><div class="detail-card p-3"><div class="text-dark fw-bold">${item.vendedores || 'No asignado'}</div></div></div>
                 </div>
                 <h6 class="text-primary fw-bold text-uppercase small mb-2 mt-4">Resumen Financiero</h6>
                 <div class="detail-card p-3 mb-3" style="background-color: #f0fdf4; border-color: #bbf7d0;">
@@ -442,7 +429,6 @@ function verDetalle(type, id) {
                         <div class="col-4"><small class="d-block text-muted text-uppercase fw-bold">Métodos</small><div class="mt-1">${item.amex ? '<span class="badge bg-primary">AMEX</span>' : ''} ${item.msi_6 ? '<span class="badge bg-info text-dark">6MSI</span>' : ''}</div></div>
                      </div>
                 </div>
-                
                 <h6 class="text-primary fw-bold text-uppercase small mb-2 mt-4">Desglose de Deducciones</h6>
                 <div class="row g-2">
                     <div class="col-4"><div class="p-2 border rounded bg-white"><small class="d-block text-muted">Regalos</small><strong class="text-dark">${fm(item.monto_regalos)}</strong></div></div>
@@ -452,7 +438,6 @@ function verDetalle(type, id) {
                     <div class="col-4"><div class="p-2 border rounded bg-white"><small class="d-block text-danger">Impuestos</small><strong class="text-danger">${item.porcentaje_impuestos || 0}%</strong></div></div>
                     <div class="col-4"><div class="p-2 border rounded bg-white"><small class="d-block text-success">Bonus Weeks</small><strong class="text-success">${item.bonus_weeks}</strong></div></div>
                 </div>
-
                 <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center">
                     <span class="fw-bold text-muted small text-uppercase">Deducciones Aplicadas:</span>
                     <div><span class="badge ${item.deduccion_meseros ? 'bg-secondary' : 'bg-light text-muted border'} me-2">Meseros</span><span class="badge ${item.deduccion_antilavado ? 'bg-secondary' : 'bg-light text-muted border'} me-2">Antilavado</span><span class="badge ${item.deduccion_explore ? 'bg-secondary' : 'bg-light text-muted border'}">Explore</span></div>
@@ -474,12 +459,11 @@ function verDetalle(type, id) {
     new bootstrap.Modal(document.getElementById('modalDetalle')).show();
 }
 
-// --- CRUD: EDITAR ---
 function iniciarEdicion(type, id) {
-    const item = allDataGlobal.find(x => x.id === id && x.type === type);
+    const item = allDataGlobal.find(x => String(x._id || x.id) === String(id) && x.type === type);
     if(!item) return;
 
-    editId = id; 
+    editId = String(item._id || item.id); 
     
     if (type === 'venta' && currentMode !== 'ventas') switchTab('ventas');
     if (type === 'maquila' && currentMode !== 'maquila') switchTab('maquila');
@@ -500,20 +484,11 @@ function iniciarEdicion(type, id) {
         }
 
         const chkLiner = document.getElementById('chkLiner');
-        if(chkLiner) {
-            chkLiner.checked = (item.es_liner === 1);
-            document.getElementById('txtLinerName').value = item.nombre_liner || '';
-            toggleLiner();
-        }
-
+        if(chkLiner) { chkLiner.checked = (item.es_liner === 1); document.getElementById('txtLinerName').value = item.nombre_liner || ''; toggleLiner(); }
         const chkCasado = document.getElementById('chkCasado');
-        if(chkCasado) {
-            chkCasado.checked = (item.es_casado === 1);
-            document.getElementById('txtCasadoName').value = item.nombre_casado || '';
-            toggleCasado();
-        }
+        if(chkCasado) { chkCasado.checked = (item.es_casado === 1); document.getElementById('txtCasadoName').value = item.nombre_casado || ''; toggleCasado(); }
 
-        document.getElementById('txtMonto').value = item.monto;
+        document.getElementById('txtMonto').value = item.monto || 0;
         document.getElementById('txtPagoTotal').value = item.pago_total || 0;
         document.getElementById('cmbStatus').value = item.status;
         document.getElementById('cmbPack').value = item.pack_nivel;
@@ -539,10 +514,8 @@ function iniciarEdicion(type, id) {
         if(item.explore_es_hoy !== 1) document.getElementById('txtFechaPromesa').value = item.promesa_pago || '';
         toggleExploreHoy();
 
-        // LLENAR CAMPOS DEDUCCIONES
         document.getElementById('chkReserva').checked = (item.es_reserva === 1); 
         document.getElementById('txtImpuestosPorcentaje').value = item.porcentaje_impuestos || ''; 
-
         document.getElementById('txtRegalos').value = item.monto_regalos || 0;
         document.getElementById('txtDonativos').value = item.monto_donativos || 0;
         document.getElementById('txtMoveIn').value = item.monto_movein || 0;
@@ -555,7 +528,6 @@ function iniciarEdicion(type, id) {
         document.getElementById('btnGuardarVenta').innerHTML = '<i class="bi bi-pencil-square fs-5"></i><span>ACTUALIZAR DATOS</span>';
         document.getElementById('btnCancelarEditVenta').classList.remove('d-none');
         window.scrollTo(0,0); 
-        
         calcularMatematica(); 
 
     } else {
@@ -592,11 +564,10 @@ function cancelarEdicion(mode) {
         toggleExploreHoy(); 
         togglePendiente('venta');
         calcularMatematica();
-        
     } else {
         document.getElementById('frmMaquila').reset();
         document.getElementById('maqFecha').valueAsDate = new Date();
-        document.getElementById('btnGuardarMaquila').innerHTML = '<i class="bi bi-floppy-fill fs-5"></i><span>GUARDAR MAQUILA</span>';
+        document.getElementById('btnGuardarMaquila').innerHTML = '<i class="bi bi-floppy-fill fs-5"></i><span>GUARDAR PAPERWORK</span>';
         document.getElementById('btnCancelarEditMaquila').classList.add('d-none');
         togglePendiente('maquila');
     }
@@ -622,10 +593,8 @@ async function guardarVenta() {
         fecha: document.getElementById('txtFecha').value,
         promesa: document.getElementById('chkExploreHoy').checked ? '' : document.getElementById('txtFechaPromesa').value,
         usuario: "Tanya",
-        
         tipo_socio: document.querySelector('input[name="tipoSocio"]:checked').value,
         pack_nivel: document.getElementById('cmbPack').value,
-        
         deduccion_antilavado: document.getElementById('chkAntilavado').checked ? 1 : 0,
         deduccion_explore: document.getElementById('chkExploreForm').checked ? 1 : 0,
         deduccion_meseros: document.getElementById('chkMeseros').checked ? 1 : 0,
@@ -633,33 +602,25 @@ async function guardarVenta() {
         explore_es_hoy: document.getElementById('chkExploreHoy').checked ? 1 : 0,
         amex: document.getElementById('chkAmex').checked ? 1 : 0,
         msi_6: document.getElementById('chkMSI').checked ? 1 : 0,
-
         num_vendedores: numVend,
         vendedores: vendedoresStr, 
         es_liner: document.getElementById('chkLiner').checked ? 1 : 0,
         nombre_liner: document.getElementById('txtLinerName').value,
         es_casado: document.getElementById('chkCasado').checked ? 1 : 0,
         nombre_casado: document.getElementById('txtCasadoName').value,
-
         es_reserva: document.getElementById('chkReserva').checked ? 1 : 0,
         porcentaje_impuestos: parseFloat(document.getElementById('txtImpuestosPorcentaje').value) || 0,
-        
         monto_regalos: parseFloat(document.getElementById('txtRegalos').value) || 0,
         monto_donativos: parseFloat(document.getElementById('txtDonativos').value) || 0,
         monto_movein: parseFloat(document.getElementById('txtMoveIn').value) || 0,
-        
         bonus_weeks: parseInt(document.getElementById('cmbBonusWeeks').value) || 0,
         nacionalidad: document.querySelector('input[name="nacionalidad"]:checked').value,
-        
         pago_total: parseFloat(document.getElementById('txtPagoTotal').value) || 0,
         comentarios: document.getElementById('txtComentarios').value,
         fecha_pendiente: document.getElementById('txtFechaPendienteVenta').value
     };
 
-    if (!payload.cliente || !payload.monto) {
-        Swal.fire('Atención', 'Falta el nombre del Cliente o el Monto.', 'warning');
-        return;
-    }
+    if (!payload.cliente || !payload.monto) { Swal.fire('Atención', 'Falta el nombre del Cliente o el Monto.', 'warning'); return; }
     await enviarDatos(endpoint, method, payload, 'ventas');
 }
 
@@ -678,10 +639,7 @@ async function guardarMaquila() {
         fecha_pendiente: document.getElementById('txtFechaPendienteMaq').value
     };
 
-    if (!payload.nombre_socio || !payload.pago_total) {
-        Swal.fire('Atención', 'Falta el Nombre del Socio o el Pago Total.', 'warning');
-        return;
-    }
+    if (!payload.nombre_socio || !payload.pago_total) { Swal.fire('Atención', 'Falta el Nombre del Socio o el Pago Total.', 'warning'); return; }
     await enviarDatos(endpoint, method, payload, 'maquila');
 }
 
@@ -693,14 +651,8 @@ async function enviarDatos(url, method, data, mode) {
             body: JSON.stringify(data)
         });
         const result = await res.json();
-        
         if (result.message) {
-            Swal.fire({
-                icon: 'success',
-                title: editId ? 'Registro Actualizado' : 'Registro Guardado',
-                showConfirmButton: false,
-                timer: 1500
-            });
+            Swal.fire({ icon: 'success', title: editId ? 'Registro Actualizado' : 'Registro Guardado', showConfirmButton: false, timer: 1500 });
             cancelarEdicion(mode); 
             cargarDatosUnificados(); 
         } else { Swal.fire('Error', result.error, 'error'); }
@@ -708,6 +660,11 @@ async function enviarDatos(url, method, data, mode) {
 }
 
 function eliminarItem(type, id) {
+    if (!id || id === 'undefined') {
+        Swal.fire('Error Técnico', 'ID de registro no válido.', 'error');
+        return;
+    }
+
     const endpointType = type === 'venta' ? 'ventas' : 'maquilas';
 
     Swal.fire({
@@ -726,15 +683,16 @@ function eliminarItem(type, id) {
                     method: 'DELETE',
                     headers: { 'Authorization': SECRET_TOKEN }
                 });
-                const resJson = await res.json();
-                if(resJson.message === 'deleted') {
+                
+                if (res.ok) {
                     Swal.fire('Eliminado', 'El registro ha sido borrado.', 'success');
                     cargarDatosUnificados(); 
                 } else {
-                    Swal.fire('Error', 'No se pudo borrar', 'error');
+                    Swal.fire('Error', 'El servidor rechazó la eliminación (Código: ' + res.status + ')', 'error');
                 }
             } catch (e) {
-                Swal.fire('Error', 'Error de conexión', 'error');
+                console.error("Falla al conectar con el servidor:", e);
+                Swal.fire('Error', 'Falla de red o conexión perdida.', 'error');
             }
         }
     });
