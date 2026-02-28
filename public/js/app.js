@@ -173,31 +173,49 @@ function calcularMatematica() {
 
     let ingresoBrutoIndividual = miParteDelPorcentaje + bonusPack;
 
-    let deduccionesPersonales = 0;
+    // --- CIRUGÍA MATEMÁTICA: Extracción de impuestos sobre Subtotal Gravable ---
+    
+    // 1. Deducir Reserva
+    let deduccionReserva = 0;
     if (document.getElementById('chkReserva').checked) {
-        deduccionesPersonales += (ingresoBrutoIndividual * 0.10);
+        deduccionReserva = (ingresoBrutoIndividual * 0.10);
     }
 
-    const impuestoPorcentaje = parseFloat(document.getElementById('txtImpuestosPorcentaje').value) || 0;
-    if (impuestoPorcentaje > 0) {
-        deduccionesPersonales += (ingresoBrutoIndividual * (impuestoPorcentaje / 100));
-    }
-
-    let cuentaGastosTotal = 0;
-    cuentaGastosTotal += parseFloat(document.getElementById('txtRegalos').value) || 0;
-    cuentaGastosTotal += parseFloat(document.getElementById('txtDonativos').value) || 0;
-    cuentaGastosTotal += parseFloat(document.getElementById('txtMoveIn').value) || 0;
+    // 2. Gastos que se extraen ANTES de impuestos
+    let gastosAntesImpuestos = 0;
+    gastosAntesImpuestos += parseFloat(document.getElementById('txtRegalos').value) || 0;
+    gastosAntesImpuestos += parseFloat(document.getElementById('txtDonativos').value) || 0;
+    gastosAntesImpuestos += parseFloat(document.getElementById('txtMoveIn').value) || 0;
     
     const bonusWeeks = parseInt(document.getElementById('cmbBonusWeeks').value) || 0;
-    cuentaGastosTotal += (bonusWeeks * 20);
+    gastosAntesImpuestos += (bonusWeeks * 20);
 
-    cuentaGastosTotal += 20; 
-    if (document.getElementById('chkAntilavado').checked) cuentaGastosTotal += 10;
-    if (document.getElementById('chkExploreForm').checked) cuentaGastosTotal += 10;
+    let miParteGastosAntes = gastosAntesImpuestos / numVendedores;
 
-    let miParteDeGastos = cuentaGastosTotal / numVendedores;
+    // 3. Calculamos el Nuevo Subtotal Gravable
+    let subtotalGravable = ingresoBrutoIndividual - deduccionReserva - miParteGastosAntes;
 
-    let pagoNetoFinal = ingresoBrutoIndividual - deduccionesPersonales - miParteDeGastos;
+    // 4. Extraemos el porcentaje de impuestos SOBRE el subtotal gravable
+    const impuestoPorcentaje = parseFloat(document.getElementById('txtImpuestosPorcentaje').value) || 0;
+    let deduccionImpuestos = 0;
+    if (impuestoPorcentaje > 0 && subtotalGravable > 0) {
+        deduccionImpuestos = subtotalGravable * (impuestoPorcentaje / 100);
+    }
+
+    // 5. Subtotal después de impuestos
+    let subtotalPostImpuestos = subtotalGravable - deduccionImpuestos;
+
+    // 6. Gastos finales (propinas y fees que se descuentan al final)
+    let gastosDespuesImpuestos = 20; // meseros default
+    if (document.getElementById('chkAntilavado').checked) gastosDespuesImpuestos += 10;
+    if (document.getElementById('chkExploreForm').checked) gastosDespuesImpuestos += 10;
+
+    let miParteGastosDespues = gastosDespuesImpuestos / numVendedores;
+
+    // 7. Pago Neto Final
+    let pagoNetoFinal = subtotalPostImpuestos - miParteGastosDespues;
+    
+    // -------------------------------------------------------------------------
 
     document.getElementById('txtPagoTotal').value = pagoNetoFinal.toFixed(2);
 }
