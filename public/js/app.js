@@ -101,6 +101,15 @@ function togglePendiente(mode) {
     else div.classList.add('d-none');
 }
 
+function toggleCasado() {
+    const chk = document.getElementById('chkCasado');
+    const divOpts = document.getElementById('divCasadoOptions');
+    if(chk && divOpts) {
+        chk.checked ? divOpts.classList.remove('d-none') : divOpts.classList.add('d-none');
+        calcularMatematica();
+    }
+}
+
 // --- LÓGICA MATEMÁTICA ---
 function renderVendedoresInputs() {
     const cmb = document.getElementById('cmbNumVendedores');
@@ -129,15 +138,6 @@ function toggleLiner() {
     }
 }
 
-function toggleCasado() {
-    const chk = document.getElementById('chkCasado');
-    const input = document.getElementById('txtCasadoName');
-    if(chk && input) {
-        chk.checked ? input.classList.remove('d-none') : input.classList.add('d-none');
-        calcularMatematica();
-    }
-}
-
 function calcularMatematica() {
     const txtMonto = document.getElementById('txtMonto');
     if(!txtMonto) return;
@@ -158,7 +158,10 @@ function calcularMatematica() {
     let miParteDelPorcentaje = dineroPorcentajeTotal / numVendedores;
 
     if (document.getElementById('chkCasado').checked) {
-        miParteDelPorcentaje = miParteDelPorcentaje / 2;
+        const tipoCasado = document.getElementById('cmbTipoCasado').value;
+        if (tipoCasado === 'Comisión' || tipoCasado === 'Ambas') {
+            miParteDelPorcentaje = miParteDelPorcentaje / 2;
+        }
     }
 
     const pack = document.getElementById('cmbPack').value;
@@ -173,15 +176,11 @@ function calcularMatematica() {
 
     let ingresoBrutoIndividual = miParteDelPorcentaje + bonusPack;
 
-    // --- CIRUGÍA MATEMÁTICA: Extracción de impuestos sobre Subtotal Gravable ---
-    
-    // 1. Deducir Reserva
     let deduccionReserva = 0;
     if (document.getElementById('chkReserva').checked) {
         deduccionReserva = (ingresoBrutoIndividual * 0.10);
     }
 
-    // 2. Gastos que se extraen ANTES de impuestos
     let gastosAntesImpuestos = 0;
     gastosAntesImpuestos += parseFloat(document.getElementById('txtRegalos').value) || 0;
     gastosAntesImpuestos += parseFloat(document.getElementById('txtDonativos').value) || 0;
@@ -192,60 +191,81 @@ function calcularMatematica() {
 
     let miParteGastosAntes = gastosAntesImpuestos / numVendedores;
 
-    // 3. Calculamos el Nuevo Subtotal Gravable
     let subtotalGravable = ingresoBrutoIndividual - deduccionReserva - miParteGastosAntes;
 
-    // 4. Extraemos el porcentaje de impuestos SOBRE el subtotal gravable
     const impuestoPorcentaje = parseFloat(document.getElementById('txtImpuestosPorcentaje').value) || 0;
     let deduccionImpuestos = 0;
     if (impuestoPorcentaje > 0 && subtotalGravable > 0) {
         deduccionImpuestos = subtotalGravable * (impuestoPorcentaje / 100);
     }
 
-    // 5. Subtotal después de impuestos
     let subtotalPostImpuestos = subtotalGravable - deduccionImpuestos;
 
-    // 6. Gastos finales (propinas y fees que se descuentan al final)
-    let gastosDespuesImpuestos = 20; // meseros default
+    let gastosDespuesImpuestos = 20; 
     if (document.getElementById('chkAntilavado').checked) gastosDespuesImpuestos += 10;
     if (document.getElementById('chkExploreForm').checked) gastosDespuesImpuestos += 10;
 
     let miParteGastosDespues = gastosDespuesImpuestos / numVendedores;
-
-    // 7. Pago Neto Final
     let pagoNetoFinal = subtotalPostImpuestos - miParteGastosDespues;
     
-    // -------------------------------------------------------------------------
-
     document.getElementById('txtPagoTotal').value = pagoNetoFinal.toFixed(2);
 }
 
-// --- ACTUALIZAR KPI ---
-async function actualizarTableroFinanciero(inicio = null, fin = null) {
+// --- KPI: CÁLCULOS EN FRONTEND (VOLUMEN, COMISIÓN Y EXPLORE) ---
+function actualizarTableroFinanciero(inicio = null, fin = null) {
     const lblTotal = document.getElementById('lblTotalCobrar');
+    const lblVolumen = document.getElementById('lblTotalVolumen');
+    const lblExplore = document.getElementById('lblTotalExplore');
     const lblRango = document.getElementById('lblRangoFechas');
 
     if (!inicio || !fin) {
         if (lblTotal) lblTotal.innerText = '$0.00';
+        if (lblVolumen) lblVolumen.innerText = '$0.00';
+        if (lblExplore) lblExplore.innerText = '$0.00';
         if (lblRango) lblRango.innerText = 'Selecciona un rango de fechas';
         return; 
     }
 
-    try {
-        let url = `${BASE_URL}/api/kpi-totales?inicio=${inicio}&fin=${fin}`;
-        
-        const res = await fetch(url, { headers: { 'Authorization': SECRET_TOKEN } });
-        const data = await res.json();
+    let granTotalComision = 0;
+    let granTotalVolumen = 0;
+    let granTotalExplore = 0;
 
-        if (lblTotal) {
-            lblTotal.innerText = `$${(data.granTotal || 0).toLocaleString()}`;
+    filteredData.forEach(item => {
+        if (item.status === 'Cerrada') {
+            granTotalComision += (parseFloat(item.pago_total) || 0);
+
+            if (item.type === 'venta') {
+                let monto = parseFloat(item.monto) || 0;
+                let numVend = parseInt(item.num_vendedores) || 1;
+                let liner = parseInt(item.es_liner) === 1 ? 1 : 0;
+                
+                let partesTotales = numVend + liner;
+                let miVolumen = monto / partesTotales;
+
+                let esCasado = parseInt(item.es_casado) === 1;
+                let tipoCasado = item.tipo_casado || 'Comisión'; 
+
+                if (esCasado && (tipoCasado === 'Volumen' || tipoCasado === 'Ambas')) {
+                    miVolumen = miVolumen / 2;
+                }
+                granTotalVolumen += miVolumen;
+
+                let esExplore = parseInt(item.es_explore_package) === 1;
+                let esExploreHoy = parseInt(item.explore_es_hoy) === 1;
+
+                if (esExplore && esExploreHoy) {
+                    let bonoNeto = 225 * 0.77; 
+                    let miBonoExplore = bonoNeto / numVend; 
+                    granTotalExplore += miBonoExplore;
+                }
+            }
         }
-        if (lblRango) {
-            lblRango.innerText = `Del ${inicio} al ${fin}`;
-        }
-    } catch (error) {
-        console.error("Error calculando KPIs:", error);
-    }
+    });
+
+    if (lblTotal) lblTotal.innerText = `$${granTotalComision.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    if (lblVolumen) lblVolumen.innerText = `$${granTotalVolumen.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    if (lblExplore) lblExplore.innerText = `$${granTotalExplore.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    if (lblRango) lblRango.innerText = `Del ${inicio} al ${fin}`;
 }
 
 // --- CARGA DE DATOS ---
@@ -299,12 +319,10 @@ function limpiarFiltro(recargar = true) {
     if (recargar) actualizarTableroFinanciero();
 }
 
-// --- CIRUGÍA: BÚSQUEDA RÁPIDA DE CONTRATOS ---
 function buscarContrato() {
     const query = document.getElementById('txtBuscador').value.toLowerCase().trim();
     
     if (query === '') {
-        // Si borran la búsqueda, regresamos a mostrar lo que indique el filtro de fechas (si lo hay)
         if (document.getElementById('filtroInicio').value && document.getElementById('filtroFin').value) {
             aplicarFiltro();
         } else {
@@ -315,7 +333,6 @@ function buscarContrato() {
         return;
     }
 
-    // Buscamos en toda la base de datos sin alterar el KPI financiero
     filteredData = allDataGlobal.filter(item => {
         const cliente = (item.cliente_nombre || '').toLowerCase();
         const socio = (item.nombre_socio || '').toLowerCase();
@@ -331,9 +348,8 @@ function buscarContrato() {
 
 function limpiarBuscador() {
     document.getElementById('txtBuscador').value = '';
-    buscarContrato(); // Vuelve a renderizar la tabla normal
+    buscarContrato(); 
 }
-// ---------------------------------------------
 
 function cambiarPagina(direction) {
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -345,7 +361,6 @@ function cambiarPagina(direction) {
     }
 }
 
-// --- RENDERIZADO: BOTONES NEGROS ---
 function renderTable() {
     const tbody = document.getElementById('tablaResultados');
     if(!tbody) return;
@@ -378,7 +393,6 @@ function renderTable() {
         let detalleHTML = '', montosCombinadosPC = '';
         let iconType = item.type === 'venta' ? '<span class="badge bg-primary me-2">T.C.</span>' : '<span class="badge bg-secondary me-2">Paper</span>';
         
-        // CIRUGÍA: Detectar Explore Package y crear la estrellita azul
         let exploreStar = (item.type === 'venta' && item.es_explore_package === 1) ? '<i class="bi bi-star-fill text-info ms-1" style="font-size: 0.85rem;" title="Explore Package"></i>' : '';
         if (item.type === 'venta') {
             const tipoSocioDisplay = item.tipo_socio ? item.tipo_socio : 'N/A';
@@ -401,11 +415,12 @@ function renderTable() {
             `;
         }
 
-        // BOTONES NEGROS EN MÓVIL (btn-outline-dark)
         let mobileCol = `
             <div class="d-md-none d-flex flex-column align-items-end justify-content-center">
                 ${item.status !== 'Cerrada' ? `<span class="badge ${badgeColor} mb-1" style="font-size:0.65rem;">${item.status}</span>` : ''}
-                <span class="fw-bold text-success" style="font-size: 1.25rem;">$${(item.pago_total || 0).toLocaleString()}</span>
+                
+                ${item.type === 'venta' ? `<span class="fw-bold text-info" style="font-size: 0.85rem;" title="Volumen de Venta">Vol: $${(item.monto || 0).toLocaleString()}</span>` : ''}
+                <span class="fw-bold text-success" style="font-size: 1.25rem;" title="Comisión / Pago Neto">$${(item.pago_total || 0).toLocaleString()}</span>
                 
                 <div class="btn-group mt-2">
                     <button onclick="verDetalle('${item.type}', '${itemId}')" class="btn btn-outline-dark py-1 px-3 shadow-sm"><i class="bi bi-eye-fill"></i></button>
@@ -418,12 +433,13 @@ function renderTable() {
             </div>
         `;
 
-        // BOTONES NEGROS EN ESCRITORIO (btn-dark)
+       // CIRUGÍA: Nacionalidad inyectada SOLO en la vista móvil (d-md-none) debajo del contrato
        const fila = `
             <tr>
                 <td class="align-middle">
                     <div class="fw-bold text-dark">${item.fecha || '--'}</div>
                     <div class="small text-muted">#${item.contrato || 'N/A'}${exploreStar}</div>
+                    ${item.type === 'venta' ? `<div class="d-md-none text-secondary fw-bold mt-1" style="font-size: 0.75rem;">${item.nacionalidad || ''}</div>` : ''}
                     <div class="d-md-none mt-1 small">${iconType}</div>
                 </td>
                 <td class="align-middle d-none d-md-table-cell">${detalleHTML}</td>
@@ -541,8 +557,14 @@ function iniciarEdicion(type, id) {
 
         const chkLiner = document.getElementById('chkLiner');
         if(chkLiner) { chkLiner.checked = (item.es_liner === 1); document.getElementById('txtLinerName').value = item.nombre_liner || ''; toggleLiner(); }
+        
         const chkCasado = document.getElementById('chkCasado');
-        if(chkCasado) { chkCasado.checked = (item.es_casado === 1); document.getElementById('txtCasadoName').value = item.nombre_casado || ''; toggleCasado(); }
+        if(chkCasado) { 
+            chkCasado.checked = (item.es_casado === 1); 
+            document.getElementById('txtCasadoName').value = item.nombre_casado || ''; 
+            document.getElementById('cmbTipoCasado').value = item.tipo_casado || 'Comisión'; 
+            toggleCasado(); 
+        }
 
         document.getElementById('txtMonto').value = item.monto || 0;
         document.getElementById('txtPagoTotal').value = item.pago_total || 0;
@@ -615,7 +637,11 @@ function cancelarEdicion(mode) {
         document.getElementById('cmbNumVendedores').value = 1;
         renderVendedoresInputs();
         toggleLiner();
-        toggleCasado();
+        
+        const divCasadoOpts = document.getElementById('divCasadoOptions');
+        if(divCasadoOpts) divCasadoOpts.classList.add('d-none');
+        document.getElementById('cmbTipoCasado').value = 'Comisión';
+
         toggleExplore(); 
         toggleExploreHoy(); 
         togglePendiente('venta');
@@ -664,6 +690,7 @@ async function guardarVenta() {
         nombre_liner: document.getElementById('txtLinerName').value,
         es_casado: document.getElementById('chkCasado').checked ? 1 : 0,
         nombre_casado: document.getElementById('txtCasadoName').value,
+        tipo_casado: document.getElementById('cmbTipoCasado').value,
         es_reserva: document.getElementById('chkReserva').checked ? 1 : 0,
         porcentaje_impuestos: parseFloat(document.getElementById('txtImpuestosPorcentaje').value) || 0,
         monto_regalos: parseFloat(document.getElementById('txtRegalos').value) || 0,

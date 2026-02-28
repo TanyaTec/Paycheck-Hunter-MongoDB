@@ -36,14 +36,12 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
-        /* VERDE BOSQUE PROFUNDO */
         .text-success { color: #166534 !important; } 
         .bg-success { background: #166534 !important; color: #ffffff !important; border: none !important; }
         .bg-success-subtle { background-color: #d1fae5 !important; color: #065f46 !important; }
         .border-success { border-color: #166534 !important; }
         .border-success-subtle { border-color: #a7f3d0 !important; }
 
-        /* Estilos base para los botones negros del CRUD */
         .btn-outline-dark, .btn-light.text-dark { border-color: #0f172a !important; color: #0f172a !important; }
         .btn-outline-dark:hover { background-color: #0f172a !important; color: #ffffff !important; }
 
@@ -80,75 +78,69 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             width: 100%;
             max-width: 420px;
-            padding: 2rem !important; /* Reducido para ahorrar espacio vertical */
+            padding: 2rem !important; 
         }
         @media (max-width: 576px) { 
-            .login-card { 
-                padding: 1.5rem !important; 
-            }
+            .login-card { padding: 1.5rem !important; }
         }
     </style>
 </head>
 <body>
 
-    <div id="loginScreen" class="w-100" style="position: fixed; top: 0; bottom: 0; left: 0; right: 0; z-index: 9999; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); overflow-y: auto;">
-        
+    <div id="loginScreen" class="w-100" style="position: fixed; top: 0; bottom: 0; left: 0; right: 0; z-index: 9999; overflow-y: auto;">
         <div class="d-flex flex-column align-items-center justify-content-center h-100 px-3 py-2">
-            
             <div class="mb-3 text-center">
                 <a href="https://tanyateclab.com" target="_blank" rel="noopener noreferrer">
                     <img src="img/TanyaTec-Lab-removebg.png" alt="TanyaTec Lab" style="height: 90px; max-width: 100%; filter: drop-shadow(0px 4px 10px rgba(0,0,0,0.4));">
                 </a>
             </div>
-
             <div class="card login-card shadow-lg border-0 text-center w-100">
                 <div class="mb-0"><span class="brand-text fw-bold fs-4">Paycheck Hunter</span></div>
-                
                 <div class="mt-2 mb-2 animate-float" style="filter: drop-shadow(0px 12px 16px rgba(15, 23, 42, 0.4));">
                     <div class="spotlight" style="width: 65px; height: 65px;">
                         <i class="bi bi-rocket-takeoff-fill rocket-icon" style="font-size: 2.2rem;"></i>
                     </div>
                 </div>
-                
-                <h3 class="fw-bold text-dark mb-0 fs-5">Hola, Closer.</h3>
+                <h3 class="fw-bold text-dark mb-0 fs-5">Bienvenida, Closer.</h3>
                 <p class="text-muted small mb-3">Ingresa tu credencial de acceso</p>
-
                 <div class="mb-3">
                     <label for="txtPassword" class="d-block text-center text-uppercase fw-bold mb-1" style="color: #94a3b8; font-size: 0.7rem; letter-spacing: 1px;">Contraseña Maestra</label>
                     <input type="password" id="txtPassword" class="form-control login-input text-center fw-bold fs-5 shadow-sm" placeholder="••••••••" style="height: 50px; color: var(--text-main);">
                 </div>
-                
                 <button onclick="login()" class="btn btn-gradient w-100 py-2 rounded-pill fw-bold shadow d-flex align-items-center justify-content-center gap-2" style="font-size: 0.95rem; letter-spacing: 1px; transition: transform 0.2s ease, box-shadow 0.2s ease;">
                     ENTRAR <i class="bi bi-arrow-right-circle-fill fs-5"></i>
                 </button>
-                
                 <div id="loginError" class="d-none mt-2">
                     <p class="text-danger fw-bold bg-danger-subtle p-2 rounded small mb-0 border border-danger-subtle d-flex align-items-center justify-content-center gap-1">
                         <i class="bi bi-exclamation-triangle-fill"></i> Credencial incorrecta
                     </p>
                 </div>
             </div>
-            
             <div class="mt-3 text-center" style="opacity: 0.6;">
                 <small class="text-white fw-bold" style="letter-spacing: 1px; font-size: 0.65rem;">
                     &copy; 2026 <a href="https://tanyateclab.com" target="_blank" rel="noopener noreferrer" class="text-white text-decoration-none">TANYATEC LAB</a>. ALL RIGHTS RESERVED.
                 </small>
             </div>
-            
         </div>
     </div>
     <div id="appContent" class="container py-4 d-none">
         
-        <div class="d-flex justify-content-between align-items-center align-items-md-start mb-4 mt-2">
-            <div class="d-flex align-items-center align-items-md-start">
+        <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
+            
+            <div class="d-flex align-items-center">
                 <i class="bi bi-rocket-takeoff-fill text-info me-2 me-md-3" style="font-size: 1.9rem; line-height: 1;"></i>
                 <div>
                     <h1 class="fw-bold text-white mb-0" style="line-height: 1.1; font-size: 1.6rem;">Paycheck Hunter</h1>
                     <p class="text-white-50 mb-0 mt-1" style="font-size: 0.85rem; letter-spacing: 0.5px;">Gestión de Comisiones</p>
                 </div>
             </div>
-            <div class="d-flex flex-column align-items-end gap-2">
-                <img src="img/TanyaTec-Lab-removebg.png" alt="TanyaTec" style="height: 50px;" class="d-none d-md-block">
+            
+            <div class="d-flex flex-column align-items-end justify-content-center gap-2">
+                
+                <a href="https://tanyateclab.com" target="_blank" rel="noopener noreferrer" class="d-none d-md-block text-decoration-none" title="Visitar TanyaTec Lab">
+                    <img src="img/TanyaTec-Lab-removebg.png" alt="TanyaTec Lab" style="height: 75px; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.3)); transition: transform 0.2s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                </a>
+                
                 <button onclick="cerrarSesion()" class="btn btn-outline-light rounded-pill px-3 px-md-4 py-1 shadow-sm d-flex align-items-center" title="Salir">
                     <i class="bi bi-power fs-5" style="transform: scale(1.1);"></i>
                     <span class="d-none d-md-inline ms-2 fw-bold">Salir</span>
@@ -172,7 +164,20 @@
                                 <div class="col-md-5 col-12">
                                     <div class="d-flex gap-3 flex-wrap align-items-start mt-2 mt-md-4">
                                         <div class="flex-grow-1"><div class="form-check bg-white border p-2 rounded"><input class="form-check-input" type="checkbox" id="chkLiner" onchange="toggleLiner()"><label class="form-check-label fw-bold text-dark small">Liner (-3.5%)</label></div><input type="text" class="form-control form-control-sm mt-1 d-none" id="txtLinerName" placeholder="Nombre Liner"></div>
-                                        <div class="flex-grow-1"><div class="form-check bg-white border p-2 rounded"><input class="form-check-input" type="checkbox" id="chkCasado" onchange="toggleCasado()"><label class="form-check-label fw-bold text-dark small">Casado (/2)</label></div><input type="text" class="form-control form-control-sm mt-1 d-none" id="txtCasadoName" placeholder="Nombre Casado"></div>
+                                        <div class="flex-grow-1">
+                                            <div class="form-check bg-white border p-2 rounded">
+                                                <input class="form-check-input" type="checkbox" id="chkCasado" onchange="toggleCasado()">
+                                                <label class="form-check-label fw-bold text-dark small">Casado</label>
+                                            </div>
+                                            <div id="divCasadoOptions" class="d-none mt-2 p-2 bg-white border rounded shadow-sm">
+                                                <input type="text" class="form-control form-control-sm mb-2" id="txtCasadoName" placeholder="Nombre Casado">
+                                                <select class="form-select form-select-sm border-secondary text-dark fw-bold" id="cmbTipoCasado" onchange="calcularMatematica()">
+                                                    <option value="Comisión">1. Sólo Comisión</option>
+                                                    <option value="Volumen">2. Sólo Volumen</option>
+                                                    <option value="Ambas">3. Ambas (Comisión + Volumen)</option>
+                                                </select>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -245,10 +250,10 @@
         <div class="row mb-4">
             <div class="col-12">
                 <div class="card p-3 p-md-4 border border-success-subtle shadow-lg" style="background: #ffffff; border-radius: 24px; color: #0f172a;">
-                    <div class="row align-items-center">
-                        <div class="col-md-7 mb-4 mb-md-0 border-md-end border-light-subtle">
-                            <label class="small fw-bold text-muted text-uppercase mb-2"><i class="bi bi-graph-up-arrow me-1"></i>Reporte Financiero por Fechas</label>
-                            <div class="d-flex gap-2 flex-wrap flex-md-nowrap align-items-center">
+                    <div class="row align-items-stretch">
+                        <div class="col-md-7 mb-4 mb-md-0 border-md-end border-light-subtle d-md-flex flex-md-column py-md-2">
+                            <h6 class="fw-bold mb-3 mb-md-0 text-dark text-uppercase"><i class="bi bi-graph-up-arrow me-2 text-primary"></i>Reporte Financiero</h6>
+                            <div class="d-flex gap-2 flex-wrap flex-md-nowrap align-items-center my-md-auto py-md-3">
                                 <input type="date" class="form-control form-control-sm" id="filtroInicio">
                                 <input type="date" class="form-control form-control-sm" id="filtroFin">
                                 <div class="d-flex gap-2 w-100 w-md-auto">
@@ -256,19 +261,33 @@
                                     <button class="btn btn-sm btn-outline-secondary px-3" onclick="limpiarFiltro()">Limpiar</button>
                                 </div>
                             </div>
-                            <div class="mt-3 text-center text-md-start">
+                            <div class="mt-3 mt-md-0 text-center text-md-start">
                                 <span class="badge bg-light text-dark border px-3 py-2" id="lblRangoFechas">Selecciona fechas</span>
                             </div>
                         </div>
-                        <div class="col-md-5 text-center text-md-end ps-md-4">
-                            <h6 class="text-uppercase text-muted fw-bold small mb-1" style="letter-spacing: 1px;">Comisión Total</h6>
-                            <h2 class="display-5 fw-bold text-success mb-0" id="lblTotalCobrar">$0.00</h2>
+                        
+                        <div class="col-md-5 text-center text-md-end ps-md-4 d-md-flex flex-md-column justify-content-md-center">
+                            <div class="d-flex flex-column gap-2 align-items-center align-items-md-end">
+                                <div>
+                                    <h6 class="text-uppercase text-muted fw-bold small mb-0" style="letter-spacing: 1px;">Volumen Total</h6>
+                                    <h3 class="fw-bold text-info mb-0" id="lblTotalVolumen">$0.00</h3>
+                                </div>
+                                <div class="border-top pt-2 w-100 d-md-none"></div>
+                                <div>
+                                    <h6 class="text-uppercase text-muted fw-bold small mb-0 mt-1" style="letter-spacing: 1px;">Comisión Total</h6>
+                                    <h2 class="fw-bold text-success mb-0" id="lblTotalCobrar">$0.00</h2>
+                                </div>
+                                <div class="border-top pt-2 w-100 d-md-none"></div>
+                                <div>
+                                    <h6 class="text-uppercase text-muted fw-bold small mb-0 mt-1" style="letter-spacing: 1px;">Bono Explore</h6>
+                                    <h4 class="fw-bold text-primary mb-0" id="lblTotalExplore">$0.00</h4>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
         <div class="row">
             <div class="col-12">
                 <div class="card card-custom p-3 p-md-4">
