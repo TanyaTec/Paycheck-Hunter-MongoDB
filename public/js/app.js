@@ -16,21 +16,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const tokenGuardado = localStorage.getItem('paycheckToken');
     const nombreGuardado = localStorage.getItem('paycheckUserName');
 
+    // Si ya hay sesión, entramos directo sin esperar a Google
     if (tokenGuardado && nombreGuardado) {
         currentUserNombre = nombreGuardado;
         mostrarDashboard();
-    } else {
-        // Inicializar el botón de Google (AQUÍ DEBES PEGAR TU CLIENT ID)
-        google.accounts.id.initialize({
-            client_id: "45355639696-ed54unj8jme9cfdehcu9o1mu700occc2.apps.googleusercontent.com", 
-            callback: handleCredentialResponse
-        });
-        google.accounts.id.renderButton(
-            document.getElementById("buttonDiv"),
-            { theme: "outline", size: "large", shape: "pill", width: 280 }
-        );
     }
 });
+
+// CIRUGÍA: Esta función es llamada por Google SOLO cuando ya terminó de descargar en el celular
+function iniciarGoogle() {
+    const tokenGuardado = localStorage.getItem('paycheckToken');
+    if (tokenGuardado) return; // Si ya entró, no dibujamos el botón
+
+    google.accounts.id.initialize({
+        client_id: "TU_CLIENT_ID_AQUI_PEGALO.apps.googleusercontent.com", 
+        callback: handleCredentialResponse
+    });
+    
+    google.accounts.id.renderButton(
+        document.getElementById("buttonDiv"),
+        { theme: "outline", size: "large", shape: "pill", width: 280 }
+    );
+}
 
 // Función que se ejecuta cuando el usuario se loguea exitosamente en Google
 function handleCredentialResponse(response) {
