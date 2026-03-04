@@ -8,36 +8,21 @@ let filteredData = [];
 let currentPage = 1;
 const itemsPerPage = 10;
 
-// CIRUGÍA: Variables dinámicas del usuario autenticado
+// Variables dinámicas del usuario autenticado
 let currentUserNombre = "";
 
 // --- INICIALIZACIÓN Y GOOGLE AUTH ---
+// CIRUGÍA: Eliminamos el renderizado por JS, el HTML ahora hace todo el trabajo para que no falle en iOS
 document.addEventListener('DOMContentLoaded', () => {
     const tokenGuardado = localStorage.getItem('paycheckToken');
     const nombreGuardado = localStorage.getItem('paycheckUserName');
 
-    // Si ya hay sesión, entramos directo sin esperar a Google
+    // Si ya hay sesión, entramos directo
     if (tokenGuardado && nombreGuardado) {
         currentUserNombre = nombreGuardado;
         mostrarDashboard();
     }
 });
-
-// CIRUGÍA: Esta función es llamada por Google SOLO cuando ya terminó de descargar en el celular
-function iniciarGoogle() {
-    const tokenGuardado = localStorage.getItem('paycheckToken');
-    if (tokenGuardado) return; // Si ya entró, no dibujamos el botón
-
-    google.accounts.id.initialize({
-        client_id: "TU_CLIENT_ID_AQUI_PEGALO.apps.googleusercontent.com", 
-        callback: handleCredentialResponse
-    });
-    
-    google.accounts.id.renderButton(
-        document.getElementById("buttonDiv"),
-        { theme: "outline", size: "large", shape: "pill", width: 280 }
-    );
-}
 
 // Función que se ejecuta cuando el usuario se loguea exitosamente en Google
 function handleCredentialResponse(response) {
@@ -49,7 +34,7 @@ function handleCredentialResponse(response) {
         const decodedJson = atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/'));
         const payload = JSON.parse(decodedJson);
         
-        // Guardamos su primer nombre (ej. "Oscar", "Tanya")
+        // Guardamos su primer nombre
         currentUserNombre = (payload.given_name || payload.name || "").toLowerCase();
         
         localStorage.setItem('paycheckToken', token);
@@ -168,7 +153,6 @@ function calcularMiVolumen(item) {
     let esCasado = parseInt(item.es_casado) === 1;
     let tipoCasado = item.tipo_casado || 'Comisión'; 
     
-    // CIRUGÍA: Ya no está hardcodeado a "Tanya". Toma el nombre del usuario de Google.
     let nombreUsuario = currentUserNombre; 
     let listaVendedores = (item.vendedores || "").toLowerCase();
     let nombreLiner = (item.nombre_liner || "").toLowerCase();
@@ -299,7 +283,7 @@ function calcularMaquila() {
     if (isPack) {
         const pack = document.getElementById('maqPack').value;
         if (pack === 'Full') importeBase = 150.88;
-        else if (pack === '1/2') importeBase = 150.88 / 2; // 75.44
+        else if (pack === '1/2') importeBase = 150.88 / 2; 
     } else {
         const vol = parseFloat(document.getElementById('maqVolumen').value) || 0;
         const pct = parseFloat(document.getElementById('maqPorcentaje').value) || 0;
