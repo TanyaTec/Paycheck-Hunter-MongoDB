@@ -1,6 +1,5 @@
 // --- CONFIGURACIÓN GLOBAL ---
 const BASE_URL = '';
-const SECRET_TOKEN = "Ytbaf1lgbt"; 
 let currentMode = 'ventas'; 
 let editId = null;
 
@@ -9,28 +8,49 @@ let filteredData = [];
 let currentPage = 1;
 const itemsPerPage = 10;
 
-// --- INICIALIZACIÓN SEGURA ---
+// CIRUGÍA: Variables dinámicas del usuario autenticado
+let currentUserNombre = "";
+
+// --- INICIALIZACIÓN Y GOOGLE AUTH ---
 document.addEventListener('DOMContentLoaded', () => {
     const tokenGuardado = localStorage.getItem('paycheckToken');
-    if (tokenGuardado === SECRET_TOKEN) {
-        mostrarDashboard();
-    }
+    const nombreGuardado = localStorage.getItem('paycheckUserName');
 
-    const passInput = document.getElementById('txtPassword');
-    if (passInput) {
-        passInput.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') login();
+    if (tokenGuardado && nombreGuardado) {
+        currentUserNombre = nombreGuardado;
+        mostrarDashboard();
+    } else {
+        // Inicializar el botón de Google (AQUÍ DEBES PEGAR TU CLIENT ID)
+        google.accounts.id.initialize({
+            client_id: "45355639696-ed54unj8jme9cfdehcu9o1mu700occc2.apps.googleusercontent.com", 
+            callback: handleCredentialResponse
         });
+        google.accounts.id.renderButton(
+            document.getElementById("buttonDiv"),
+            { theme: "outline", size: "large", shape: "pill", width: 280 }
+        );
     }
 });
 
-// --- FUNCIÓN LOGIN ---
-function login() {
-    const pass = document.getElementById('txtPassword').value;
-    if (pass === "Ytbaf1lgbt") {
-        localStorage.setItem('paycheckToken', SECRET_TOKEN);
+// Función que se ejecuta cuando el usuario se loguea exitosamente en Google
+function handleCredentialResponse(response) {
+    const token = response.credential;
+    
+    // Decodificamos el pase de Google para leer el nombre del usuario
+    try {
+        const payloadBase64 = token.split('.')[1];
+        const decodedJson = atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/'));
+        const payload = JSON.parse(decodedJson);
+        
+        // Guardamos su primer nombre (ej. "Oscar", "Tanya")
+        currentUserNombre = (payload.given_name || payload.name || "").toLowerCase();
+        
+        localStorage.setItem('paycheckToken', token);
+        localStorage.setItem('paycheckUserName', currentUserNombre);
+        
         mostrarDashboard();
-    } else {
+    } catch (e) {
+        console.error("Error decodificando token", e);
         const errorMsg = document.getElementById('loginError');
         if(errorMsg) errorMsg.classList.remove('d-none');
     }
@@ -48,6 +68,7 @@ function mostrarDashboard() {
 
 function cerrarSesion() {
     localStorage.removeItem('paycheckToken');
+    localStorage.removeItem('paycheckUserName');
     location.reload(); 
 }
 
@@ -140,7 +161,8 @@ function calcularMiVolumen(item) {
     let esCasado = parseInt(item.es_casado) === 1;
     let tipoCasado = item.tipo_casado || 'Comisión'; 
     
-    let nombreUsuario = (item.usuario || "Tanya").toLowerCase();
+    // CIRUGÍA: Ya no está hardcodeado a "Tanya". Toma el nombre del usuario de Google.
+    let nombreUsuario = currentUserNombre; 
     let listaVendedores = (item.vendedores || "").toLowerCase();
     let nombreLiner = (item.nombre_liner || "").toLowerCase();
     
@@ -338,9 +360,11 @@ function actualizarTableroFinanciero(inicio = null, fin = null) {
 // --- CARGA DE DATOS ---
 async function cargarDatosUnificados() {
     try {
-        const resVentas = await fetch(`${BASE_URL}/api/ventas`, { headers: { 'Authorization': SECRET_TOKEN } });
+        const resVentas = await fetch(`${BASE_URL}/api/ventas`, { headers: { 'Authorization': localStorage.getItem('paycheckToken') } });
+        if (resVentas.status === 403) { cerrarSesion(); return; }
         const jsonVentas = await resVentas.json();
-        const resMaquilas = await fetch(`${BASE_URL}/api/maquilas`, { headers: { 'Authorization': SECRET_TOKEN } });
+        
+        const resMaquilas = await fetch(`${BASE_URL}/api/maquilas`, { headers: { 'Authorization': localStorage.getItem('paycheckToken') } });
         const jsonMaquilas = await resMaquilas.json();
 
         const dataV = jsonVentas.data || [];
@@ -827,7 +851,6 @@ async function guardarVenta() {
         fecha: document.getElementById('txtFecha').value,
         promesa: valorFechaPromesa,
         promesa_pago: valorFechaPromesa,
-        usuario: "Tanya",
         tipo_socio: document.querySelector('input[name="tipoSocio"]:checked').value,
         pack_nivel: document.getElementById('cmbPack').value,
         deduccion_antilavado: document.getElementById('chkAntilavado').checked ? 1 : 0,
@@ -931,7 +954,7 @@ async function enviarDatos(url, method, data, mode) {
     try {
         const res = await fetch(BASE_URL + url, {
             method: method,
-            headers: { 'Content-Type': 'application/json', 'Authorization': SECRET_TOKEN },
+            headers: { 'Content-Type': 'application/json', 'Authorization': localStorage.getItem('paycheckToken') },
             body: JSON.stringify(data)
         });
         const result = await res.json();
@@ -965,7 +988,7 @@ function eliminarItem(type, id) {
             try {
                 const res = await fetch(`${BASE_URL}/api/${endpointType}/${id}`, {
                     method: 'DELETE',
-                    headers: { 'Authorization': SECRET_TOKEN }
+                    headers: { 'Authorization': localStorage.getItem('paycheckToken') }
                 });
                 
                 if (res.ok) {
@@ -1092,7 +1115,6 @@ function generarCardAlerta(alertaType, item, monto, tiempoText) {
     }
 }
 
-// CIRUGÍA: Botón FAILED marca como Caída, baja el pago a $0.00 y no borra NADA de la información
 async function resolverExplore(id, accion) {
     const item = allDataGlobal.find(x => String(x._id || x.id) === String(id) && x.type === 'venta');
     if(!item) return;
@@ -1118,7 +1140,7 @@ async function resolverExplore(id, accion) {
         
         const res = await fetch(`${BASE_URL}/api/ventas/${id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json', 'Authorization': SECRET_TOKEN },
+            headers: { 'Content-Type': 'application/json', 'Authorization': localStorage.getItem('paycheckToken') },
             body: JSON.stringify(payload)
         });
         const result = await res.json();
