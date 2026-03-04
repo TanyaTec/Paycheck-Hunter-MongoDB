@@ -110,7 +110,59 @@ function toggleCasado() {
     }
 }
 
-// --- LÓGICA MATEMÁTICA ---
+function toggleTipoPagoMaquila() {
+    const isPack = document.getElementById('maqTipoPack').checked;
+    const packContainer = document.getElementById('maqPackContainer');
+    const pctContainer = document.getElementById('maqPorcentajeContainer');
+    
+    if(isPack) {
+        packContainer.classList.remove('d-none');
+        pctContainer.classList.add('d-none');
+    } else {
+        packContainer.classList.add('d-none');
+        pctContainer.classList.remove('d-none');
+    }
+    calcularMaquila();
+}
+
+// --- LÓGICA MATEMÁTICA PRINCIPAL ---
+
+function calcularMiVolumen(item) {
+    if (item.type !== 'venta') return 0;
+    
+    let monto = parseFloat(item.monto) || 0;
+    let numVend = parseInt(item.num_vendedores) || 1;
+    let liner = parseInt(item.es_liner) === 1 ? 1 : 0;
+    
+    let partesTotales = numVend + liner;
+    let volumenPorPersona = monto / partesTotales; 
+
+    let esCasado = parseInt(item.es_casado) === 1;
+    let tipoCasado = item.tipo_casado || 'Comisión'; 
+    
+    let nombreUsuario = (item.usuario || "Tanya").toLowerCase();
+    let listaVendedores = (item.vendedores || "").toLowerCase();
+    let nombreLiner = (item.nombre_liner || "").toLowerCase();
+    
+    let participeDirectamente = listaVendedores.includes(nombreUsuario) || nombreLiner.includes(nombreUsuario);
+    let miVolumen = 0;
+
+    if (participeDirectamente) {
+        miVolumen = volumenPorPersona;
+        if (esCasado && (tipoCasado === 'Volumen' || tipoCasado === 'Ambas')) {
+            miVolumen = miVolumen / 2;
+        }
+    } else {
+        if (esCasado && (tipoCasado === 'Volumen' || tipoCasado === 'Ambas')) {
+            miVolumen = volumenPorPersona / 2;
+        } else {
+            miVolumen = 0;
+        }
+    }
+    
+    return miVolumen;
+}
+
 function renderVendedoresInputs() {
     const cmb = document.getElementById('cmbNumVendedores');
     if(!cmb) return;
@@ -211,7 +263,34 @@ function calcularMatematica() {
     document.getElementById('txtPagoTotal').value = pagoNetoFinal.toFixed(2);
 }
 
-// --- KPI: CÁLCULOS EN FRONTEND (VOLUMEN, COMISIÓN Y EXPLORE) ---
+function calcularMaquila() {
+    const isPack = document.getElementById('maqTipoPack').checked;
+    let importeBase = 0;
+
+    if (isPack) {
+        const pack = document.getElementById('maqPack').value;
+        if (pack === 'Full') importeBase = 150.88;
+        else if (pack === '1/2') importeBase = 150.88 / 2; // 75.44
+    } else {
+        const vol = parseFloat(document.getElementById('maqVolumen').value) || 0;
+        const pct = parseFloat(document.getElementById('maqPorcentaje').value) || 0;
+        importeBase = vol * (pct / 100);
+    }
+
+    let deduccionReserva = 0;
+    if (document.getElementById('maqReserva').checked) {
+        deduccionReserva = importeBase * 0.10;
+    }
+
+    const impPct = parseFloat(document.getElementById('maqImpuestos').value) || 0;
+    let deduccionImpuestos = importeBase * (impPct / 100);
+
+    let pagoNeto = importeBase - deduccionReserva - deduccionImpuestos;
+    document.getElementById('maqPago').value = pagoNeto.toFixed(2);
+}
+
+
+// --- KPI: CÁLCULOS EN FRONTEND ---
 function actualizarTableroFinanciero(inicio = null, fin = null) {
     const lblTotal = document.getElementById('lblTotalCobrar');
     const lblVolumen = document.getElementById('lblTotalVolumen');
@@ -235,25 +314,13 @@ function actualizarTableroFinanciero(inicio = null, fin = null) {
             granTotalComision += (parseFloat(item.pago_total) || 0);
 
             if (item.type === 'venta') {
-                let monto = parseFloat(item.monto) || 0;
-                let numVend = parseInt(item.num_vendedores) || 1;
-                let liner = parseInt(item.es_liner) === 1 ? 1 : 0;
-                
-                let partesTotales = numVend + liner;
-                let miVolumen = monto / partesTotales;
-
-                let esCasado = parseInt(item.es_casado) === 1;
-                let tipoCasado = item.tipo_casado || 'Comisión'; 
-
-                if (esCasado && (tipoCasado === 'Volumen' || tipoCasado === 'Ambas')) {
-                    miVolumen = miVolumen / 2;
-                }
-                granTotalVolumen += miVolumen;
+                granTotalVolumen += calcularMiVolumen(item);
 
                 let esExplore = parseInt(item.es_explore_package) === 1;
                 let esExploreHoy = parseInt(item.explore_es_hoy) === 1;
 
                 if (esExplore && esExploreHoy) {
+                    let numVend = parseInt(item.num_vendedores) || 1;
                     let bonoNeto = 225 * 0.77; 
                     let miBonoExplore = bonoNeto / numVend; 
                     granTotalExplore += miBonoExplore;
@@ -262,9 +329,9 @@ function actualizarTableroFinanciero(inicio = null, fin = null) {
         }
     });
 
-    if (lblTotal) lblTotal.innerText = `$${granTotalComision.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-    if (lblVolumen) lblVolumen.innerText = `$${granTotalVolumen.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-    if (lblExplore) lblExplore.innerText = `$${granTotalExplore.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    if (lblTotal) lblTotal.innerText = `$${granTotalComision.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    if (lblVolumen) lblVolumen.innerText = `$${granTotalVolumen.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    if (lblExplore) lblExplore.innerText = `$${granTotalExplore.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
     if (lblRango) lblRango.innerText = `Del ${inicio} al ${fin}`;
 }
 
@@ -290,6 +357,7 @@ async function cargarDatosUnificados() {
         
         renderTable(); 
         actualizarTableroFinanciero();
+        verificarAlertas();
 
     } catch (error) { console.error("Error cargando datos:", error); }
 }
@@ -394,6 +462,14 @@ function renderTable() {
         let iconType = item.type === 'venta' ? '<span class="badge bg-primary me-2">T.C.</span>' : '<span class="badge bg-secondary me-2">Paper</span>';
         
         let exploreStar = (item.type === 'venta' && item.es_explore_package === 1) ? '<i class="bi bi-star-fill text-info ms-1" style="font-size: 0.85rem;" title="Explore Package"></i>' : '';
+        
+        let miVolumenDisplay = item.type === 'venta' ? calcularMiVolumen(item) : 0;
+        let miVolFormatted = miVolumenDisplay.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        let pagoTotalFormatted = (parseFloat(item.pago_total) || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+        let esPorcentaje = item.tipo_pago === 'porcentaje' || (parseFloat(item.maq_volumen) > 0);
+        let volMaquilaFormatted = (parseFloat(item.maq_volumen) || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
         if (item.type === 'venta') {
             const tipoSocioDisplay = item.tipo_socio ? item.tipo_socio : 'N/A';
             detalleHTML = `
@@ -401,17 +477,17 @@ function renderTable() {
                 <div class="small text-muted">${item.nacionalidad || ''} | ${tipoSocioDisplay}</div> 
             `;
             montosCombinadosPC = `
-                <div class="fw-bold text-success">$${(item.monto || 0).toLocaleString()} <span class="small text-muted fw-normal">Venta</span></div>
-                <div class="fw-bold text-primary mt-1 pt-1 border-top" style="font-size:0.95rem">$${(item.pago_total || 0).toLocaleString()} <span class="small text-muted fw-normal">Neto</span></div>
+                <div class="fw-bold text-success" title="Total del Contrato: $${(item.monto || 0).toLocaleString()}">$${miVolFormatted} <span class="small text-muted fw-normal">Mi Vol.</span></div>
+                <div class="fw-bold text-primary mt-1 pt-1 border-top" style="font-size:0.95rem">$${pagoTotalFormatted} <span class="small text-muted fw-normal">Neto</span></div>
             `;
         } else {
             detalleHTML = `
                 <div>${iconType} <span class="fw-bold text-dark">${item.nombre_socio || '--'}</span></div>
-                <div class="small text-muted">Pack: ${item.pack_nivel || '--'}</div>
+                <div class="small text-muted">${esPorcentaje ? (item.maq_porcentaje || 0) + '% del Vol' : 'Pack: ' + (item.pack_nivel || 'None')}</div>
             `;
             montosCombinadosPC = `
-                <div class="text-muted small">--</div>
-                <div class="fw-bold text-success mt-1 pt-1 border-top">$${(item.pago_total || 0).toLocaleString()} <span class="small text-muted fw-normal">Total</span></div>
+                <div class="fw-bold text-info" style="font-size:0.85rem">${esPorcentaje ? '$' + volMaquilaFormatted + ' <span class="small text-muted fw-normal">Vol.</span>' : '<span class="text-muted small">--</span>'}</div>
+                <div class="fw-bold text-success mt-1 pt-1 border-top">$${pagoTotalFormatted} <span class="small text-muted fw-normal">Total</span></div>
             `;
         }
 
@@ -419,8 +495,11 @@ function renderTable() {
             <div class="d-md-none d-flex flex-column align-items-end justify-content-center">
                 ${item.status !== 'Cerrada' ? `<span class="badge ${badgeColor} mb-1" style="font-size:0.65rem;">${item.status}</span>` : ''}
                 
-                ${item.type === 'venta' ? `<span class="fw-bold text-info" style="font-size: 0.85rem;" title="Volumen de Venta">Vol: $${(item.monto || 0).toLocaleString()}</span>` : ''}
-                <span class="fw-bold text-success" style="font-size: 1.25rem;" title="Comisión / Pago Neto">$${(item.pago_total || 0).toLocaleString()}</span>
+                ${item.type === 'venta' 
+                    ? `<span class="fw-bold text-info" style="font-size: 0.85rem;" title="Total Contrato: $${(item.monto || 0).toLocaleString()}">Mi Vol: $${miVolFormatted}</span>` 
+                    : (esPorcentaje ? `<span class="fw-bold text-info" style="font-size: 0.85rem;">Vol: $${volMaquilaFormatted}</span>` : '')
+                }
+                <span class="fw-bold text-success" style="font-size: 1.25rem;" title="Comisión / Pago Neto">$${pagoTotalFormatted}</span>
                 
                 <div class="btn-group mt-2">
                     <button onclick="verDetalle('${item.type}', '${itemId}')" class="btn btn-outline-dark py-1 px-3 shadow-sm"><i class="bi bi-eye-fill"></i></button>
@@ -433,7 +512,6 @@ function renderTable() {
             </div>
         `;
 
-       // CIRUGÍA: Nacionalidad inyectada SOLO en la vista móvil (d-md-none) debajo del contrato
        const fila = `
             <tr>
                 <td class="align-middle">
@@ -466,7 +544,7 @@ function verDetalle(type, id) {
     const modalBody = document.getElementById('modalCuerpo');
     modalTitle.innerHTML = `<i class="bi bi-file-earmark-text me-2"></i>Ficha Técnica: #${item.contrato}`;
 
-    const fm = (val) => val ? `$${val.toLocaleString()}` : '$0';
+    const fm = (val) => val ? `$${parseFloat(val).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : '$0.00';
     const badgeStatus = item.status === 'Cerrada' ? 'bg-success' : (item.status === 'Caída' || item.status === 'Cancelada' ? 'bg-danger' : 'bg-warning text-dark');
 
     let statusBlock = `<span class="badge ${badgeStatus} fs-6 mb-1">${item.status}</span>`;
@@ -478,10 +556,13 @@ function verDetalle(type, id) {
     if (type === 'venta') { 
         let exploreIndicator = '<span class="text-muted small">No incluye Explore Package</span>';
         if (item.es_explore_package === 1) {
-            let textoFecha = (item.explore_es_hoy === 1) ? 'HOY' : (item.promesa_pago || '');
+            const fechaVal = item.promesa_pago || item.promesa || '';
+            let textoFecha = (item.explore_es_hoy === 1) ? 'HOY' : fechaVal;
             exploreIndicator = `<div class="alert alert-info py-1 px-2 mb-0 small fw-bold"><i class="bi bi-star-fill me-1"></i>EXPLORE: ${textoFecha}</div>`;
         }
         const reservaTxt = (item.es_reserva === 1) ? '10%' : 'No';
+        
+        let miVolumen = calcularMiVolumen(item);
 
         html = `
             <div class="container-fluid px-0">
@@ -496,7 +577,11 @@ function verDetalle(type, id) {
                 <h6 class="text-primary fw-bold text-uppercase small mb-2 mt-4">Resumen Financiero</h6>
                 <div class="detail-card p-3 mb-3" style="background-color: #f0fdf4; border-color: #bbf7d0;">
                      <div class="row text-center">
-                        <div class="col-4 border-end border-success-subtle"><small class="d-block text-success fw-bold text-uppercase">Monto Venta</small><span class="fs-4 fw-bold text-dark">${fm(item.monto)}</span></div>
+                        <div class="col-4 border-end border-success-subtle">
+                            <small class="d-block text-success fw-bold text-uppercase">Mi Volumen</small>
+                            <span class="fs-4 fw-bold text-dark">${fm(miVolumen)}</span>
+                            <div class="small text-muted mt-1" style="font-size: 0.75rem; line-height: 1;">Total: ${fm(item.monto)}</div>
+                        </div>
                         <div class="col-4 border-end border-success-subtle"><small class="d-block text-success fw-bold text-uppercase">Pago Neto</small><span class="fs-4 fw-bold text-dark">${fm(item.pago_total)}</span></div>
                         <div class="col-4"><small class="d-block text-muted text-uppercase fw-bold">Métodos</small><div class="mt-1">${item.amex ? '<span class="badge bg-primary">AMEX</span>' : ''} ${item.msi_6 ? '<span class="badge bg-info text-dark">6MSI</span>' : ''}</div></div>
                      </div>
@@ -518,12 +603,57 @@ function verDetalle(type, id) {
             </div>
         `;
     } else { 
+        let calcInfo = '';
+        let esPorcentaje = item.tipo_pago === 'porcentaje' || (parseFloat(item.maq_volumen) > 0);
+        
+        if (esPorcentaje) {
+            calcInfo = `<span class="badge bg-info text-dark mb-1">Porcentaje</span><br>Base: ${item.maq_porcentaje || 0}% de $${(parseFloat(item.maq_volumen) || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        } else {
+            calcInfo = `<span class="badge bg-primary mb-1">Pack</span><br>Nivel: ${item.pack_nivel || 'None'}`;
+        }
+
         html = `
             <div class="container-fluid px-0">
-                <div class="row mb-3 border-bottom pb-3"><div class="col-6"><small class="text-muted d-block text-uppercase fw-bold">Fecha</small><span class="fs-5 fw-bold text-dark">${item.fecha}</span></div><div class="col-6 text-end">${statusBlock}</div></div>
-                <div class="row mb-3"><div class="col-12"><h6 class="text-primary fw-bold text-uppercase small mb-2">Datos del Socio</h6><div class="detail-card p-3"><div class="fs-5 fw-bold mb-1">${item.nombre_socio}</div><div class="text-muted">Contrato: <strong>${item.contrato}</strong></div></div></div></div>
-                <div class="row mb-3"><div class="col-6"><div class="p-3 border rounded bg-light"><small class="d-block text-muted">Pack Nivel</small><strong>${item.pack_nivel}</strong></div></div><div class="col-6"><div class="p-3 border rounded bg-success-subtle"><small class="d-block text-success">Pago Total</small><strong class="fs-5 text-success">${fm(item.pago_total)}</strong></div></div></div>
-                <div class="row"><div class="col-12"><small class="text-muted">Vendedores:</small> <span class="fw-bold">${item.vendedores || '--'}</span></div></div>
+                <div class="row mb-3 border-bottom pb-3 align-items-center">
+                    <div class="col-6"><small class="text-muted d-block text-uppercase fw-bold">Fecha de Ingreso</small><span class="fs-5 fw-bold text-dark">${item.fecha}</span></div>
+                    <div class="col-6 text-end">${statusBlock}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <h6 class="text-primary fw-bold text-uppercase small mb-2">Datos del Socio</h6>
+                        <div class="detail-card p-3 shadow-sm border border-secondary-subtle">
+                            <div class="fs-5 fw-bold mb-1">${item.nombre_socio}</div>
+                            <div class="text-muted">Contrato: <strong>${item.contrato}</strong></div>
+                        </div>
+                    </div>
+                </div>
+                <h6 class="text-primary fw-bold text-uppercase small mb-2 mt-4">Análisis de Pago</h6>
+                <div class="row mb-3 g-2">
+                    <div class="col-md-6 mb-2">
+                        <div class="p-3 border rounded bg-light h-100 shadow-sm">
+                            <small class="d-block text-muted text-uppercase fw-bold mb-1">Cálculo Base</small>
+                            <strong>${calcInfo}</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <div class="p-3 border border-success-subtle rounded bg-success-subtle h-100 shadow-sm text-center">
+                            <small class="d-block text-success text-uppercase fw-bold mb-1">Pago Neto</small>
+                            <strong class="fs-3 text-success">${fm(item.pago_total)}</strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <small class="text-muted fw-bold text-uppercase d-block mb-2">Deducciones Aplicadas</small>
+                        <div class="d-flex gap-3">
+                            <span class="badge ${item.maq_reserva === 1 ? 'bg-dark' : 'bg-light text-muted border'} px-3 py-2">Fondo Reserva (10%)</span>
+                            <span class="badge ${(item.maq_impuestos || 0) > 0 ? 'bg-danger' : 'bg-light text-muted border'} px-3 py-2">Impuestos: ${item.maq_impuestos || 0}%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-4 border-top pt-3">
+                    <div class="col-12"><small class="text-muted fw-bold text-uppercase">Vendedores Involucrados:</small> <span class="fw-bold text-dark d-block mt-1">${item.vendedores || 'No especificados'}</span></div>
+                </div>
             </div>
         `;
     }
@@ -589,7 +719,10 @@ function iniciarEdicion(type, id) {
 
         const chkExploreHoy = document.getElementById('chkExploreHoy');
         chkExploreHoy.checked = (item.explore_es_hoy === 1);
-        if(item.explore_es_hoy !== 1) document.getElementById('txtFechaPromesa').value = item.promesa_pago || '';
+        
+        if(item.explore_es_hoy !== 1) {
+            document.getElementById('txtFechaPromesa').value = item.promesa_pago || item.promesa || '';
+        }
         toggleExploreHoy();
 
         document.getElementById('chkReserva').checked = (item.es_reserva === 1); 
@@ -605,7 +738,8 @@ function iniciarEdicion(type, id) {
 
         document.getElementById('btnGuardarVenta').innerHTML = '<i class="bi bi-pencil-square fs-5"></i><span>ACTUALIZAR DATOS</span>';
         document.getElementById('btnCancelarEditVenta').classList.remove('d-none');
-        window.scrollTo(0,0); 
+        document.getElementById('frmVenta').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
         calcularMatematica(); 
 
     } else {
@@ -614,15 +748,29 @@ function iniciarEdicion(type, id) {
         document.getElementById('maqSocio').value = item.nombre_socio;
         document.getElementById('maqVendedores').value = item.vendedores;
         document.getElementById('maqStatus').value = item.status;
-        document.getElementById('maqPack').value = item.pack_nivel;
-        document.getElementById('maqPago').value = item.pago_total;
+        document.getElementById('maqPack').value = item.pack_nivel || 'None';
         
+        let esPorcentaje = item.tipo_pago === 'porcentaje' || (parseFloat(item.maq_volumen) > 0);
+        if(esPorcentaje) {
+            document.getElementById('maqTipoPorcentaje').checked = true;
+        } else {
+            document.getElementById('maqTipoPack').checked = true;
+        }
+        toggleTipoPagoMaquila();
+
+        document.getElementById('maqVolumen').value = item.maq_volumen || '';
+        document.getElementById('maqPorcentaje').value = item.maq_porcentaje || '';
+        document.getElementById('maqReserva').checked = (item.maq_reserva === 1);
+        document.getElementById('maqImpuestos').value = item.maq_impuestos || '';
+
         document.getElementById('txtFechaPendienteMaq').value = item.fecha_pendiente || '';
         togglePendiente('maquila');
+        
+        calcularMaquila(); 
 
         document.getElementById('btnGuardarMaquila').innerHTML = '<i class="bi bi-pencil-square fs-5"></i><span>ACTUALIZAR DATOS</span>';
         document.getElementById('btnCancelarEditMaquila').classList.remove('d-none');
-        window.scrollTo(0,0);
+        document.getElementById('frmMaquila').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 }
 
@@ -651,6 +799,8 @@ function cancelarEdicion(mode) {
         document.getElementById('maqFecha').valueAsDate = new Date();
         document.getElementById('btnGuardarMaquila').innerHTML = '<i class="bi bi-floppy-fill fs-5"></i><span>GUARDAR PAPERWORK</span>';
         document.getElementById('btnCancelarEditMaquila').classList.add('d-none');
+        document.getElementById('maqTipoPack').checked = true;
+        toggleTipoPagoMaquila();
         togglePendiente('maquila');
     }
 }
@@ -667,13 +817,16 @@ async function guardarVenta() {
     }
     const vendedoresStr = nombresVendedores.join(', ');
 
+    const valorFechaPromesa = document.getElementById('chkExploreHoy').checked ? '' : document.getElementById('txtFechaPromesa').value;
+
     const payload = {
         cliente: document.getElementById('txtCliente').value,
         contrato: document.getElementById('txtContrato').value,
-        monto: parseFloat(document.getElementById('txtMonto').value),
+        monto: parseFloat(document.getElementById('txtMonto').value) || 0,
         status: document.getElementById('cmbStatus').value,
         fecha: document.getElementById('txtFecha').value,
-        promesa: document.getElementById('chkExploreHoy').checked ? '' : document.getElementById('txtFechaPromesa').value,
+        promesa: valorFechaPromesa,
+        promesa_pago: valorFechaPromesa,
         usuario: "Tanya",
         tipo_socio: document.querySelector('input[name="tipoSocio"]:checked').value,
         pack_nivel: document.getElementById('cmbPack').value,
@@ -703,7 +856,23 @@ async function guardarVenta() {
         fecha_pendiente: document.getElementById('txtFechaPendienteVenta').value
     };
 
-    if (!payload.cliente || !payload.monto) { Swal.fire('Atención', 'Falta el nombre del Cliente o el Monto.', 'warning'); return; }
+    const oldItem = editId ? allDataGlobal.find(x => String(x._id || x.id) === String(editId) && x.type === 'venta') : null;
+
+    if (payload.status === 'Caída' || payload.status === 'Cancelada') {
+        payload.pago_total = 0; 
+        if (!payload.monto && oldItem) {
+            payload.monto = oldItem.monto;
+        }
+    } else if (!payload.monto) {
+        Swal.fire('Atención', 'Falta ingresar el Monto de la venta.', 'warning'); 
+        return;
+    }
+
+    if (!payload.cliente) { 
+        Swal.fire('Atención', 'Falta el nombre del Cliente.', 'warning'); 
+        return; 
+    }
+
     await enviarDatos(endpoint, method, payload, 'ventas');
 }
 
@@ -719,10 +888,42 @@ async function guardarMaquila() {
         status: document.getElementById('maqStatus').value,
         pack_nivel: document.getElementById('maqPack').value,
         pago_total: parseFloat(document.getElementById('maqPago').value) || 0,
-        fecha_pendiente: document.getElementById('txtFechaPendienteMaq').value
+        fecha_pendiente: document.getElementById('txtFechaPendienteMaq').value,
+        
+        tipo_pago: document.getElementById('maqTipoPack').checked ? 'pack' : 'porcentaje',
+        maq_volumen: parseFloat(document.getElementById('maqVolumen').value) || 0,
+        maq_porcentaje: parseFloat(document.getElementById('maqPorcentaje').value) || 0,
+        maq_reserva: document.getElementById('maqReserva').checked ? 1 : 0,
+        maq_impuestos: parseFloat(document.getElementById('maqImpuestos').value) || 0
     };
 
-    if (!payload.nombre_socio || !payload.pago_total) { Swal.fire('Atención', 'Falta el Nombre del Socio o el Pago Total.', 'warning'); return; }
+    const oldItem = editId ? allDataGlobal.find(x => String(x._id || x.id) === String(editId) && x.type === 'maquila') : null;
+
+    if (payload.status === 'Cancelada') {
+        payload.pago_total = 0; 
+        
+        if (oldItem) {
+            let esViejoPorcentaje = payload.tipo_pago === 'porcentaje' || oldItem.tipo_pago === 'porcentaje' || parseFloat(oldItem.maq_volumen) > 0;
+            
+            if (esViejoPorcentaje) {
+                payload.tipo_pago = 'porcentaje';
+                payload.maq_volumen = payload.maq_volumen || oldItem.maq_volumen || 0;
+                payload.maq_porcentaje = payload.maq_porcentaje || oldItem.maq_porcentaje || 0;
+            } else {
+                payload.tipo_pago = 'pack';
+                payload.pack_nivel = (payload.pack_nivel && payload.pack_nivel !== 'None') ? payload.pack_nivel : (oldItem.pack_nivel || 'None');
+            }
+        }
+    } else if (!payload.pago_total) {
+        Swal.fire('Atención', 'Revisa los montos y cálculos. El pago no puede quedar vacío.', 'warning'); 
+        return;
+    }
+
+    if (!payload.nombre_socio) { 
+        Swal.fire('Atención', 'Falta el Nombre del Socio.', 'warning'); 
+        return; 
+    }
+
     await enviarDatos(endpoint, method, payload, 'maquila');
 }
 
@@ -779,4 +980,156 @@ function eliminarItem(type, id) {
             }
         }
     });
+}
+
+function verificarAlertas() {
+    const container = document.getElementById('alertasContainer');
+    const lista = document.getElementById('alertasLista');
+    if (!container || !lista) return;
+
+    let alertasHTML = '';
+    let totalEnElAire = 0;
+    let hayAlertas = false;
+
+    const hoy = new Date();
+    hoy.setHours(0,0,0,0);
+
+    filteredData.forEach(item => {
+        if (item.status === 'Pendiente' && item.fecha_pendiente) {
+            let [yyyy, mm, dd] = item.fecha_pendiente.split('-');
+            let fechaPend = new Date(yyyy, mm - 1, dd);
+            fechaPend.setHours(0,0,0,0);
+
+            let diffTime = hoy.getTime() - fechaPend.getTime();
+            let diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays >= 0 && diffDays % 7 === 0) {
+                hayAlertas = true;
+                let monto = parseFloat(item.pago_total) || 0;
+                totalEnElAire += monto;
+                alertasHTML += generarCardAlerta(item.type, item, monto, diffDays === 0 ? 'HOY' : `Hace ${diffDays} días`);
+            }
+        }
+
+        const fechaPromesaString = item.promesa_pago || item.promesa; 
+        
+        if (item.type === 'venta' && parseInt(item.es_explore_package) === 1 && parseInt(item.explore_es_hoy) === 0 && fechaPromesaString) {
+            let [yyyy, mm, dd] = fechaPromesaString.split('-');
+            let fechaPromesa = new Date(yyyy, mm - 1, dd);
+            fechaPromesa.setHours(0,0,0,0);
+
+            let diffTime = hoy.getTime() - fechaPromesa.getTime();
+            let diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays >= 0 && diffDays % 7 === 0) {
+                hayAlertas = true;
+                let numVend = parseInt(item.num_vendedores) || 1;
+                let bonoNeto = 225 * 0.77;
+                let miBono = bonoNeto / numVend;
+                totalEnElAire += miBono;
+                
+                let textoDias = diffDays === 0 ? 'HOY' : `Hace ${diffDays} días`;
+                alertasHTML += generarCardAlerta('explore', item, miBono, textoDias);
+            }
+        }
+    });
+
+    if (hayAlertas) {
+        let tituloAlerta = `<h5 class="fw-bold text-danger mb-3" style="letter-spacing: -0.5px;"><i class="bi bi-exclamation-triangle-fill me-2 fs-4"></i>Atención: Tienes $${totalEnElAire.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})} USD en el aire esperando a ser cobrados.</h5>`;
+
+        lista.innerHTML = `<div class="card p-3 p-md-4 border border-danger shadow-lg" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-radius: 24px;">
+                            ${tituloAlerta}
+                            <div class="d-flex flex-column gap-3">${alertasHTML}</div>
+                           </div>`;
+        container.classList.remove('d-none');
+    } else {
+        container.classList.add('d-none');
+        lista.innerHTML = '';
+    }
+}
+
+function generarCardAlerta(alertaType, item, monto, tiempoText) {
+    const fm = (val) => `$${val.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+    const id = item._id || item.id;
+
+    if (alertaType === 'venta' || alertaType === 'maquila') {
+        let isMaq = alertaType === 'maquila';
+        let badgeClass = isMaq ? 'bg-secondary' : 'bg-danger';
+        let badgeText = isMaq ? 'Paperwork Pendiente' : 'Venta Pendiente';
+        
+        return `
+            <div class="bg-white p-3 rounded-4 shadow-sm border ${isMaq ? 'border-secondary-subtle' : 'border-danger-subtle'} d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div>
+                    <span class="badge ${badgeClass} mb-1 text-uppercase" style="letter-spacing:1px;">${badgeText}</span>
+                    <h6 class="fw-bold text-dark mb-0 fs-5">${item.cliente_nombre || item.nombre_socio}</h6>
+                    <small class="text-danger fw-bold"><i class="bi bi-calendar-x me-1"></i>Vencimiento de Cierre: ${tiempoText}</small>
+                </div>
+                <div class="text-md-end d-flex flex-column align-items-md-end">
+                    <span class="fs-4 fw-bold text-success">${fm(monto)}</span>
+                    <button class="btn btn-sm btn-outline-dark mt-1 rounded-pill fw-bold shadow-sm px-3" onclick="iniciarEdicion('${alertaType}', '${id}')">
+                        <i class="bi bi-pencil-fill me-1"></i>Ir a Editar a Cerrada
+                    </button>
+                </div>
+            </div>
+        `;
+    } else if (alertaType === 'explore') {
+        return `
+            <div class="bg-white p-3 rounded-4 shadow-sm border border-warning d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div>
+                    <span class="badge bg-warning text-dark mb-1 text-uppercase" style="letter-spacing:1px;">Explore Package</span>
+                    <h6 class="fw-bold text-dark mb-0 fs-5">${item.cliente_nombre}</h6>
+                    <small class="text-warning-emphasis fw-bold"><i class="bi bi-calendar-check me-1"></i>Promesa: ${tiempoText}</small>
+                </div>
+                <div class="text-md-end d-flex flex-column align-items-md-end">
+                    <span class="fs-4 fw-bold text-primary">${fm(monto)}</span>
+                    <div class="btn-group mt-2 shadow-sm rounded-pill w-100">
+                        <button class="btn btn-sm btn-success fw-bold px-3 rounded-start-pill w-50" onclick="resolverExplore('${id}', 'pagado')"><i class="bi bi-check-circle-fill me-1"></i>Paid</button>
+                        <button class="btn btn-sm btn-dark fw-bold px-3 rounded-end-pill w-50" onclick="resolverExplore('${id}', 'caido')"><i class="bi bi-x-circle-fill me-1"></i>Failed</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+}
+
+// CIRUGÍA: Botón FAILED marca como Caída, baja el pago a $0.00 y no borra NADA de la información
+async function resolverExplore(id, accion) {
+    const item = allDataGlobal.find(x => String(x._id || x.id) === String(id) && x.type === 'venta');
+    if(!item) return;
+
+    let payload = { ...item };
+    
+    if (accion === 'pagado') {
+        payload.explore_es_hoy = 1; 
+        payload.promesa = ''; 
+        payload.promesa_pago = ''; 
+        if (payload.status === 'Pendiente') {
+            payload.status = 'Cerrada';
+        }
+    } else if (accion === 'caido') {
+        payload.status = 'Caída';
+        payload.pago_total = 0;
+        payload.promesa = '';
+        payload.promesa_pago = '';
+    }
+
+    try {
+        Swal.fire({ title: 'Procesando...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+        
+        const res = await fetch(`${BASE_URL}/api/ventas/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': SECRET_TOKEN },
+            body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+        
+        if (result.message) {
+            Swal.fire({ icon: 'success', title: accion === 'pagado' ? '¡Cobrado y Cerrado!' : 'Marcado como Caída', showConfirmButton: false, timer: 1500 });
+            cargarDatosUnificados(); 
+        } else { 
+            Swal.fire('Error', result.error, 'error'); 
+        }
+    } catch (e) { 
+        Swal.fire('Error', 'Problema de conexión', 'error'); 
+    }
 }
