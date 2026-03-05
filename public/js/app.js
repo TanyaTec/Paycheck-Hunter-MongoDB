@@ -12,7 +12,6 @@ const itemsPerPage = 10;
 let currentUserNombre = "";
 
 // --- INICIALIZACIÓN Y GOOGLE AUTH ---
-// CIRUGÍA: Eliminamos el renderizado por JS, el HTML ahora hace todo el trabajo para que no falle en iOS
 document.addEventListener('DOMContentLoaded', () => {
     const tokenGuardado = localStorage.getItem('paycheckToken');
     const nombreGuardado = localStorage.getItem('paycheckUserName');
@@ -54,6 +53,14 @@ function mostrarDashboard() {
     
     if(loginScreen) loginScreen.classList.add('d-none');
     if(appContent) appContent.classList.remove('d-none');
+
+    // CIRUGÍA UX: Personalización de Saludo Dinámico en el Dashboard
+    const greetingEl = document.getElementById('userGreetingName');
+    if (greetingEl && currentUserNombre) {
+        // Capitalizamos la primera letra
+        const nombreFormateado = currentUserNombre.charAt(0).toUpperCase() + currentUserNombre.slice(1);
+        greetingEl.innerText = nombreFormateado;
+    }
     
     cargarDatosUnificados(); 
 }
@@ -794,7 +801,7 @@ function cancelarEdicion(mode) {
     if (mode === 'ventas') {
         document.getElementById('frmVenta').reset();
         document.getElementById('txtFecha').valueAsDate = new Date();
-        document.getElementById('btnGuardarVenta').innerHTML = '<i class="bi bi-floppy-fill fs-5"></i><span>GUARDAR VENTA</span>';
+        document.getElementById('btnGuardarVenta').innerHTML = '<i class="bi bi-floppy-fill"></i> GUARDAR VENTA';
         document.getElementById('btnCancelarEditVenta').classList.add('d-none');
         
         document.getElementById('cmbNumVendedores').value = 1;
@@ -812,7 +819,7 @@ function cancelarEdicion(mode) {
     } else {
         document.getElementById('frmMaquila').reset();
         document.getElementById('maqFecha').valueAsDate = new Date();
-        document.getElementById('btnGuardarMaquila').innerHTML = '<i class="bi bi-floppy-fill fs-5"></i><span>GUARDAR PAPERWORK</span>';
+        document.getElementById('btnGuardarMaquila').innerHTML = '<i class="bi bi-floppy-fill"></i> GUARDAR PAPERWORK';
         document.getElementById('btnCancelarEditMaquila').classList.add('d-none');
         document.getElementById('maqTipoPack').checked = true;
         toggleTipoPagoMaquila();

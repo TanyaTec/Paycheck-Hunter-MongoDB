@@ -8,23 +8,25 @@
     <link rel="icon" type="image/png" href="https://fonts.gstatic.com/s/e/notoemoji/latest/1f680/512.png">
     <link rel="apple-touch-icon" href="https://fonts.gstatic.com/s/e/notoemoji/latest/1f680/512.png">
 
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
     <style>
         :root {
-            --primary-gradient: linear-gradient(135deg, #334155 0%, #1e293b 100%);
-            --primary-color: #334155;
+            --primary-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --primary-color: #0f172a;
             --text-main: #0f172a;
             --text-muted: #64748b;
+            --accent-blue: #00c6ff;
+            --accent-dark-blue: #0072ff;
         }
 
         body { 
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             background-size: 20px 20px, 100% 100%;
             background-attachment: fixed;
             font-family: 'Inter', sans-serif; 
@@ -52,24 +54,53 @@
         .btn-outline-dark:hover { background-color: #0f172a !important; color: #ffffff !important; }
 
         .rocket-icon {
-            background: linear-gradient(180deg, #94a3b8 0%, #64748b 40%, #475569 50%, #334155 60%, #0f172a 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            background: linear-gradient(135deg, #ffffff 0%, #73c8ff 25%, #0056b3 50%, #00c6ff 75%, #ffffff 100%);
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            background-clip: text;
             display: inline-block;
+            filter: drop-shadow(0px 8px 16px rgba(0, 198, 255, 0.4));
         }
 
-        .spotlight { background: radial-gradient(circle, rgba(226, 232, 240, 0.6) 0%, rgba(255, 255, 255, 0) 70%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
-        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-15px); } }
+        .spotlight { background: radial-gradient(circle, rgba(0, 198, 255, 0.15) 0%, rgba(255, 255, 255, 0) 70%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-12px); } }
         .animate-float { animation: float 4s ease-in-out infinite; }
 
-        .login-input { background-color: rgba(241, 245, 249, 0.8); letter-spacing: 3px; border: 2px solid transparent; border-radius: 12px; }
-        .form-control, .form-select { border-radius: 12px; border: 1px solid #e2e8f0; font-size: 0.95rem; color: var(--text-main); }
-        .btn-gradient { background: var(--primary-gradient); color: white; border: none; font-weight: 700; transition: transform 0.2s; }
-        .brand-text { background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 800; }
+        .form-control, .form-select { border-radius: 12px; border: 1px solid #e2e8f0; font-size: 0.95rem; color: var(--text-main); transition: border-color 0.3s, box-shadow 0.3s; }
+        .form-control:focus, .form-select:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 0.25rem rgba(0, 198, 255, 0.25); }
+        
+        .btn-gradient { 
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); 
+            color: white; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            font-weight: 700; 
+            transition: transform 0.2s, box-shadow 0.2s; 
+        }
+        .btn-gradient:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 10px 20px -10px rgba(15, 23, 42, 0.8); 
+            color: white;
+        }
+        
+        /* CIRUGÍA UX: Título de Login con gradiente titanio a azul vibrante, y tipografía unificada (Inter 900) */
+        .brand-text { 
+            font-family: 'Inter', sans-serif;
+            font-weight: 900;
+            font-size: 2.1rem;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #0072ff 100%); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            background-clip: text; 
+            display: inline-block;
+        }
+        
         label { font-weight: 700; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
 
         .nav-tabs { border-bottom: 2px solid #e2e8f0; position: relative; z-index: 10; }
-        .nav-tabs .nav-link { color: #64748b; font-weight: 700; border: none; padding: 15px 10px; border-radius: 0; cursor: pointer; }
-        .nav-tabs .nav-link.active { color: #1e293b; border-bottom: 3px solid #1e293b; background: transparent; }
+        .nav-tabs .nav-link { color: #64748b; font-weight: 700; border: none; padding: 15px 10px; border-radius: 0; cursor: pointer; transition: color 0.3s; }
+        .nav-tabs .nav-link.active { color: var(--primary-color); border-bottom: 3px solid var(--primary-color); background: transparent; }
 
         .swal2-popup { font-size: 0.85rem !important; border-radius: 20px !important; width: 90% !important; max-width: 400px !important; }
         #loginScreen.d-none { display: none !important; }
@@ -78,13 +109,29 @@
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
             color: var(--text-main);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 32px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255,255,255,0.5);
             width: 100%;
             max-width: 420px;
-            padding: 2rem !important; 
+            padding: 2.5rem !important; 
         }
+        
+        .google-btn-wrapper {
+            background: rgba(248, 250, 252, 0.8);
+            border: 1px solid #e2e8f0;
+            border-radius: 50px;
+            padding: 6px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            display: inline-block;
+        }
+        .google-btn-wrapper:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.1);
+            background: #ffffff;
+        }
+
         @media (max-width: 576px) { 
             .login-card { padding: 1.5rem !important; }
         }
@@ -100,40 +147,43 @@
                 </a>
             </div>
             <div class="card login-card shadow-lg border-0 text-center w-100">
-                <div class="mb-0"><span class="brand-text fw-bold fs-4">Paycheck Hunter</span></div>
-                <div class="mt-2 mb-2 animate-float" style="filter: drop-shadow(0px 12px 16px rgba(15, 23, 42, 0.4));">
-                    <div class="spotlight" style="width: 65px; height: 65px;">
-                        <i class="bi bi-rocket-takeoff-fill rocket-icon" style="font-size: 2.2rem;"></i>
+                <div class="mb-1"><span class="brand-text">Paycheck Hunter</span></div>
+                <div class="mt-2 mb-3 animate-float">
+                    <div class="spotlight" style="width: 75px; height: 75px;">
+                        <i class="bi bi-rocket-takeoff-fill rocket-icon" style="font-size: 2.8rem;"></i>
                     </div>
                 </div>
+                
                 <h3 class="fw-bold text-dark mb-0 fs-5">Hola, Closer.</h3>
                 <p class="text-muted small mb-4">Ingresa con tu cuenta autorizada</p>
                 
-                <div class="d-flex justify-content-center mt-2 mb-2 w-100">
-                    <div id="g_id_onload"
-                         data-client_id="45355639696-ed54unj8jme9cfdehcu9o1mu700occc2.apps.googleusercontent.com"
-                         data-context="signin"
-                         data-ux_mode="popup"
-                         data-callback="handleCredentialResponse"
-                         data-auto_prompt="false">
-                    </div>
-                    <div class="g_id_signin"
-                         data-type="standard"
-                         data-shape="pill"
-                         data-theme="outline"
-                         data-text="continue_with"
-                         data-size="large"
-                         data-width="280">
+                <div class="d-flex justify-content-center mt-1 mb-2 w-100">
+                    <div class="google-btn-wrapper">
+                        <div id="g_id_onload"
+                             data-client_id="45355639696-ed54unj8jme9cfdehcu9o1mu700occc2.apps.googleusercontent.com"
+                             data-context="signin"
+                             data-ux_mode="popup"
+                             data-callback="handleCredentialResponse"
+                             data-auto_prompt="false">
+                        </div>
+                        <div class="g_id_signin"
+                             data-type="standard"
+                             data-shape="pill"
+                             data-theme="outline"
+                             data-text="continue_with"
+                             data-size="large"
+                             data-width="260">
+                        </div>
                     </div>
                 </div>
 
                 <div id="loginError" class="d-none mt-3">
-                    <p class="text-danger fw-bold bg-danger-subtle p-2 rounded small mb-0 border border-danger-subtle d-flex align-items-center justify-content-center gap-1">
-                        <i class="bi bi-exclamation-triangle-fill"></i> Acceso denegado o error de red
+                    <p class="text-danger fw-bold bg-danger-subtle p-2 rounded-3 small mb-0 border border-danger-subtle d-flex align-items-center justify-content-center gap-1">
+                        <i class="bi bi-exclamation-triangle-fill"></i> Acceso denegado
                     </p>
                 </div>
             </div>
-            <div class="mt-3 text-center" style="opacity: 0.6;">
+            <div class="mt-4 text-center" style="opacity: 0.6;">
                 <small class="text-white fw-bold" style="letter-spacing: 1px; font-size: 0.65rem;">
                     &copy; 2026 <a href="https://tanyateclab.com" target="_blank" rel="noopener noreferrer" class="text-white text-decoration-none">TANYATEC LAB</a>. ALL RIGHTS RESERVED.
                 </small>
@@ -144,16 +194,18 @@
     <div id="appContent" class="container py-4 d-none">
         <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
             <div class="d-flex align-items-center">
-                <i class="bi bi-rocket-takeoff-fill text-info me-2 me-md-3" style="font-size: 1.9rem; line-height: 1;"></i>
+                <i class="bi bi-rocket-takeoff-fill rocket-icon me-2 me-md-3" style="font-size: 2.2rem; line-height: 1; filter: none;"></i>
                 <div>
-                    <h1 class="fw-bold text-white mb-0" style="line-height: 1.1; font-size: 1.6rem;">Paycheck Hunter</h1>
-                    <p class="text-white-50 mb-0 mt-1" style="font-size: 0.85rem; letter-spacing: 0.5px;">Gestión de Comisiones</p>
+                    <h1 class="fw-bold text-white mb-0" style="line-height: 1.1; font-size: 1.7rem; letter-spacing: -0.5px;">
+                        Hola, <span id="userGreetingName" class="text-white">Closer</span> <i class="bi bi-patch-check-fill ms-1" style="font-size: 1.1rem; color: var(--accent-blue);" title="Cuenta Verificada"></i>
+                    </h1>
+                    <p class="text-white-50 mb-0 mt-1" style="font-size: 0.9rem; letter-spacing: 0.5px; font-weight: 600;">Bienvenida a tu centro de mando financiero.</p>
                 </div>
             </div>
             
             <div class="d-flex flex-column align-items-end justify-content-center gap-2">
                 <a href="https://tanyateclab.com" target="_blank" rel="noopener noreferrer" class="d-none d-md-block text-decoration-none" title="Visitar TanyaTec Lab">
-                    <img src="img/TanyaTec-Lab-removebg.png" alt="TanyaTec Lab" style="height: 75px; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.3)); transition: transform 0.2s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <img src="img/TanyaTec-Lab-removebg.png" alt="TanyaTec Lab" style="height: 65px; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.5)); transition: transform 0.2s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                 </a>
                 <button onclick="cerrarSesion()" class="btn btn-outline-light rounded-pill px-3 px-md-4 py-1 shadow-sm d-flex align-items-center" title="Salir">
                     <i class="bi bi-power fs-5" style="transform: scale(1.1);"></i>
@@ -170,21 +222,21 @@
             <div class="col-12">
                 <div class="card card-custom p-3 p-md-4">
                     <ul class="nav nav-tabs mb-4 w-100 d-flex flex-nowrap">
-                        <li class="nav-item flex-fill"><button type="button" class="nav-link w-100 active" id="nav-ventas" onclick="switchTab('ventas')">📈 Ventas</button></li>
-                        <li class="nav-item flex-fill"><button type="button" class="nav-link w-100" id="nav-maquila" onclick="switchTab('maquila')">📝 Paperwork</button></li>
+                        <li class="nav-item flex-fill"><button type="button" class="nav-link w-100 active" id="nav-ventas" onclick="switchTab('ventas')"><i class="bi bi-graph-up-arrow me-1"></i> Ventas</button></li>
+                        <li class="nav-item flex-fill"><button type="button" class="nav-link w-100" id="nav-maquila" onclick="switchTab('maquila')"><i class="bi bi-file-earmark-text me-1"></i> Paperwork</button></li>
                     </ul>
 
                     <div id="tabVentas">
                         <form id="frmVenta" onsubmit="return false;">
-                            <div class="row g-3 mb-3 bg-light p-3 rounded mx-0 border border-primary-subtle">
+                            <div class="row g-3 mb-3 bg-light p-3 rounded mx-0 border border-primary-subtle shadow-sm">
                                 <div class="col-md-2 col-6"><label class="form-label text-primary fw-bold"># Vendedores</label><select class="form-select border-primary" id="cmbNumVendedores" onchange="renderVendedoresInputs()"><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                                 <div class="col-md-5 col-12" id="containerVendedores"><label class="form-label text-muted small">Nombre Vendedor 1</label><input type="text" class="form-control mb-2 form-control-sm" id="vend_1" placeholder="Nombre..."></div>
                                 <div class="col-md-5 col-12">
                                     <div class="d-flex gap-3 flex-wrap align-items-start mt-2 mt-md-4">
-                                        <div class="flex-grow-1"><div class="form-check bg-white border p-2 rounded"><input class="form-check-input" type="checkbox" id="chkLiner" onchange="toggleLiner()"><label class="form-check-label fw-bold text-dark small">Liner (-3.5%)</label></div><input type="text" class="form-control form-control-sm mt-1 d-none" id="txtLinerName" placeholder="Nombre Liner"></div>
+                                        <div class="flex-grow-1"><div class="form-check bg-white border p-2 rounded shadow-sm"><input class="form-check-input border-secondary" type="checkbox" id="chkLiner" onchange="toggleLiner()"><label class="form-check-label fw-bold text-dark small">Liner (-3.5%)</label></div><input type="text" class="form-control form-control-sm mt-1 d-none" id="txtLinerName" placeholder="Nombre Liner"></div>
                                         <div class="flex-grow-1">
-                                            <div class="form-check bg-white border p-2 rounded">
-                                                <input class="form-check-input" type="checkbox" id="chkCasado" onchange="toggleCasado()">
+                                            <div class="form-check bg-white border p-2 rounded shadow-sm">
+                                                <input class="form-check-input border-secondary" type="checkbox" id="chkCasado" onchange="toggleCasado()">
                                                 <label class="form-check-label fw-bold text-dark small">Casado</label>
                                             </div>
                                             <div id="divCasadoOptions" class="d-none mt-2 p-2 bg-white border rounded shadow-sm">
@@ -203,19 +255,19 @@
                                 <div class="col-md-2 col-6"><label class="form-label">Fecha</label><input type="date" class="form-control" id="txtFecha" required></div>
                                 <div class="col-md-2 col-6"><label class="form-label">Contrato</label><input type="text" class="form-control fw-bold" id="txtContrato" required></div>
                                 <div class="col-md-4 col-12"><label class="form-label">Cliente</label><input type="text" class="form-control" id="txtCliente" required>
-                                    <div class="d-flex gap-4 mt-2 align-items-center"><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="nacionalidad" id="nacExtranjero" value="Extranjero" checked><label class="form-check-label small text-dark">Extranjero</label></div><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="nacionalidad" id="nacMexicano" value="Mexicano"><label class="form-check-label small text-dark">Mexicano</label></div></div>
+                                    <div class="d-flex gap-4 mt-2 align-items-center"><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="nacionalidad" id="nacExtranjero" value="Extranjero" checked><label class="form-check-label small text-dark fw-semibold">Extranjero</label></div><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="nacionalidad" id="nacMexicano" value="Mexicano"><label class="form-check-label small text-dark fw-semibold">Mexicano</label></div></div>
                                 </div>
-                                <div class="col-md-4 col-12"><label class="form-label text-dark">Socio</label><div class="d-flex gap-3 mt-1"><div class="form-check"><input class="form-check-input" type="radio" name="tipoSocio" id="radioNew" value="New" checked onchange="calcularMatematica()"><label class="form-check-label text-dark">New (9%)</label></div><div class="form-check"><input class="form-check-input" type="radio" name="tipoSocio" id="radioUpgrade" value="Upgrade" onchange="calcularMatematica()"><label class="form-check-label text-dark">Upgrade (8%)</label></div></div></div>
+                                <div class="col-md-4 col-12"><label class="form-label text-dark">Socio</label><div class="d-flex gap-3 mt-1"><div class="form-check"><input class="form-check-input" type="radio" name="tipoSocio" id="radioNew" value="New" checked onchange="calcularMatematica()"><label class="form-check-label text-dark fw-semibold">New (9%)</label></div><div class="form-check"><input class="form-check-input" type="radio" name="tipoSocio" id="radioUpgrade" value="Upgrade" onchange="calcularMatematica()"><label class="form-check-label text-dark fw-semibold">Upgrade (8%)</label></div></div></div>
                             </div>
                             <div class="row g-3 mb-3">
-                                <div class="col-md-3 col-12"><label class="form-label">Monto Venta (USD)</label><div class="input-group"><span class="input-group-text bg-light text-muted border-secondary-subtle">$</span><input type="number" class="form-control fw-bold text-dark fs-5 border-secondary-subtle" id="txtMonto" required oninput="calcularMatematica()"></div></div>
-                                <div class="col-md-3 col-12"><label class="form-label text-primary fw-bold" style="font-size: 0.7rem;">Importe Base (-13.79%)</label><div class="input-group"><span class="input-group-text bg-primary-subtle text-primary">$</span><input type="text" class="form-control bg-white fw-bold text-primary" id="txtImporteBase" readonly></div></div>
-                                <div class="col-md-3 col-6"><label class="form-label">Status</label><select class="form-select" id="cmbStatus" onchange="togglePendiente('venta')"><option value="Cerrada">✅ Cerrada</option><option value="Pendiente">⏳ Pendiente</option><option value="Caída">❌ Caída</option></select><div id="divFechaPendienteVenta" class="d-none mt-2"><input type="date" class="form-control form-control-sm" id="txtFechaPendienteVenta"></div></div>
-                                <div class="col-md-3 col-6"><label class="form-label">Pack</label><select class="form-select" id="cmbPack" onchange="calcularMatematica()"><option value="None">None</option><option value="Full">Full</option><option value="1/2">1/2</option><option value="1/3">1/3</option><option value="1/4">1/4</option></select></div>
+                                <div class="col-md-3 col-12"><label class="form-label">Monto Venta (USD)</label><div class="input-group shadow-sm"><span class="input-group-text bg-light text-muted border-secondary-subtle">$</span><input type="number" class="form-control fw-bold text-dark fs-5 border-secondary-subtle" id="txtMonto" required oninput="calcularMatematica()"></div></div>
+                                <div class="col-md-3 col-12"><label class="form-label text-primary fw-bold" style="font-size: 0.7rem;">Importe Base (-13.79%)</label><div class="input-group shadow-sm"><span class="input-group-text bg-primary-subtle text-primary">$</span><input type="text" class="form-control bg-white fw-bold text-primary" id="txtImporteBase" readonly></div></div>
+                                <div class="col-md-3 col-6"><label class="form-label">Status</label><select class="form-select shadow-sm" id="cmbStatus" onchange="togglePendiente('venta')"><option value="Cerrada">✅ Cerrada</option><option value="Pendiente">⏳ Pendiente</option><option value="Caída">❌ Caída</option></select><div id="divFechaPendienteVenta" class="d-none mt-2"><input type="date" class="form-control form-control-sm border-warning shadow-sm" id="txtFechaPendienteVenta"></div></div>
+                                <div class="col-md-3 col-6"><label class="form-label">Pack</label><select class="form-select shadow-sm" id="cmbPack" onchange="calcularMatematica()"><option value="None">None</option><option value="Full">Full</option><option value="1/2">1/2</option><option value="1/3">1/3</option><option value="1/4">1/4</option></select></div>
                             </div>
-                            <div class="row g-3 mb-3 mx-0"><div class="col-12"><div class="bg-light p-2 rounded border d-flex flex-wrap gap-3 align-items-center px-3"><span class="text-muted small fw-bold">OPCIONES:</span><div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" id="chkAmex" onchange="calcularMatematica()"><label class="form-check-label fw-bold text-primary" for="chkAmex">AMEX</label></div><div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" id="chkMSI" onchange="calcularMatematica()"><label class="form-check-label fw-bold text-info" for="chkMSI">6MSI (-1.5%)</label></div></div></div></div>
+                            <div class="row g-3 mb-3 mx-0"><div class="col-12"><div class="bg-light p-2 rounded border shadow-sm d-flex flex-wrap gap-3 align-items-center px-3"><span class="text-muted small fw-bold">OPCIONES:</span><div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" id="chkAmex" onchange="calcularMatematica()"><label class="form-check-label fw-bold text-primary" for="chkAmex">AMEX</label></div><div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" id="chkMSI" onchange="calcularMatematica()"><label class="form-check-label fw-bold text-info" for="chkMSI">6MSI (-1.5%)</label></div></div></div></div>
                             
-                            <div class="row g-3 mb-4 bg-light p-3 rounded mx-0 border border-danger-subtle">
+                            <div class="row g-3 mb-4 bg-light p-3 rounded mx-0 border border-danger-subtle shadow-sm">
                                 <div class="col-12 mb-0"><span class="text-danger fw-bold small text-uppercase"><i class="bi bi-dash-circle me-1"></i>Deducciones</span></div>
                                 <div class="col-6 col-md-2">
                                     <label class="form-label text-primary small fw-bold mb-1 text-truncate w-100" for="chkReserva" style="cursor: pointer;">Reserva (-10%)</label>
@@ -227,24 +279,32 @@
                                 </div>
                                 <div class="col-6 col-md-2">
                                     <label class="form-label text-danger small fw-bold mb-1 text-truncate w-100">Impuestos %</label>
-                                    <input type="number" class="form-control form-control-sm border-danger text-center fw-bold text-danger" id="txtImpuestosPorcentaje" oninput="calcularMatematica()" style="height: 31px;" placeholder="Ej. 20">
+                                    <input type="number" class="form-control form-control-sm border-danger text-center fw-bold text-danger shadow-sm" id="txtImpuestosPorcentaje" oninput="calcularMatematica()" style="height: 31px;" placeholder="Ej. 20">
                                 </div>
                                 <div class="col-6 col-md-2">
                                     <label class="form-label text-muted small fw-bold mb-1 text-truncate w-100">Regalos ($)</label>
-                                    <input type="number" class="form-control form-control-sm text-center" id="txtRegalos" oninput="calcularMatematica()" style="height: 31px;" placeholder="0">
+                                    <input type="number" class="form-control form-control-sm text-center shadow-sm" id="txtRegalos" oninput="calcularMatematica()" style="height: 31px;" placeholder="0">
                                 </div>
                                 <div class="col-6 col-md-2">
                                     <label class="form-label text-muted small fw-bold mb-1 text-truncate w-100">Donativos ($)</label>
-                                    <input type="number" class="form-control form-control-sm text-center" id="txtDonativos" oninput="calcularMatematica()" style="height: 31px;" placeholder="0">
+                                    <input type="number" class="form-control form-control-sm text-center shadow-sm" id="txtDonativos" oninput="calcularMatematica()" style="height: 31px;" placeholder="0">
                                 </div>
                                 <div class="col-6 col-md-2">
                                     <label class="form-label text-muted small fw-bold mb-1 text-truncate w-100">Move In ($)</label>
-                                    <input type="number" class="form-control form-control-sm text-center" id="txtMoveIn" oninput="calcularMatematica()" style="height: 31px;" placeholder="0">
+                                    <input type="number" class="form-control form-control-sm text-center shadow-sm" id="txtMoveIn" oninput="calcularMatematica()" style="height: 31px;" placeholder="0">
                                 </div>
                                 <div class="col-6 col-md-2">
                                     <label class="form-label text-success fw-bold small mb-1 text-truncate w-100">Bonus Wk</label>
-                                    <select class="form-select form-select-sm border-success text-success fw-bold text-center" id="cmbBonusWeeks" onchange="calcularMatematica()" style="height: 31px;">
-                                        <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option>
+                                    <select class="form-select form-select-sm border-success text-success fw-bold text-center shadow-sm" id="cmbBonusWeeks" onchange="calcularMatematica()" style="height: 31px;">
+                                        <option value="0">0</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
                                     </select>
                                 </div>
                             </div>
@@ -252,32 +312,32 @@
                             <div class="row g-3 mb-3 mx-0">
                                 <div class="col-12 d-flex flex-wrap gap-3">
                                     <div class="form-check"><input class="form-check-input" type="checkbox" id="chkMeseros" checked disabled><label class="form-check-label text-dark fw-bold small">Meseros <span class="badge bg-light text-dark border ms-1">-$20</span></label></div>
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" id="chkAntilavado" onchange="calcularMatematica()"><label class="form-check-label text-dark small">Antilavado <span class="badge bg-light text-dark border ms-1">-$10</span></label></div>
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" id="chkExploreForm" onchange="calcularMatematica()"><label class="form-check-label text-dark small">Explore Form <span class="badge bg-light text-dark border ms-1">-$10</span></label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" id="chkAntilavado" onchange="calcularMatematica()"><label class="form-check-label text-dark small fw-semibold">Antilavado <span class="badge bg-light text-dark border ms-1">-$10</span></label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" id="chkExploreForm" onchange="calcularMatematica()"><label class="form-check-label text-dark small fw-semibold">Explore Form <span class="badge bg-light text-dark border ms-1">-$10</span></label></div>
                                 </div>
                             </div>
                             <div class="row g-3 mb-4 mx-0 justify-content-center justify-content-md-end">
                                 <div class="col-md-6 px-0">
-                                    <div class="p-3 bg-white border border-success-subtle rounded shadow-sm text-center">
-                                        <label class="small fw-bold text-uppercase mb-2 d-block text-muted">Pago Neto Final (Por Persona)</label>
-                                        <div class="d-flex align-items-center justify-content-center text-success"><span class="fs-1 fw-bold me-1">$</span><input type="text" class="form-control-plaintext fw-bold text-success text-center p-0 fs-1" id="txtPagoTotal" readonly style="width: auto;" value="0.00"></div>
+                                    <div class="p-4 bg-white border border-success-subtle rounded-4 shadow text-center" style="background: linear-gradient(to right, #f0fdf4, #ffffff);">
+                                        <label class="small fw-bold text-uppercase mb-2 d-block text-success opacity-75" style="letter-spacing: 1px;">Pago Neto Final</label>
+                                        <div class="d-flex align-items-center justify-content-center text-success"><span class="fs-1 fw-bold me-1">$</span><input type="text" class="form-control-plaintext fw-bold text-success text-center p-0 fs-1" id="txtPagoTotal" readonly style="width: auto; letter-spacing: -1px;" value="0.00"></div>
                                     </div>
                                 </div>
                             </div>
                             <div class="row g-3 mb-4">
-                                <div class="col-md-4 col-12"><div class="form-check mt-1"><input class="form-check-input" type="checkbox" id="chkExplore" onchange="toggleExplore()"><label class="form-check-label fw-bold text-primary">¿Explore Package?</label></div><div id="exploreFields" class="d-none bg-info-subtle p-2 rounded mt-2"><div class="d-flex flex-wrap align-items-end gap-2"><div class="flex-grow-1"><label class="small">Fecha Promesa</label><input type="date" class="form-control form-control-sm" id="txtFechaPromesa"></div><div class="form-check mb-1"><input class="form-check-input" type="checkbox" id="chkExploreHoy" onchange="toggleExploreHoy()"><label class="form-check-label small fw-bold">Hoy</label></div></div></div></div>
-                                <div class="col-md-8 col-12"><label class="form-label text-muted small fw-bold">Comentarios</label><textarea class="form-control" id="txtComentarios" rows="2"></textarea></div>
+                                <div class="col-md-4 col-12"><div class="form-check mt-1"><input class="form-check-input border-primary" type="checkbox" id="chkExplore" onchange="toggleExplore()"><label class="form-check-label fw-bold text-primary">¿Explore Package?</label></div><div id="exploreFields" class="d-none bg-info-subtle p-3 rounded-4 mt-2 shadow-sm border border-info-subtle"><div class="d-flex flex-wrap align-items-end gap-2"><div class="flex-grow-1"><label class="small fw-bold text-dark">Fecha Promesa</label><input type="date" class="form-control form-control-sm border-info" id="txtFechaPromesa"></div><div class="form-check mb-1 bg-white px-2 py-1 rounded border"><input class="form-check-input ms-1" type="checkbox" id="chkExploreHoy" onchange="toggleExploreHoy()"><label class="form-check-label small fw-bold ms-2">Hoy</label></div></div></div></div>
+                                <div class="col-md-8 col-12"><label class="form-label text-muted small fw-bold">Comentarios</label><textarea class="form-control shadow-sm" id="txtComentarios" rows="2"></textarea></div>
                             </div>
                             <div class="mt-2 pb-2 d-grid gap-2 d-md-flex justify-content-md-end">
-                                <button id="btnCancelarEditVenta" onclick="cancelarEdicion('ventas')" class="btn btn-light border-0 text-danger px-4 py-2 rounded-pill fw-bold shadow-sm d-none">CANCELAR</button>
-                                <button id="btnGuardarVenta" onclick="guardarVenta()" class="btn-gradient px-5 py-2 rounded-pill fw-bold shadow d-flex align-items-center justify-content-center gap-2">GUARDAR VENTA</button>
+                                <button id="btnCancelarEditVenta" onclick="cancelarEdicion('ventas')" class="btn btn-light border border-danger-subtle text-danger px-4 py-2 rounded-pill fw-bold shadow-sm d-none">CANCELAR</button>
+                                <button id="btnGuardarVenta" onclick="guardarVenta()" class="btn-gradient px-5 py-2 rounded-pill shadow d-flex align-items-center justify-content-center gap-2" style="font-size: 1.05rem;"><i class="bi bi-floppy-fill"></i> GUARDAR VENTA</button>
                             </div>
                         </form>
                     </div>
 
                     <div id="tabMaquila" class="d-none">
                         <form id="frmMaquila" onsubmit="return false;">
-                            <div class="alert bg-success-subtle text-success border-0 shadow-sm mb-4 fw-bold">Calculadora Quirúrgica de Paperwork</div>
+                            <div class="alert text-success border-0 shadow-sm mb-4 fw-bold rounded-4" style="background: linear-gradient(to right, #d1fae5, #f0fdf4);"><i class="bi bi-calculator me-2"></i>Calculadora de Paperwork</div>
                             
                             <div class="row g-3 mb-3">
                                 <div class="col-md-3 col-6"><label class="form-label">Fecha</label><input type="date" class="form-control" id="maqFecha" required></div>
@@ -294,20 +354,20 @@
                                         <option value="Pendiente">⏳ Pendiente</option>
                                         <option value="Cancelada">🚫 Cancelada</option>
                                     </select>
-                                    <div id="divFechaPendienteMaq" class="d-none mt-2"><input type="date" class="form-control form-control-sm" id="txtFechaPendienteMaq"></div>
+                                    <div id="divFechaPendienteMaq" class="d-none mt-2"><input type="date" class="form-control form-control-sm border-warning shadow-sm" id="txtFechaPendienteMaq"></div>
                                 </div>
                             </div>
 
                             <div class="row g-3 mb-3 mt-2">
                                 <div class="col-12">
                                     <label class="form-label fw-bold text-primary small text-uppercase">Método de Pago Acordado</label>
-                                    <div class="d-flex flex-wrap gap-3 p-2 rounded border bg-light">
+                                    <div class="d-flex flex-wrap gap-3 p-3 rounded-3 border bg-light shadow-sm">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="maqTipoPago" id="maqTipoPack" value="pack" checked onchange="toggleTipoPagoMaquila()">
+                                            <input class="form-check-input border-primary" type="radio" name="maqTipoPago" id="maqTipoPack" value="pack" checked onchange="toggleTipoPagoMaquila()">
                                             <label class="form-check-label fw-bold text-dark">Por Pack ($150.88)</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="maqTipoPago" id="maqTipoPorcentaje" value="porcentaje" onchange="toggleTipoPagoMaquila()">
+                                            <input class="form-check-input border-primary" type="radio" name="maqTipoPago" id="maqTipoPorcentaje" value="porcentaje" onchange="toggleTipoPagoMaquila()">
                                             <label class="form-check-label fw-bold text-dark">Por Porcentaje (%)</label>
                                         </div>
                                     </div>
@@ -317,7 +377,7 @@
                             <div class="row g-3 mb-3" id="maqPackContainer">
                                 <div class="col-md-4 col-12">
                                     <label class="form-label">Nivel de Pack</label>
-                                    <select class="form-select border-primary" id="maqPack" onchange="calcularMaquila()">
+                                    <select class="form-select border-primary shadow-sm" id="maqPack" onchange="calcularMaquila()">
                                         <option value="None" selected>None</option>
                                         <option value="Full">Full ($150.88)</option>
                                         <option value="1/2">1/2 ($75.44)</option>
@@ -325,24 +385,24 @@
                                 </div>
                             </div>
 
-                            <div class="row g-3 mb-3 d-none mx-0 bg-info-subtle p-3 rounded border border-info" id="maqPorcentajeContainer">
+                            <div class="row g-3 mb-3 d-none mx-0 bg-info-subtle p-3 rounded-4 border border-info shadow-sm" id="maqPorcentajeContainer">
                                 <div class="col-md-6 col-12">
-                                    <label class="form-label text-dark fw-bold small">Volumen Venta <span class="badge bg-light text-muted fw-normal ms-1">No suma a KPI</span></label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">$</span>
-                                        <input type="number" class="form-control border-info" id="maqVolumen" placeholder="Ej. 10000" oninput="calcularMaquila()">
+                                    <label class="form-label text-dark fw-bold small">Volumen Venta <span class="badge bg-light text-muted fw-normal ms-1 border">No suma a KPI</span></label>
+                                    <div class="input-group shadow-sm">
+                                        <span class="input-group-text bg-white border-info">$</span>
+                                        <input type="number" class="form-control border-info fw-bold" id="maqVolumen" placeholder="Ej. 10000" oninput="calcularMaquila()">
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-12">
                                     <label class="form-label text-dark fw-bold small">Porcentaje Ofrecido</label>
-                                    <div class="input-group">
-                                        <input type="number" step="0.1" class="form-control border-info" id="maqPorcentaje" placeholder="Ej. 1.5" oninput="calcularMaquila()">
-                                        <span class="input-group-text">%</span>
+                                    <div class="input-group shadow-sm">
+                                        <input type="number" step="0.1" class="form-control border-info fw-bold text-center" id="maqPorcentaje" placeholder="Ej. 1.5" oninput="calcularMaquila()">
+                                        <span class="input-group-text bg-info text-dark border-info fw-bold">%</span>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="bg-light p-3 rounded border border-danger-subtle mb-4 mt-2">
+                            <div class="bg-light p-3 rounded-4 border border-danger-subtle mb-4 mt-2 shadow-sm">
                                 <div class="text-danger fw-bold small text-uppercase mb-3"><i class="bi bi-dash-circle me-1"></i>Deducciones Aplicables</div>
                                 <div class="row g-3">
                                     <div class="col-6 col-md-6">
@@ -365,19 +425,19 @@
 
                             <div class="row g-3 mb-4 mx-0 justify-content-center justify-content-md-end">
                                 <div class="col-md-6 px-0">
-                                    <div class="p-3 bg-white border border-success-subtle rounded shadow-sm text-center">
-                                        <label class="small fw-bold text-uppercase mb-2 d-block text-muted">Pago Neto Paperwork</label>
+                                    <div class="p-4 bg-white border border-success-subtle rounded-4 shadow text-center" style="background: linear-gradient(to right, #f0fdf4, #ffffff);">
+                                        <label class="small fw-bold text-uppercase mb-2 d-block text-success opacity-75" style="letter-spacing: 1px;">Pago Neto Paperwork</label>
                                         <div class="d-flex align-items-center justify-content-center text-success">
                                             <span class="fs-1 fw-bold me-1">$</span>
-                                            <input type="text" class="form-control-plaintext fw-bold text-success text-center p-0 fs-1" id="maqPago" readonly style="width: auto;" value="0.00">
+                                            <input type="text" class="form-control-plaintext fw-bold text-success text-center p-0 fs-1" id="maqPago" readonly style="width: auto; letter-spacing: -1px;" value="0.00">
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="mt-4 pb-2 d-grid gap-2 d-md-flex justify-content-md-end">
-                                <button id="btnCancelarEditMaquila" onclick="cancelarEdicion('maquila')" class="btn btn-light border-0 text-danger px-4 py-2 rounded-pill fw-bold shadow-sm d-none">CANCELAR</button>
-                                <button id="btnGuardarMaquila" onclick="guardarMaquila()" class="btn btn-secondary px-5 py-2 rounded-pill fw-bold shadow d-flex align-items-center justify-content-center gap-2" style="background: linear-gradient(135deg, #166534 0%, #14532d 100%); border:none;">GUARDAR PAPERWORK</button>
+                                <button id="btnCancelarEditMaquila" onclick="cancelarEdicion('maquila')" class="btn btn-light border border-danger-subtle text-danger px-4 py-2 rounded-pill fw-bold shadow-sm d-none">CANCELAR</button>
+                                <button id="btnGuardarMaquila" onclick="guardarMaquila()" class="btn-gradient px-5 py-2 rounded-pill shadow d-flex align-items-center justify-content-center gap-2" style="font-size: 1.05rem;"><i class="bi bi-floppy-fill"></i> GUARDAR PAPERWORK</button>
                             </div>
                         </form>
                     </div>
@@ -387,38 +447,38 @@
 
         <div class="row mb-4">
             <div class="col-12">
-                <div class="card p-3 p-md-4 border border-success-subtle shadow-lg" style="background: #ffffff; border-radius: 24px; color: #0f172a;">
+                <div class="card p-4 border-0 shadow-lg" style="background: #ffffff; border-radius: 28px; color: #0f172a; border-top: 4px solid var(--primary-color) !important;">
                     <div class="row align-items-stretch">
                         <div class="col-md-7 mb-4 mb-md-0 border-md-end border-light-subtle d-md-flex flex-md-column py-md-2">
-                            <h6 class="fw-bold mb-3 mb-md-0 text-dark text-uppercase"><i class="bi bi-graph-up-arrow me-2 text-primary"></i>Reporte Financiero</h6>
+                            <h6 class="fw-bold mb-3 mb-md-0 text-dark text-uppercase" style="letter-spacing: 1px;"><i class="bi bi-graph-up-arrow me-2" style="color: var(--primary-color);"></i>Reporte Financiero</h6>
                             <div class="d-flex gap-2 flex-wrap flex-md-nowrap align-items-center my-md-auto py-md-3">
-                                <input type="date" class="form-control form-control-sm" id="filtroInicio">
-                                <input type="date" class="form-control form-control-sm" id="filtroFin">
+                                <input type="date" class="form-control form-control-sm shadow-sm" id="filtroInicio">
+                                <input type="date" class="form-control form-control-sm shadow-sm" id="filtroFin">
                                 <div class="d-flex gap-2 w-100 w-md-auto">
-                                    <button class="btn btn-sm btn-dark flex-grow-1 px-3 fw-bold" onclick="aplicarFiltro()">Calcular</button>
-                                    <button class="btn btn-sm btn-outline-secondary px-3" onclick="limpiarFiltro()">Limpiar</button>
+                                    <button class="btn btn-sm btn-dark flex-grow-1 px-3 fw-bold shadow-sm" onclick="aplicarFiltro()" style="background: #0f172a;">Calcular</button>
+                                    <button class="btn btn-sm btn-outline-secondary px-3 shadow-sm" onclick="limpiarFiltro()">Limpiar</button>
                                 </div>
                             </div>
                             <div class="mt-3 mt-md-0 text-center text-md-start">
-                                <span class="badge bg-light text-dark border px-3 py-2" id="lblRangoFechas">Selecciona fechas</span>
+                                <span class="badge bg-light text-dark border px-3 py-2 shadow-sm rounded-pill" id="lblRangoFechas">Selecciona fechas</span>
                             </div>
                         </div>
                         
                         <div class="col-md-5 text-center text-md-end ps-md-4 d-md-flex flex-md-column justify-content-md-center">
-                            <div class="d-flex flex-column gap-2 align-items-center align-items-md-end">
+                            <div class="d-flex flex-column gap-3 align-items-center align-items-md-end">
                                 <div>
-                                    <h6 class="text-uppercase text-muted fw-bold small mb-0" style="letter-spacing: 1px;">Volumen Total</h6>
-                                    <h3 class="fw-bold text-info mb-0" id="lblTotalVolumen">$0.00</h3>
+                                    <h6 class="text-uppercase text-muted fw-bold small mb-0" style="letter-spacing: 1.5px;">Volumen Total</h6>
+                                    <h3 class="fw-bold mb-0" id="lblTotalVolumen" style="color: var(--primary-color); letter-spacing: -1px;">$0.00</h3>
                                 </div>
-                                <div class="border-top pt-2 w-100 d-md-none"></div>
+                                <div class="border-top pt-2 w-100 d-md-none opacity-50"></div>
                                 <div>
-                                    <h6 class="text-uppercase text-muted fw-bold small mb-0 mt-1" style="letter-spacing: 1px;">Comisión Total</h6>
-                                    <h2 class="fw-bold text-success mb-0" id="lblTotalCobrar">$0.00</h2>
+                                    <h6 class="text-uppercase text-muted fw-bold small mb-0 mt-1" style="letter-spacing: 1.5px;">Comisión Total</h6>
+                                    <h2 class="fw-bold text-success mb-0" id="lblTotalCobrar" style="letter-spacing: -1.5px;">$0.00</h2>
                                 </div>
-                                <div class="border-top pt-2 w-100 d-md-none"></div>
+                                <div class="border-top pt-2 w-100 d-md-none opacity-50"></div>
                                 <div>
-                                    <h6 class="text-uppercase text-muted fw-bold small mb-0 mt-1" style="letter-spacing: 1px;">Bono Explore</h6>
-                                    <h4 class="fw-bold text-primary mb-0" id="lblTotalExplore">$0.00</h4>
+                                    <h6 class="text-uppercase text-muted fw-bold small mb-0 mt-1" style="letter-spacing: 1.5px;">Bono Explore</h6>
+                                    <h4 class="fw-bold mb-0 text-primary" id="lblTotalExplore" style="letter-spacing: -1px;">$0.00</h4>
                                 </div>
                             </div>
                         </div>
@@ -433,13 +493,13 @@
                     
                     <div class="row mb-3 align-items-center border-bottom pb-3">
                         <div class="col-md-5 col-12 mb-2 mb-md-0">
-                            <h6 class="fw-bold mb-0 text-dark text-uppercase"><i class="bi bi-search me-2 text-primary"></i>Buscador de Contratos</h6>
+                            <h6 class="fw-bold mb-0 text-dark text-uppercase" style="letter-spacing: 0.5px;"><i class="bi bi-search me-2" style="color: var(--primary-color);"></i>Buscador de Contratos</h6>
                         </div>
                         <div class="col-md-7 col-12">
-                            <div class="input-group shadow-sm">
-                                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
-                                <input type="text" class="form-control border-start-0 ps-0" id="txtBuscador" placeholder="Cliente, socio, # contrato o fecha..." onkeyup="buscarContrato()">
-                                <button class="btn btn-light border text-danger" type="button" onclick="limpiarBuscador()" title="Limpiar"><i class="bi bi-x-circle-fill"></i></button>
+                            <div class="input-group shadow-sm rounded-pill overflow-hidden border">
+                                <span class="input-group-text bg-white border-0 text-muted ps-3"><i class="bi bi-search"></i></span>
+                                <input type="text" class="form-control border-0 ps-1 shadow-none" id="txtBuscador" placeholder="Cliente, socio, # contrato o fecha..." onkeyup="buscarContrato()">
+                                <button class="btn btn-white border-0 text-danger pe-3" type="button" onclick="limpiarBuscador()" title="Limpiar"><i class="bi bi-x-circle-fill"></i></button>
                             </div>
                         </div>
                     </div>
@@ -448,30 +508,30 @@
                         <table class="table table-hover align-middle mb-0 w-100">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Fecha / Contrato</th>
-                                    <th class="d-none d-md-table-cell">Detalles</th>
-                                    <th class="d-none d-md-table-cell">Status</th>
-                                    <th class="text-end text-md-start">Total / Acciones</th>
-                                    <th class="text-end d-none d-md-table-cell">Acciones</th>
+                                    <th class="text-uppercase small fw-bold text-muted">Fecha / Contrato</th>
+                                    <th class="d-none d-md-table-cell text-uppercase small fw-bold text-muted">Detalles</th>
+                                    <th class="d-none d-md-table-cell text-uppercase small fw-bold text-muted">Status</th>
+                                    <th class="text-end text-md-start text-uppercase small fw-bold text-muted">Total / Acciones</th>
+                                    <th class="text-end d-none d-md-table-cell text-uppercase small fw-bold text-muted">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="tablaResultados"></tbody>
                         </table>
                     </div>
                     <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top flex-wrap gap-2">
-                        <small class="text-muted w-100 text-center w-md-auto text-md-start" id="pageInfo">Mostrando 0 - 0 de 0</small>
+                        <small class="text-muted w-100 text-center w-md-auto text-md-start fw-semibold" id="pageInfo">Mostrando 0 - 0 de 0</small>
                         <div class="w-100 d-flex justify-content-center w-md-auto justify-content-md-end">
-                            <button class="btn btn-sm btn-outline-secondary me-2" onclick="cambiarPagina(-1)" id="btnPrev">Anterior</button>
-                            <button class="btn btn-sm btn-outline-primary" onclick="cambiarPagina(1)" id="btnNext">Siguiente</button>
+                            <button class="btn btn-sm btn-outline-secondary me-2 rounded-pill px-3 fw-bold" onclick="cambiarPagina(-1)" id="btnPrev">Anterior</button>
+                            <button class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold" onclick="cambiarPagina(1)" id="btnNext" style="border-color: var(--primary-color); color: var(--primary-color);">Siguiente</button>
                         </div>
                     </div>
-                    <div id="emptyState" class="text-center py-5 d-none"><i class="bi bi-inbox text-muted display-4 opacity-25"></i><p class="text-muted mt-2 small">No hay registros.</p></div>
+                    <div id="emptyState" class="text-center py-5 d-none"><i class="bi bi-inbox text-muted display-4 opacity-25"></i><p class="text-muted mt-2 small fw-semibold">No hay registros.</p></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="modalDetalle" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content"><div class="modal-header bg-light"><h5 class="modal-title fw-bold text-primary" id="modalTitulo">Detalle</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body p-4" id="modalCuerpo"></div><div class="modal-footer border-0"><button class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Cerrar</button></div></div></div></div>
+    <div class="modal fade" id="modalDetalle" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content"><div class="modal-header bg-light border-0"><h5 class="modal-title fw-bold text-primary" id="modalTitulo">Detalle</h5><button class="btn-close shadow-none" data-bs-dismiss="modal"></button></div><div class="modal-body p-4" id="modalCuerpo"></div><div class="modal-footer border-0 bg-light"><button class="btn btn-dark rounded-pill px-4 fw-bold shadow-sm" data-bs-dismiss="modal">Cerrar</button></div></div></div></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
