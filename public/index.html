@@ -24,6 +24,7 @@
             --accent-dark-blue: #0072ff;
         }
 
+        /* TU FONDO ORIGINAL INTACTO */
         body { 
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
@@ -82,7 +83,6 @@
             color: white;
         }
         
-        /* CIRUGÍA UX: Título de Login con gradiente titanio a azul vibrante, y tipografía unificada (Inter 900) */
         .brand-text { 
             font-family: 'Inter', sans-serif;
             font-weight: 900;
@@ -132,9 +132,142 @@
             background: #ffffff;
         }
 
+        /* Nav Bar Premium Glassmorphism */
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+        .nav-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .nav-brand-group { display: flex; align-items: center; gap: 0.5rem; }
+
+        /* CIRUGÍA UX: Platino Claro Diagonal con Doble Reflejo (Brillan ambas palabras) */
+        .nav-brand-text {
+            font-family: 'Inter', sans-serif;
+            font-weight: 900;
+            font-size: 1.2rem;
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
+            /* Inyectamos dos cortes de luz para cubrir toda la longitud del texto */
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 20%, #94a3b8 35%, #ffffff 42%, #cbd5e1 65%, #94a3b8 80%, #ffffff 86%, #e2e8f0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .user-pill {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50px;
+            padding: 0.35rem; 
+            gap: 0.5rem;
+        }
+        /* CIRUGÍA UX: Borde Oro Ámbar para Avatar (Sincronía VIP con el Header) */
+        .avatar-container { 
+            width: 36px; 
+            height: 36px; 
+            border-radius: 50%; 
+            overflow: hidden; 
+            /* Cambiamos var(--accent-blue) por el tono Oro Ámbar VIP (#fbbf24) */
+            border: 2px solid #fbbf24; 
+            box-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
+        }
+        .user-img { width: 100%; height: 100%; object-fit: cover; }
+        .user-initial { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--accent-dark-blue); color: white; font-weight: 900; font-size: 1rem; }
+        
+        .btn-logout {
+            background: rgba(255, 255, 255, 0.1);
+            color: #f8fafc;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .btn-logout:hover { 
+            background: rgba(255, 255, 255, 0.2); 
+            color: white; 
+            transform: scale(1.1); 
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.2); 
+        }
+
         @media (max-width: 576px) { 
             .login-card { padding: 1.5rem !important; }
+            .nav-brand-text { font-size: 1rem; } 
+            .nav-brand-group .rocket-icon { font-size: 1.5rem !important; }
         }
+
+        /* =========================================================
+           CIRUGÍA UX: REVAMP EJECUTIVO 2026 (Novedoso y sin saturar)
+           ========================================================= */
+        
+        /* 1. Pestañas (Tabs) estilo Segmented Control de iOS */
+        .nav-tabs {
+            background: rgba(15, 23, 42, 0.04);
+            padding: 6px;
+            border-radius: 16px;
+            display: inline-flex;
+            gap: 5px;
+            border-bottom: none;
+        }
+        .nav-tabs .nav-link {
+            color: #64748b;
+            font-weight: 700;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .nav-tabs .nav-link:hover { color: var(--primary-color); }
+        .nav-tabs .nav-link.active {
+            color: var(--primary-color);
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        /* 2. Tabla Magnética (Interacción al pasar el mouse) */
+        .table-hover tbody tr {
+            transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .table-hover tbody tr:hover {
+            transform: scale(1.005) translateX(4px);
+            background-color: rgba(0, 198, 255, 0.03) !important;
+            box-shadow: inset 4px 0 0 var(--accent-blue);
+            cursor: pointer;
+        }
+
+        /* 3. Inputs Vivos (Elevación suave al escribir) */
+        .form-control, .form-select {
+            transition: all 0.25s ease;
+        }
+        .form-control:focus, .form-select:focus { 
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 198, 255, 0.08), 0 0 0 2px rgba(0, 198, 255, 0.2) !important;
+            border-color: var(--accent-blue) !important;
+        }
+
+        /* 4. Badges / Etiquetas Soft-UI Premium */
+        .badge.bg-success { background-color: #d1fae5 !important; color: #065f46 !important; border: 1px solid #6ee7b7; font-weight: 700; padding: 0.4em 0.65em;}
+        .badge.bg-warning { background-color: #fef3c7 !important; color: #92400e !important; border: 1px solid #fcd34d; font-weight: 700; padding: 0.4em 0.65em;}
+        .badge.bg-danger { background-color: #fee2e2 !important; color: #991b1b !important; border: 1px solid #fca5a5; font-weight: 700; padding: 0.4em 0.65em;}
+        .badge.bg-primary { background-color: #e0f2fe !important; color: #0369a1 !important; border: 1px solid #7dd3fc; font-weight: 700; padding: 0.4em 0.65em;}
+        .badge.bg-secondary { background-color: #f1f5f9 !important; color: #475569 !important; border: 1px solid #cbd5e1; font-weight: 700; padding: 0.4em 0.65em;}
+        
     </style>
 </head>
 <body>
@@ -191,28 +324,32 @@
         </div>
     </div>
 
-    <div id="appContent" class="container py-4 d-none">
-        <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
-            <div class="d-flex align-items-center">
-                <i class="bi bi-rocket-takeoff-fill rocket-icon me-2 me-md-3" style="font-size: 2.2rem; line-height: 1; filter: none;"></i>
-                <div>
-                    <h1 class="fw-bold text-white mb-0" style="line-height: 1.1; font-size: 1.7rem; letter-spacing: -0.5px;">
-                        Hola, <span id="userGreetingName" class="text-white">Closer</span> <i class="bi bi-patch-check-fill ms-1" style="font-size: 1.1rem; color: var(--accent-blue);" title="Cuenta Verificada"></i>
-                    </h1>
-                    <p class="text-white-50 mb-0 mt-1" style="font-size: 0.9rem; letter-spacing: 0.5px; font-weight: 600;">Bienvenida a tu centro de mando financiero.</p>
+    <div id="appContent" class="container-fluid px-3 px-md-4 px-lg-5 py-4 d-none" style="max-width: 1440px; margin: 0 auto;">
+        
+        <nav class="glass-nav mb-4 mb-md-5 pb-md-3">
+            <div class="nav-wrapper">
+                <div class="nav-brand-group">
+                    <i class="bi bi-rocket-takeoff-fill rocket-icon" style="font-size: 1.8rem; line-height: 1; filter: none;"></i>
+                    <span class="nav-brand-text">Paycheck Hunter</span>
+                </div>
+                <div class="user-pill shadow-sm">
+                    <div class="avatar-container">
+                        <img src="" id="userProfilePic" class="user-img d-none" alt="Avatar" referrerpolicy="no-referrer">
+                        <div id="userInitials" class="user-initial d-none">C</div>
+                    </div>
+                    <button onclick="cerrarSesion()" class="btn-logout" title="Cerrar Sesión">
+                        <i class="bi bi-power fs-6 fw-bold"></i>
+                    </button>
                 </div>
             </div>
-            
-            <div class="d-flex flex-column align-items-end justify-content-center gap-2">
-                <a href="https://tanyateclab.com" target="_blank" rel="noopener noreferrer" class="d-none d-md-block text-decoration-none" title="Visitar TanyaTec Lab">
-                    <img src="img/TanyaTec-Lab-removebg.png" alt="TanyaTec Lab" style="height: 65px; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.5)); transition: transform 0.2s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                </a>
-                <button onclick="cerrarSesion()" class="btn btn-outline-light rounded-pill px-3 px-md-4 py-1 shadow-sm d-flex align-items-center" title="Salir">
-                    <i class="bi bi-power fs-5" style="transform: scale(1.1);"></i>
-                    <span class="d-none d-md-inline ms-2 fw-bold">Salir</span>
-                </button>
-            </div>
-        </div>
+        </nav>
+
+        <header class="mb-4 mb-md-5 pb-md-3 text-start">
+            <h1 class="fw-bold text-white mb-1" style="line-height: 1.1; font-size: 1.8rem; letter-spacing: -0.5px;">
+                Hola, <span id="userGreetingName" class="text-white">Closer</span> <i class="bi bi-patch-check-fill ms-1" style="font-size: 1.1rem; color: #fbbf24; filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.4));" title="Cuenta VIP Verificada"></i>
+            </h1>
+            <p class="text-white-50 mb-0" style="font-size: 0.95rem; letter-spacing: 0.5px; font-weight: 600;">Bienvenida a tu centro de mando financiero.</p>
+        </header>
 
         <div id="alertasContainer" class="row mb-4 d-none">
             <div class="col-12" id="alertasLista"></div>
@@ -337,7 +474,7 @@
 
                     <div id="tabMaquila" class="d-none">
                         <form id="frmMaquila" onsubmit="return false;">
-                            <div class="alert text-success border-0 shadow-sm mb-4 fw-bold rounded-4" style="background: linear-gradient(to right, #d1fae5, #f0fdf4);"><i class="bi bi-calculator me-2"></i>Calculadora de Paperwork</div>
+                            <div class="alert text-success border-0 shadow-sm mb-4 fw-bold rounded-4" style="background: linear-gradient(to right, #d1fae5, #f0fdf4);"><i class="bi bi-calculator me-2"></i>Calculadora Quirúrgica de Paperwork</div>
                             
                             <div class="row g-3 mb-3">
                                 <div class="col-md-3 col-6"><label class="form-label">Fecha</label><input type="date" class="form-control" id="maqFecha" required></div>
@@ -437,7 +574,7 @@
 
                             <div class="mt-4 pb-2 d-grid gap-2 d-md-flex justify-content-md-end">
                                 <button id="btnCancelarEditMaquila" onclick="cancelarEdicion('maquila')" class="btn btn-light border border-danger-subtle text-danger px-4 py-2 rounded-pill fw-bold shadow-sm d-none">CANCELAR</button>
-                                <button id="btnGuardarMaquila" onclick="guardarMaquila()" class="btn-gradient px-5 py-2 rounded-pill shadow d-flex align-items-center justify-content-center gap-2" style="font-size: 1.05rem;"><i class="bi bi-floppy-fill"></i> GUARDAR PAPERWORK</button>
+                                <button id="btnGuardarMaquila" onclick="guardarMaquila()" class="btn btn-secondary px-5 py-2 rounded-pill shadow d-flex align-items-center justify-content-center gap-2" style="background: linear-gradient(135deg, #166534 0%, #0f172a 100%); border:none; font-size: 1.05rem; font-weight: 700;"><i class="bi bi-floppy-fill"></i> GUARDAR PAPERWORK</button>
                             </div>
                         </form>
                     </div>

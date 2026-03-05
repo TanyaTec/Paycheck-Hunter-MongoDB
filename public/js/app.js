@@ -33,11 +33,13 @@ function handleCredentialResponse(response) {
         const decodedJson = atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/'));
         const payload = JSON.parse(decodedJson);
         
-        // Guardamos su primer nombre
+        // Guardamos nombre y foto de perfil real de Google
         currentUserNombre = (payload.given_name || payload.name || "").toLowerCase();
+        const userPicture = payload.picture || "";
         
         localStorage.setItem('paycheckToken', token);
         localStorage.setItem('paycheckUserName', currentUserNombre);
+        localStorage.setItem('paycheckUserPic', userPicture);
         
         mostrarDashboard();
     } catch (e) {
@@ -54,12 +56,26 @@ function mostrarDashboard() {
     if(loginScreen) loginScreen.classList.add('d-none');
     if(appContent) appContent.classList.remove('d-none');
 
-    // CIRUGÍA UX: Personalización de Saludo Dinámico en el Dashboard
+    // Saludo Dinámico y Renderizado del Avatar
     const greetingEl = document.getElementById('userGreetingName');
-    if (greetingEl && currentUserNombre) {
+    const profilePicEl = document.getElementById('userProfilePic');
+    const userInitialsEl = document.getElementById('userInitials');
+    const picUrl = localStorage.getItem('paycheckUserPic');
+
+    if (currentUserNombre) {
         // Capitalizamos la primera letra
         const nombreFormateado = currentUserNombre.charAt(0).toUpperCase() + currentUserNombre.slice(1);
-        greetingEl.innerText = nombreFormateado;
+        if(greetingEl) greetingEl.innerText = nombreFormateado;
+        
+        if (picUrl && profilePicEl) {
+            profilePicEl.src = picUrl;
+            profilePicEl.classList.remove('d-none');
+            if(userInitialsEl) userInitialsEl.classList.add('d-none');
+        } else if (userInitialsEl) {
+            userInitialsEl.innerText = nombreFormateado.charAt(0);
+            userInitialsEl.classList.remove('d-none');
+            if(profilePicEl) profilePicEl.classList.add('d-none');
+        }
     }
     
     cargarDatosUnificados(); 
@@ -68,6 +84,7 @@ function mostrarDashboard() {
 function cerrarSesion() {
     localStorage.removeItem('paycheckToken');
     localStorage.removeItem('paycheckUserName');
+    localStorage.removeItem('paycheckUserPic');
     location.reload(); 
 }
 
@@ -801,7 +818,7 @@ function cancelarEdicion(mode) {
     if (mode === 'ventas') {
         document.getElementById('frmVenta').reset();
         document.getElementById('txtFecha').valueAsDate = new Date();
-        document.getElementById('btnGuardarVenta').innerHTML = '<i class="bi bi-floppy-fill"></i> GUARDAR VENTA';
+        document.getElementById('btnGuardarVenta').innerHTML = '<i class="bi bi-floppy-fill me-2"></i>GUARDAR VENTA';
         document.getElementById('btnCancelarEditVenta').classList.add('d-none');
         
         document.getElementById('cmbNumVendedores').value = 1;
@@ -819,7 +836,7 @@ function cancelarEdicion(mode) {
     } else {
         document.getElementById('frmMaquila').reset();
         document.getElementById('maqFecha').valueAsDate = new Date();
-        document.getElementById('btnGuardarMaquila').innerHTML = '<i class="bi bi-floppy-fill"></i> GUARDAR PAPERWORK';
+        document.getElementById('btnGuardarMaquila').innerHTML = '<i class="bi bi-floppy-fill me-2"></i>GUARDAR PAPERWORK';
         document.getElementById('btnCancelarEditMaquila').classList.add('d-none');
         document.getElementById('maqTipoPack').checked = true;
         toggleTipoPagoMaquila();
