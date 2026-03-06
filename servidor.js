@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const { OAuth2Client } = require('google-auth-library');
+const jwt = require('jsonwebtoken'); // CIRUGÍA UX: Fábrica de Llaves Infinitas
 
 const app = express();
 const PUERTO = process.env.PORT || 3000; 
@@ -10,6 +11,7 @@ const PUERTO = process.env.PORT || 3000;
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 const VIP_USERS = process.env.VIP_USERS ? process.env.VIP_USERS.split(',').map(e => e.trim().toLowerCase()) : [];
+const JWT_SECRET = process.env.JWT_SECRET || 'paycheck_secreto_infinito_2026'; // Secreto para firmar tus llaves
 
 app.use(cors());
 app.use(express.json());
@@ -106,7 +108,40 @@ mongoose.connect(URI_NUBE)
     .catch(err => console.error('❌ Error conectando a Atlas:', err));
 
 
-// --- 3. MIDDLEWARE DE SEGURIDAD (CADENERO GOOGLE VIP) ---
+// --- 3. MIDDLEWARE Y LOGIN PERMANENTE (LLAVE INFINITA JWT) ---
+
+// A. Ruta para canjear el token de Google (1hr) por nuestra Llave Infinita (1 año)
+app.post('/api/auth/google', async (req, res) => {
+    const { googleToken } = req.body;
+    try {
+        // 1. Verificamos que Google lo apruebe
+        const ticket = await client.verifyIdToken({ idToken: googleToken, audience: GOOGLE_CLIENT_ID });
+        const payload = ticket.getPayload();
+        const emailUsuario = payload['email'].toLowerCase();
+        const nombreUsuario = payload['given_name'] || payload['name'];
+
+        // 2. Verificamos que esté en la lista VIP de Render
+        if (!VIP_USERS.includes(emailUsuario)) {
+            console.log(`⛔ Intento de acceso bloqueado para: ${emailUsuario}`);
+            return res.status(403).json({ error: "Suscripción Inactiva. Contacta al administrador." });
+        }
+
+        // 3. Creamos TU propia llave que dura 365 días
+        const tokenPermanente = jwt.sign(
+            { email: emailUsuario, nombre: nombreUsuario }, 
+            JWT_SECRET, 
+            { expiresIn: '365d' }
+        );
+
+        // Devolvemos la llave permanente a la app
+        res.json({ token: tokenPermanente, nombre: nombreUsuario, picture: payload['picture'] });
+    } catch (error) {
+        console.error("❌ Error en Login de Google:", error.message);
+        res.status(403).json({ error: "Credencial inválida o expirada." });
+    }
+});
+
+// B. El Cadenero: Revisa NUESTRA llave de 1 año, no la de Google
 async function guardiaDeSeguridad(req, res, next) {
     const tokenEntrante = req.headers['authorization'];
     
@@ -115,27 +150,20 @@ async function guardiaDeSeguridad(req, res, next) {
     }
 
     try {
-        const ticket = await client.verifyIdToken({
-            idToken: tokenEntrante,
-            audience: GOOGLE_CLIENT_ID,
-        });
+        // Leemos nuestra llave infinita
+        const decodificado = jwt.verify(tokenEntrante, JWT_SECRET);
         
-        const payload = ticket.getPayload();
-        const emailUsuario = payload['email'].toLowerCase();
-        const nombreUsuario = payload['given_name'] || payload['name']; 
-
-        if (!VIP_USERS.includes(emailUsuario)) {
-            console.log(`⛔ Intento de acceso bloqueado para: ${emailUsuario}`);
-            return res.status(403).json({ error: "Suscripción Inactiva. Contacta al administrador." });
+        // Re-validamos que siga en la lista VIP por seguridad
+        if (!VIP_USERS.includes(decodificado.email)) {
+            return res.status(403).json({ error: "Acceso revocado." });
         }
 
-        req.usuarioEmail = emailUsuario;
-        req.usuarioNombre = nombreUsuario;
-        next();
+        req.usuarioEmail = decodificado.email;
+        req.usuarioNombre = decodificado.nombre;
+        next(); 
 
     } catch (error) {
-        console.error("❌ Error escaneando token de Google:", error.message);
-        res.status(403).json({ error: "Sesión expirada o credencial inválida." });
+        res.status(403).json({ error: "Sesión expirada. Vuelve a iniciar sesión." });
     }
 }
 

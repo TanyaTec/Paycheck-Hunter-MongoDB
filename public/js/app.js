@@ -24,28 +24,38 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Función que se ejecuta cuando el usuario se loguea exitosamente en Google
-function handleCredentialResponse(response) {
-    const token = response.credential;
+async function handleCredentialResponse(response) {
+    const googleToken = response.credential;
     
-    // Decodificamos el pase de Google para leer el nombre del usuario
     try {
-        const payloadBase64 = token.split('.')[1];
-        const decodedJson = atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/'));
-        const payload = JSON.parse(decodedJson);
+        // Vamos al backend a cambiar el token de Google (1hr) por nuestra Llave Infinita JWT (1 año)
+        const res = await fetch(`${BASE_URL}/api/auth/google`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ googleToken })
+        });
         
-        // Guardamos nombre y foto de perfil real de Google
-        currentUserNombre = (payload.given_name || payload.name || "").toLowerCase();
-        const userPicture = payload.picture || "";
+        const data = await res.json();
         
-        localStorage.setItem('paycheckToken', token);
-        localStorage.setItem('paycheckUserName', currentUserNombre);
-        localStorage.setItem('paycheckUserPic', userPicture);
-        
-        mostrarDashboard();
+        if (res.ok && data.token) {
+            currentUserNombre = data.nombre.toLowerCase();
+            
+            // Guardamos nuestra llave permanente en el teléfono/navegador
+            localStorage.setItem('paycheckToken', data.token); 
+            localStorage.setItem('paycheckUserName', currentUserNombre);
+            localStorage.setItem('paycheckUserPic', data.picture || "");
+            
+            mostrarDashboard();
+        } else {
+            throw new Error(data.error || "Acceso denegado por el servidor");
+        }
     } catch (e) {
-        console.error("Error decodificando token", e);
+        console.error("Error canjeando token", e);
         const errorMsg = document.getElementById('loginError');
-        if(errorMsg) errorMsg.classList.remove('d-none');
+        if(errorMsg) {
+            errorMsg.innerHTML = `<p class="text-danger fw-bold bg-danger-subtle p-2 rounded-3 small mb-0 border border-danger-subtle d-flex align-items-center justify-content-center gap-1"><i class="bi bi-exclamation-triangle-fill"></i> ${e.message}</p>`;
+            errorMsg.classList.remove('d-none');
+        }
     }
 }
 
