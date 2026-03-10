@@ -122,7 +122,6 @@
             padding: 2.5rem !important; 
         }
         
-        /* CIRUGÍA UX: Wrapper del Botón Google (Alta visibilidad con pulso magnético) */
         .google-btn-wrapper {
             background: rgba(0, 198, 255, 0.05);
             border: 1px solid rgba(0, 198, 255, 0.4);
@@ -131,7 +130,7 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0, 198, 255, 0.15);
             display: inline-block;
-            animation: pulse-login 2.5s infinite; /* Atrae la mirada suavemente */
+            animation: pulse-login 2.5s infinite; 
         }
         .google-btn-wrapper:hover {
             border-color: var(--accent-dark-blue);
@@ -145,7 +144,6 @@
             100% { box-shadow: 0 0 0 0 rgba(0, 198, 255, 0); }
         }
 
-        /* Nav Bar Premium Glassmorphism */
         .glass-nav {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(20px);
@@ -163,14 +161,12 @@
         }
         .nav-brand-group { display: flex; align-items: center; gap: 0.5rem; }
 
-        /* CIRUGÍA UX: Platino Claro Diagonal con Doble Reflejo (Brillan ambas palabras) */
         .nav-brand-text {
             font-family: 'Inter', sans-serif;
             font-weight: 900;
             font-size: 1.2rem;
             letter-spacing: -0.5px;
             text-transform: uppercase;
-            /* Inyectamos dos cortes de luz para cubrir toda la longitud del texto */
             background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 20%, #94a3b8 35%, #ffffff 42%, #cbd5e1 65%, #94a3b8 80%, #ffffff 86%, #e2e8f0 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -186,7 +182,6 @@
             padding: 0.35rem; 
             gap: 0.5rem;
         }
-        /* CIRUGÍA UX: Borde de avatar en Oro Ámbar VIP (haciendo match con la estrellita) */
         .avatar-container { 
             width: 36px; 
             height: 36px; 
@@ -219,10 +214,20 @@
             box-shadow: 0 0 12px rgba(255, 255, 255, 0.2); 
         }
 
-        @media (max-width: 576px) { 
-            .login-card { padding: 1.5rem !important; }
-            .nav-brand-text { font-size: 1rem; } 
-            .nav-brand-group .rocket-icon { font-size: 1.5rem !important; }
+        /* CIRUGÍA UX: Accesibilidad móvil (Tamaños y anti-zoom) */
+        @media (max-width: 768px) {
+            label, .form-label, .small, small, .badge { font-size: 0.85rem !important; }
+            .form-control, .form-select, .input-group-text { font-size: 1rem !important; padding: 0.6rem 0.75rem !important; }
+            .form-control-sm, .form-select-sm { font-size: 0.95rem !important; padding: 0.5rem 0.6rem !important; height: auto !important; }
+            .form-check-label { font-size: 0.95rem !important; margin-left: 0.3rem; }
+            .form-check-input { transform: scale(1.2); }
+            .form-control.d-flex.align-items-center { height: auto !important; padding: 0.6rem !important; }
+            .row.g-3 > div { margin-bottom: 0.5rem; }
+            
+            /* Mejoras visuales específicas para el acumulado mensual en celular */
+            .mes-stats { flex-direction: column !important; }
+            .mes-stats > div { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; padding-top: 15px; }
+            .mes-stats > div:last-child { border-bottom: none !important; }
         }
     </style>
 </head>
@@ -301,12 +306,61 @@
             </div>
         </nav>
 
-        <header class="mb-4 mb-md-5 pb-md-3 text-start">
-            <h1 class="fw-bold text-white mb-1" style="line-height: 1.1; font-size: 1.8rem; letter-spacing: -0.5px;">
-                Hola, <span id="userGreetingName" class="text-white">Closer</span> <i class="bi bi-patch-check-fill ms-1" style="font-size: 1.1rem; color: #fbbf24; filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.4));" title="Cuenta VIP Verificada"></i>
-            </h1>
-            <p class="text-white-50 mb-0" style="font-size: 0.95rem; letter-spacing: 0.5px; font-weight: 600;">Bienvenida a tu centro de mando financiero.</p>
-        </header>
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4 gap-3">
+            
+            <header class="text-start mb-0">
+                <h1 class="fw-bold text-white mb-1" style="line-height: 1.1; font-size: 1.8rem; letter-spacing: -0.5px;">
+                    Hola, <span id="userGreetingName" class="text-white">Closer</span> <i class="bi bi-patch-check-fill ms-1" style="font-size: 1.1rem; color: #fbbf24; filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.4));" title="Cuenta VIP Verificada"></i>
+                </h1>
+                <p class="text-white-50 mb-0" style="font-size: 0.95rem; letter-spacing: 0.5px; font-weight: 600;">Te damos la bienvenida a tu centro de mando financiero.</p>
+            </header>
+
+            <div class="d-flex flex-column align-items-start align-items-lg-end mt-3 mt-lg-0">
+                <h6 class="text-uppercase fw-bold text-white-50 mb-2" style="letter-spacing: 1px; font-size: 0.7rem;">
+                    <i class="bi bi-fire me-1" style="color: #ea580c;"></i>Tu acumulado de <span id="lblMesActualNombre"></span>
+                </h6>
+                
+                <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-2 gap-md-3 px-3 py-2 rounded-4 shadow-sm" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);">
+                    
+                    <div class="d-flex align-items-center">
+                        <div class="d-flex align-items-baseline gap-2">
+                            <small class="text-uppercase fw-bold" style="color: #cbd5e1; font-size: 0.65rem;">Volumen</small>
+                            <span class="fw-bold text-white" style="font-size: 1.1rem; line-height: 1;" id="mesVolumen">$0.00</span>
+                        </div>
+                        <div class="border-start border-secondary border-opacity-50 d-none d-md-block ms-3" style="height: 15px;"></div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="d-flex align-items-baseline gap-2">
+                            <small class="text-uppercase fw-bold" style="color: #cbd5e1; font-size: 0.65rem;">Neto</small>
+                            <span class="fw-bold" style="color: #10b981; font-size: 1.1rem; line-height: 1;" id="mesComision">$0.00</span>
+                        </div>
+
+                        <div id="mesBlockExplore" class="d-none">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="border-start border-secondary border-opacity-50 d-none d-md-block" style="height: 15px;"></div>
+                                <div class="d-flex align-items-baseline gap-2">
+                                    <small class="text-info text-uppercase fw-bold" style="font-size: 0.65rem;">Explore</small>
+                                    <span class="fw-bold text-info" style="font-size: 1.1rem; line-height: 1;" id="mesExplore">$0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="mesBlockMalibu" class="d-none">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="border-start border-secondary border-opacity-50 d-none d-md-block" style="height: 15px;"></div>
+                            <div class="d-flex align-items-baseline gap-2">
+                                <small class="text-uppercase fw-bold" style="color: #fbbf24; font-size: 0.65rem;">Malibu</small>
+                                <span class="fw-bold" style="color: #fbbf24; font-size: 1.1rem; line-height: 1;" id="mesMalibu">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
 
         <div id="alertasContainer" class="row mb-4 d-none">
             <div class="col-12" id="alertasLista"></div>
@@ -418,10 +472,22 @@
                                     </div>
                                 </div>
                             </div>
+                            
                             <div class="row g-3 mb-4">
-                                <div class="col-md-4 col-12"><div class="form-check mt-1"><input class="form-check-input border-primary" type="checkbox" id="chkExplore" onchange="toggleExplore()"><label class="form-check-label fw-bold text-primary">¿Explore Package?</label></div><div id="exploreFields" class="d-none bg-info-subtle p-3 rounded-4 mt-2 shadow-sm border border-info-subtle"><div class="d-flex flex-wrap align-items-end gap-2"><div class="flex-grow-1"><label class="small fw-bold text-dark">Fecha Promesa</label><input type="date" class="form-control form-control-sm border-info" id="txtFechaPromesa"></div><div class="form-check mb-1 bg-white px-2 py-1 rounded border"><input class="form-check-input ms-1" type="checkbox" id="chkExploreHoy" onchange="toggleExploreHoy()"><label class="form-check-label small fw-bold ms-2">Hoy</label></div></div></div></div>
-                                <div class="col-md-8 col-12"><label class="form-label text-muted small fw-bold">Comentarios</label><textarea class="form-control shadow-sm" id="txtComentarios" rows="2"></textarea></div>
+                                <div class="col-md-3 col-12">
+                                    <div class="form-check mt-1"><input class="form-check-input border-primary" type="checkbox" id="chkExplore" onchange="toggleExplore()"><label class="form-check-label fw-bold text-primary">¿Explore Package?</label></div>
+                                    <div id="exploreFields" class="d-none bg-info-subtle p-3 rounded-4 mt-2 shadow-sm border border-info-subtle"><div class="d-flex flex-wrap align-items-end gap-2"><div class="flex-grow-1"><label class="small fw-bold text-dark">Fecha Promesa</label><input type="date" class="form-control form-control-sm border-info" id="txtFechaPromesa"></div><div class="form-check mb-1 bg-white px-2 py-1 rounded border"><input class="form-check-input ms-1" type="checkbox" id="chkExploreHoy" onchange="toggleExploreHoy()"><label class="form-check-label small fw-bold ms-2">Hoy</label></div></div></div>
+                                </div>
+                                <div class="col-md-3 col-12">
+                                    <div class="form-check mt-1"><input class="form-check-input" type="checkbox" id="chkMalibu" onchange="toggleMalibu()" style="border-color: #800000;"><label class="form-check-label fw-bold" style="color: #800000;">¿Malibu?</label></div>
+                                    <div id="malibuFields" class="d-none p-3 rounded-4 mt-2 shadow-sm" style="background-color: #fff0f0; border: 1px solid #fecaca;">
+                                        <label class="small fw-bold" style="color: #800000;">Bono Efectivo ($)</label>
+                                        <input type="number" class="form-control form-control-sm" id="txtMalibuMonto" placeholder="Ej. 200" style="border-color: #fca5a5;">
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-12"><label class="form-label text-muted small fw-bold">Comentarios</label><textarea class="form-control shadow-sm" id="txtComentarios" rows="2"></textarea></div>
                             </div>
+
                             <div class="mt-2 pb-2 d-grid gap-2 d-md-flex justify-content-md-end">
                                 <button id="btnCancelarEditVenta" onclick="cancelarEdicion('ventas')" class="btn btn-light border border-danger-subtle text-danger px-4 py-2 rounded-pill fw-bold shadow-sm d-none">CANCELAR</button>
                                 <button id="btnGuardarVenta" onclick="guardarVenta()" class="btn-gradient px-5 py-2 rounded-pill shadow d-flex align-items-center justify-content-center gap-2" style="font-size: 1.05rem;"><i class="bi bi-floppy-fill"></i> GUARDAR VENTA</button>
@@ -544,15 +610,23 @@
                 <div class="card p-4 border-0 shadow-lg" style="background: #ffffff; border-radius: 28px; color: #0f172a; border-top: 4px solid var(--primary-color) !important;">
                     <div class="row align-items-stretch">
                         <div class="col-md-7 mb-4 mb-md-0 border-md-end border-light-subtle d-md-flex flex-md-column py-md-2">
-                            <h6 class="fw-bold mb-3 mb-md-0 text-dark text-uppercase" style="letter-spacing: 1px;"><i class="bi bi-graph-up-arrow me-2" style="color: var(--primary-color);"></i>Reporte Financiero</h6>
-                            <div class="d-flex gap-2 flex-wrap flex-md-nowrap align-items-center my-md-auto py-md-3">
-                                <input type="date" class="form-control form-control-sm shadow-sm" id="filtroInicio">
-                                <input type="date" class="form-control form-control-sm shadow-sm" id="filtroFin">
-                                <div class="d-flex gap-2 w-100 w-md-auto">
-                                    <button class="btn btn-sm btn-dark flex-grow-1 px-3 fw-bold shadow-sm" onclick="aplicarFiltro()" style="background: #0f172a;">Calcular</button>
-                                    <button class="btn btn-sm btn-outline-secondary px-3 shadow-sm" onclick="limpiarFiltro()">Limpiar</button>
+                            <h6 class="fw-bold mb-3 mb-md-0 text-dark text-uppercase" style="letter-spacing: 1px;"><i class="bi bi-calculator me-2" style="color: var(--primary-color);"></i>Calculadora de Comisiones</h6>
+                            
+                            <div class="d-flex flex-column flex-md-row gap-2 my-md-auto py-md-3 w-100">
+                                <div class="w-100">
+                                    <label class="d-md-none text-muted small fw-bold mb-1"><i class="bi bi-calendar-range me-1"></i>Desde:</label>
+                                    <input type="date" class="form-control form-control-sm shadow-sm w-100" id="filtroInicio">
+                                </div>
+                                <div class="w-100">
+                                    <label class="d-md-none text-muted small fw-bold mb-1"><i class="bi bi-calendar-range-fill me-1"></i>Hasta:</label>
+                                    <input type="date" class="form-control form-control-sm shadow-sm w-100" id="filtroFin">
+                                </div>
+                                <div class="d-flex gap-2 w-100 mt-2 mt-md-0 align-items-end">
+                                    <button class="btn btn-sm btn-dark flex-grow-1 px-3 fw-bold shadow-sm h-100" onclick="aplicarFiltro()" style="background: #0f172a; min-height: 36px;">Calcular</button>
+                                    <button class="btn btn-sm btn-outline-secondary px-3 shadow-sm h-100" onclick="limpiarFiltro()" style="min-height: 36px;">Limpiar</button>
                                 </div>
                             </div>
+
                             <div class="mt-3 mt-md-0 text-center text-md-start">
                                 <span class="badge bg-light text-dark border px-3 py-2 shadow-sm rounded-pill" id="lblRangoFechas">Selecciona fechas</span>
                             </div>
@@ -561,7 +635,7 @@
                         <div class="col-md-5 text-center text-md-end ps-md-4 d-md-flex flex-md-column justify-content-md-center">
                             <div class="d-flex flex-column gap-3 align-items-center align-items-md-end">
                                 <div>
-                                    <h6 class="text-uppercase text-muted fw-bold small mb-0" style="letter-spacing: 1.5px;">Volumen Total</h6>
+                                    <h6 class="text-uppercase text-muted fw-bold small mb-0" style="letter-spacing: 1.5px;">Volumen Rango</h6>
                                     <h3 class="fw-bold mb-0" id="lblTotalVolumen" style="color: var(--primary-color); letter-spacing: -1px;">$0.00</h3>
                                 </div>
                                 <div class="border-top pt-2 w-100 d-md-none opacity-50"></div>
@@ -570,10 +644,18 @@
                                     <h2 class="fw-bold text-success mb-0" id="lblTotalCobrar" style="letter-spacing: -1.5px;">$0.00</h2>
                                 </div>
                                 <div class="border-top pt-2 w-100 d-md-none opacity-50"></div>
-                                <div>
+                                
+                                <div class="w-100 d-flex flex-column align-items-center align-items-md-end">
                                     <h6 class="text-uppercase text-muted fw-bold small mb-0 mt-1" style="letter-spacing: 1.5px;">Bono Explore</h6>
                                     <h4 class="fw-bold mb-0 text-primary" id="lblTotalExplore" style="letter-spacing: -1px;">$0.00</h4>
                                 </div>
+                                
+                                <div id="blockTotalMalibu" class="d-none w-100 flex-column align-items-center align-items-md-end mt-2">
+                                    <div class="border-top pt-2 w-100 d-md-none opacity-50 mb-1"></div>
+                                    <h6 class="text-uppercase fw-bold small mb-0 mt-1" style="letter-spacing: 1.5px; color: #800000;">Bono Malibu</h6>
+                                    <h4 class="fw-bold mb-0" id="lblTotalMalibu" style="letter-spacing: -1px; color: #800000;">$0.00</h4>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -637,9 +719,25 @@
 
     <div class="modal fade" id="modalDetalle" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content"><div class="modal-header bg-light border-0"><h5 class="modal-title fw-bold text-primary" id="modalTitulo">Detalle</h5><button class="btn-close shadow-none" data-bs-dismiss="modal"></button></div><div class="modal-body p-4" id="modalCuerpo"></div><div class="modal-footer border-0 bg-light"><button class="btn btn-dark rounded-pill px-4 fw-bold shadow-sm" data-bs-dismiss="modal">Cerrar</button></div></div></div></div>
 
+    <div class="modal fade" id="modalCelebracion" tabindex="-1" aria-hidden="true" style="z-index: 1055;">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg text-center" style="background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.2) !important; border-radius: 32px;">
+                <div class="modal-body p-5 text-white">
+                    <div id="celIcon" style="font-size: 4.5rem; filter: drop-shadow(0 0 15px rgba(0, 198, 255, 0.5)); margin-bottom: 1rem;">🚀</div>
+                    <h2 id="celTitle" class="fw-bold mb-2" style="background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">¡Felicidades!</h2>
+                    <p id="celMessage" class="text-white-50 mb-4" style="font-size: 1.05rem;">Tu venta ha sido registrada exitosamente.</p>
+                    <button type="button" class="btn px-5 py-2 rounded-pill fw-bold shadow-sm text-white" data-bs-dismiss="modal" id="celButton" style="background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%); border: none; letter-spacing: 0.5px;">¡A seguir facturando!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="js/app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script src="js/app.js?v=acumuladoMensual"></script>
+    
     <script>
         document.getElementById('txtFecha').valueAsDate = new Date();
         document.getElementById('maqFecha').valueAsDate = new Date();

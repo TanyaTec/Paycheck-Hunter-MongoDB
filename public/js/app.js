@@ -8,49 +8,63 @@ let filteredData = [];
 let currentPage = 1;
 const itemsPerPage = 10;
 
-// Variables dinámicas del usuario autenticado
 let currentUserNombre = "";
 
-// --- INICIALIZACIÓN Y GOOGLE AUTH ---
+const successMessages = {
+    'nueva_venta': { icon: '🚀', title: '¡Venta Cerrada!', msg: '¡Excelente trabajo, Closer! Una comisión más al bolsillo.', btn: '¡A seguir facturando! 💸' },
+    'update_venta': { icon: '📝', title: '¡Datos Actualizados!', msg: 'Los datos de la venta han sido ajustados con precisión.', btn: 'Entendido' },
+    'nueva_maquila': { icon: '🤝', title: '¡Paperwork Listo!', msg: 'Un trámite menos, un paso más cerca de tu meta.', btn: '¡Excelente!' },
+    'update_maquila': { icon: '📝', title: '¡Paperwork Actualizado!', msg: 'Documentación al día y en orden.', btn: 'Entendido' },
+    'pago_explore': { icon: '💰', title: '¡Explore Cobrado!', msg: 'Ese bono ya está en la bolsa. ¡Felicidades!', btn: '¡A celebrar! 🎉' }
+};
+
+function detonarCelebracion(tipoAccion) {
+    const config = successMessages[tipoAccion] || successMessages['nueva_venta'];
+    
+    document.getElementById('celIcon').innerText = config.icon;
+    document.getElementById('celTitle').innerText = config.title;
+    document.getElementById('celMessage').innerText = config.msg;
+    document.getElementById('celButton').innerText = config.btn;
+
+    const modalEl = document.getElementById('modalCelebracion');
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+
+    if (tipoAccion === 'nueva_venta' || tipoAccion === 'pago_explore') {
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#00c6ff', '#0072ff', '#fbbf24', '#ffffff'], zIndex: 10000 });
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const tokenGuardado = localStorage.getItem('paycheckToken');
     const nombreGuardado = localStorage.getItem('paycheckUserName');
 
-    // Si ya hay sesión, entramos directo
     if (tokenGuardado && nombreGuardado) {
         currentUserNombre = nombreGuardado;
         mostrarDashboard();
     }
 });
 
-// Función que se ejecuta cuando el usuario se loguea exitosamente en Google
 async function handleCredentialResponse(response) {
     const googleToken = response.credential;
-    
     try {
-        // Vamos al backend a cambiar el token de Google (1hr) por nuestra Llave Infinita JWT (1 año)
         const res = await fetch(`${BASE_URL}/api/auth/google`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ googleToken })
         });
-        
         const data = await res.json();
         
         if (res.ok && data.token) {
             currentUserNombre = data.nombre.toLowerCase();
-            
-            // Guardamos nuestra llave permanente en el teléfono/navegador
             localStorage.setItem('paycheckToken', data.token); 
             localStorage.setItem('paycheckUserName', currentUserNombre);
             localStorage.setItem('paycheckUserPic', data.picture || "");
-            
             mostrarDashboard();
         } else {
             throw new Error(data.error || "Acceso denegado por el servidor");
         }
     } catch (e) {
-        console.error("Error canjeando token", e);
         const errorMsg = document.getElementById('loginError');
         if(errorMsg) {
             errorMsg.innerHTML = `<p class="text-danger fw-bold bg-danger-subtle p-2 rounded-3 small mb-0 border border-danger-subtle d-flex align-items-center justify-content-center gap-1"><i class="bi bi-exclamation-triangle-fill"></i> ${e.message}</p>`;
@@ -66,14 +80,12 @@ function mostrarDashboard() {
     if(loginScreen) loginScreen.classList.add('d-none');
     if(appContent) appContent.classList.remove('d-none');
 
-    // Saludo Dinámico y Renderizado del Avatar
     const greetingEl = document.getElementById('userGreetingName');
     const profilePicEl = document.getElementById('userProfilePic');
     const userInitialsEl = document.getElementById('userInitials');
     const picUrl = localStorage.getItem('paycheckUserPic');
 
     if (currentUserNombre) {
-        // Capitalizamos la primera letra
         const nombreFormateado = currentUserNombre.charAt(0).toUpperCase() + currentUserNombre.slice(1);
         if(greetingEl) greetingEl.innerText = nombreFormateado;
         
@@ -98,10 +110,8 @@ function cerrarSesion() {
     location.reload(); 
 }
 
-// --- NAVEGACIÓN Y UI ---
 function switchTab(mode) {
     currentMode = mode;
-    
     document.querySelectorAll('.nav-link').forEach(t => t.classList.remove('active'));
     
     if (mode === 'ventas') {
@@ -113,32 +123,28 @@ function switchTab(mode) {
         document.getElementById('tabVentas').classList.add('d-none');
         document.getElementById('tabMaquila').classList.remove('d-none');
     }
-
-    try {
-        cancelarEdicion(mode); 
-        limpiarFiltro(false);
-    } catch(e) { console.error("Error reseteando formulario", e); }
+    try { cancelarEdicion(mode); limpiarFiltro(false); } catch(e) {}
 }
 
 function toggleExplore() {
     const check = document.getElementById('chkExplore');
     const fields = document.getElementById('exploreFields');
-    if(check && fields) {
-        check.checked ? fields.classList.remove('d-none') : fields.classList.add('d-none');
-    }
+    if(check && fields) check.checked ? fields.classList.remove('d-none') : fields.classList.add('d-none');
 }
 
 function toggleExploreHoy() {
     const chk = document.getElementById('chkExploreHoy');
     const dateInput = document.getElementById('txtFechaPromesa');
     if (chk && dateInput) {
-        if (chk.checked) {
-            dateInput.value = ''; 
-            dateInput.disabled = true; 
-        } else {
-            dateInput.disabled = false; 
-        }
+        if (chk.checked) { dateInput.value = ''; dateInput.disabled = true; } 
+        else { dateInput.disabled = false; }
     }
+}
+
+function toggleMalibu() {
+    const check = document.getElementById('chkMalibu');
+    const fields = document.getElementById('malibuFields');
+    if(check && fields) check.checked ? fields.classList.remove('d-none') : fields.classList.add('d-none');
 }
 
 function togglePendiente(mode) {
@@ -163,20 +169,15 @@ function toggleTipoPagoMaquila() {
     const pctContainer = document.getElementById('maqPorcentajeContainer');
     
     if(isPack) {
-        packContainer.classList.remove('d-none');
-        pctContainer.classList.add('d-none');
+        packContainer.classList.remove('d-none'); pctContainer.classList.add('d-none');
     } else {
-        packContainer.classList.add('d-none');
-        pctContainer.classList.remove('d-none');
+        packContainer.classList.add('d-none'); pctContainer.classList.remove('d-none');
     }
     calcularMaquila();
 }
 
-// --- LÓGICA MATEMÁTICA PRINCIPAL ---
-
 function calcularMiVolumen(item) {
     if (item.type !== 'venta') return 0;
-    
     let monto = parseFloat(item.monto) || 0;
     let numVend = parseInt(item.num_vendedores) || 1;
     let liner = parseInt(item.es_liner) === 1 ? 1 : 0;
@@ -186,7 +187,6 @@ function calcularMiVolumen(item) {
 
     let esCasado = parseInt(item.es_casado) === 1;
     let tipoCasado = item.tipo_casado || 'Comisión'; 
-    
     let nombreUsuario = currentUserNombre; 
     let listaVendedores = (item.vendedores || "").toLowerCase();
     let nombreLiner = (item.nombre_liner || "").toLowerCase();
@@ -196,33 +196,22 @@ function calcularMiVolumen(item) {
 
     if (participeDirectamente) {
         miVolumen = volumenPorPersona;
-        if (esCasado && (tipoCasado === 'Volumen' || tipoCasado === 'Ambas')) {
-            miVolumen = miVolumen / 2;
-        }
+        if (esCasado && (tipoCasado === 'Volumen' || tipoCasado === 'Ambas')) miVolumen = miVolumen / 2;
     } else {
-        if (esCasado && (tipoCasado === 'Volumen' || tipoCasado === 'Ambas')) {
-            miVolumen = volumenPorPersona / 2;
-        } else {
-            miVolumen = 0;
-        }
+        if (esCasado && (tipoCasado === 'Volumen' || tipoCasado === 'Ambas')) miVolumen = volumenPorPersona / 2;
+        else miVolumen = 0;
     }
-    
     return miVolumen;
 }
 
 function renderVendedoresInputs() {
     const cmb = document.getElementById('cmbNumVendedores');
     if(!cmb) return;
-
     const num = parseInt(cmb.value);
     const container = document.getElementById('containerVendedores');
     let html = '';
-    
     for(let i=1; i<=num; i++) {
-        html += `
-            <label class="form-label text-muted small">Nombre Vendedor ${i}</label>
-            <input type="text" class="form-control mb-2 form-control-sm" id="vend_${i}" placeholder="Nombre...">
-        `;
+        html += `<label class="form-label text-muted small">Nombre Vendedor ${i}</label><input type="text" class="form-control mb-2 form-control-sm" id="vend_${i}" placeholder="Nombre...">`;
     }
     container.innerHTML = html;
     calcularMatematica(); 
@@ -231,10 +220,7 @@ function renderVendedoresInputs() {
 function toggleLiner() {
     const chk = document.getElementById('chkLiner');
     const input = document.getElementById('txtLinerName');
-    if(chk && input) {
-        chk.checked ? input.classList.remove('d-none') : input.classList.add('d-none');
-        calcularMatematica();
-    }
+    if(chk && input) { chk.checked ? input.classList.remove('d-none') : input.classList.add('d-none'); calcularMatematica(); }
 }
 
 function calcularMatematica() {
@@ -258,9 +244,7 @@ function calcularMatematica() {
 
     if (document.getElementById('chkCasado').checked) {
         const tipoCasado = document.getElementById('cmbTipoCasado').value;
-        if (tipoCasado === 'Comisión' || tipoCasado === 'Ambas') {
-            miParteDelPorcentaje = miParteDelPorcentaje / 2;
-        }
+        if (tipoCasado === 'Comisión' || tipoCasado === 'Ambas') miParteDelPorcentaje = miParteDelPorcentaje / 2;
     }
 
     const pack = document.getElementById('cmbPack').value;
@@ -275,11 +259,6 @@ function calcularMatematica() {
 
     let ingresoBrutoIndividual = miParteDelPorcentaje + bonusPack;
 
-    let deduccionReserva = 0;
-    if (document.getElementById('chkReserva').checked) {
-        deduccionReserva = (ingresoBrutoIndividual * 0.10);
-    }
-
     let gastosAntesImpuestos = 0;
     gastosAntesImpuestos += parseFloat(document.getElementById('txtRegalos').value) || 0;
     gastosAntesImpuestos += parseFloat(document.getElementById('txtDonativos').value) || 0;
@@ -289,16 +268,20 @@ function calcularMatematica() {
     gastosAntesImpuestos += (bonusWeeks * 20);
 
     let miParteGastosAntes = gastosAntesImpuestos / numVendedores;
-
-    let subtotalGravable = ingresoBrutoIndividual - deduccionReserva - miParteGastosAntes;
+    let baseParaImpuestosYReserva = ingresoBrutoIndividual - miParteGastosAntes;
 
     const impuestoPorcentaje = parseFloat(document.getElementById('txtImpuestosPorcentaje').value) || 0;
     let deduccionImpuestos = 0;
-    if (impuestoPorcentaje > 0 && subtotalGravable > 0) {
-        deduccionImpuestos = subtotalGravable * (impuestoPorcentaje / 100);
+    if (impuestoPorcentaje > 0 && baseParaImpuestosYReserva > 0) {
+        deduccionImpuestos = baseParaImpuestosYReserva * (impuestoPorcentaje / 100);
     }
 
-    let subtotalPostImpuestos = subtotalGravable - deduccionImpuestos;
+    let deduccionReserva = 0;
+    if (document.getElementById('chkReserva').checked && baseParaImpuestosYReserva > 0) {
+        deduccionReserva = baseParaImpuestosYReserva * 0.10;
+    }
+
+    let subtotalPostImpuestos = baseParaImpuestosYReserva - deduccionImpuestos - deduccionReserva;
 
     let gastosDespuesImpuestos = 20; 
     if (document.getElementById('chkAntilavado').checked) gastosDespuesImpuestos += 10;
@@ -325,9 +308,7 @@ function calcularMaquila() {
     }
 
     let deduccionReserva = 0;
-    if (document.getElementById('maqReserva').checked) {
-        deduccionReserva = importeBase * 0.10;
-    }
+    if (document.getElementById('maqReserva').checked) deduccionReserva = importeBase * 0.10;
 
     const impPct = parseFloat(document.getElementById('maqImpuestos').value) || 0;
     let deduccionImpuestos = importeBase * (impPct / 100);
@@ -336,8 +317,65 @@ function calcularMaquila() {
     document.getElementById('maqPago').value = pagoNeto.toFixed(2);
 }
 
+// CIRUGÍA UX: NUEVA FUNCIÓN PARA ACUMULADO DEL MES EN CURSO
+function actualizarTotalesMesActual() {
+    const hoy = new Date();
+    const mesActual = hoy.getMonth(); 
+    const anioActual = hoy.getFullYear();
+    const nombresMeses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+    
+    let volMes = 0, comisionMes = 0, exploreMes = 0, malibuMes = 0;
 
-// --- KPI: CÁLCULOS EN FRONTEND ---
+    allDataGlobal.forEach(item => {
+        if (item.status === 'Cerrada' && item.fecha) {
+            let [yyyy, mm, dd] = item.fecha.split('-');
+            if (parseInt(yyyy) === anioActual && parseInt(mm) - 1 === mesActual) {
+                comisionMes += (parseFloat(item.pago_total) || 0);
+
+                if (item.type === 'venta') {
+                    volMes += calcularMiVolumen(item);
+
+                    let esExplore = parseInt(item.es_explore_package) === 1;
+                    let esExploreHoy = parseInt(item.explore_es_hoy) === 1;
+
+                    if (esExplore && esExploreHoy) {
+                        let numVend = parseInt(item.num_vendedores) || 1;
+                        let bonoNeto = 225 * 0.77; 
+                        exploreMes += (bonoNeto / numVend);
+                    }
+
+                    if (parseInt(item.es_malibu) === 1 && parseFloat(item.monto_malibu) > 0) {
+                        malibuMes += parseFloat(item.monto_malibu);
+                    }
+                }
+            }
+        }
+    });
+
+    const f = (v) => `$${v.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    
+    const lblMesNombre = document.getElementById('lblMesActualNombre');
+    if(lblMesNombre) lblMesNombre.innerText = nombresMeses[mesActual];
+
+    const lblVol = document.getElementById('mesVolumen');
+    if(lblVol) lblVol.innerText = f(volMes);
+    
+    const lblCom = document.getElementById('mesComision');
+    if(lblCom) lblCom.innerText = f(comisionMes);
+    
+    const blockExp = document.getElementById('mesBlockExplore');
+    if (blockExp) {
+        if (exploreMes > 0) { blockExp.classList.remove('d-none'); document.getElementById('mesExplore').innerText = f(exploreMes); } 
+        else { blockExp.classList.add('d-none'); }
+    }
+
+    const blockMal = document.getElementById('mesBlockMalibu');
+    if (blockMal) {
+        if (malibuMes > 0) { blockMal.classList.remove('d-none'); document.getElementById('mesMalibu').innerText = f(malibuMes); } 
+        else { blockMal.classList.add('d-none'); }
+    }
+}
+
 function actualizarTableroFinanciero(inicio = null, fin = null) {
     const lblTotal = document.getElementById('lblTotalCobrar');
     const lblVolumen = document.getElementById('lblTotalVolumen');
@@ -352,9 +390,7 @@ function actualizarTableroFinanciero(inicio = null, fin = null) {
         return; 
     }
 
-    let granTotalComision = 0;
-    let granTotalVolumen = 0;
-    let granTotalExplore = 0;
+    let granTotalComision = 0, granTotalVolumen = 0, granTotalExplore = 0, granTotalMalibu = 0;
 
     filteredData.forEach(item => {
         if (item.status === 'Cerrada') {
@@ -369,8 +405,11 @@ function actualizarTableroFinanciero(inicio = null, fin = null) {
                 if (esExplore && esExploreHoy) {
                     let numVend = parseInt(item.num_vendedores) || 1;
                     let bonoNeto = 225 * 0.77; 
-                    let miBonoExplore = bonoNeto / numVend; 
-                    granTotalExplore += miBonoExplore;
+                    granTotalExplore += (bonoNeto / numVend);
+                }
+
+                if (parseInt(item.es_malibu) === 1 && parseFloat(item.monto_malibu) > 0) {
+                    granTotalMalibu += parseFloat(item.monto_malibu);
                 }
             }
         }
@@ -379,10 +418,19 @@ function actualizarTableroFinanciero(inicio = null, fin = null) {
     if (lblTotal) lblTotal.innerText = `$${granTotalComision.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
     if (lblVolumen) lblVolumen.innerText = `$${granTotalVolumen.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
     if (lblExplore) lblExplore.innerText = `$${granTotalExplore.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    
+    const blockMalibu = document.getElementById('blockTotalMalibu');
+    const lblMalibu = document.getElementById('lblTotalMalibu');
+    if (granTotalMalibu > 0) {
+        if(blockMalibu) blockMalibu.classList.replace('d-none', 'd-flex');
+        if(lblMalibu) lblMalibu.innerText = `$${granTotalMalibu.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    } else {
+        if(blockMalibu) blockMalibu.classList.replace('d-flex', 'd-none');
+    }
+
     if (lblRango) lblRango.innerText = `Del ${inicio} al ${fin}`;
 }
 
-// --- CARGA DE DATOS ---
 async function cargarDatosUnificados() {
     try {
         const resVentas = await fetch(`${BASE_URL}/api/ventas`, { headers: { 'Authorization': localStorage.getItem('paycheckToken') } });
@@ -405,6 +453,7 @@ async function cargarDatosUnificados() {
         currentPage = 1;
         
         renderTable(); 
+        actualizarTotalesMesActual(); // CIRUGÍA: Calculamos el mes al cargar la app
         actualizarTableroFinanciero();
         verificarAlertas();
 
@@ -432,21 +481,14 @@ function limpiarFiltro(recargar = true) {
     filteredData = allDataGlobal; 
     currentPage = 1;
     renderTable(); 
-    
     if (recargar) actualizarTableroFinanciero();
 }
 
 function buscarContrato() {
     const query = document.getElementById('txtBuscador').value.toLowerCase().trim();
-    
     if (query === '') {
-        if (document.getElementById('filtroInicio').value && document.getElementById('filtroFin').value) {
-            aplicarFiltro();
-        } else {
-            filteredData = allDataGlobal;
-            currentPage = 1;
-            renderTable();
-        }
+        if (document.getElementById('filtroInicio').value && document.getElementById('filtroFin').value) { aplicarFiltro(); } 
+        else { filteredData = allDataGlobal; currentPage = 1; renderTable(); }
         return;
     }
 
@@ -455,7 +497,6 @@ function buscarContrato() {
         const socio = (item.nombre_socio || '').toLowerCase();
         const contrato = (item.contrato || '').toLowerCase();
         const fecha = (item.fecha || '').toLowerCase();
-        
         return cliente.includes(query) || socio.includes(query) || contrato.includes(query) || fecha.includes(query);
     });
     
@@ -471,11 +512,7 @@ function limpiarBuscador() {
 function cambiarPagina(direction) {
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
     const newPage = parseInt(currentPage) + parseInt(direction);
-
-    if (newPage > 0 && newPage <= totalPages) {
-        currentPage = newPage;
-        renderTable();
-    }
+    if (newPage > 0 && newPage <= totalPages) { currentPage = newPage; renderTable(); }
 }
 
 function renderTable() {
@@ -491,10 +528,7 @@ function renderTable() {
     document.getElementById('btnPrev').disabled = currentPage === 1;
     document.getElementById('btnNext').disabled = endIndex >= filteredData.length;
 
-    if (pageData.length === 0) { 
-        document.getElementById('emptyState').classList.remove('d-none'); 
-        return; 
-    }
+    if (pageData.length === 0) { document.getElementById('emptyState').classList.remove('d-none'); return; }
     document.getElementById('emptyState').classList.add('d-none');
 
     pageData.forEach(item => {
@@ -510,7 +544,11 @@ function renderTable() {
         let detalleHTML = '', montosCombinadosPC = '';
         let iconType = item.type === 'venta' ? '<span class="badge bg-primary me-2">T.C.</span>' : '<span class="badge bg-secondary me-2">Paper</span>';
         
-        let exploreStar = (item.type === 'venta' && item.es_explore_package === 1) ? '<i class="bi bi-star-fill text-info ms-1" style="font-size: 0.85rem;" title="Explore Package"></i>' : '';
+        let exploreStar = '';
+        if (item.type === 'venta') {
+            if (item.es_explore_package === 1) exploreStar += '<i class="bi bi-star-fill text-info ms-1" style="font-size: 0.85rem;" title="Explore Package"></i>';
+            if (item.es_malibu === 1) exploreStar += '<i class="bi bi-star-fill ms-1" style="font-size: 0.85rem; color: #800000;" title="Bono Malibu"></i>';
+        }
         
         let miVolumenDisplay = item.type === 'venta' ? calcularMiVolumen(item) : 0;
         let miVolFormatted = miVolumenDisplay.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
@@ -609,41 +647,67 @@ function verDetalle(type, id) {
             let textoFecha = (item.explore_es_hoy === 1) ? 'HOY' : fechaVal;
             exploreIndicator = `<div class="alert alert-info py-1 px-2 mb-0 small fw-bold"><i class="bi bi-star-fill me-1"></i>EXPLORE: ${textoFecha}</div>`;
         }
-        const reservaTxt = (item.es_reserva === 1) ? '10%' : 'No';
         
+        let malibuIndicator = '';
+        if (item.es_malibu === 1 && parseFloat(item.monto_malibu) > 0) {
+            malibuIndicator = `<div class="alert py-1 px-2 mb-0 small fw-bold mt-1 text-white shadow-sm" style="background-color:#800000;"><i class="bi bi-star-fill me-1 text-warning"></i>MALIBU: $${parseFloat(item.monto_malibu).toLocaleString('en-US', {minimumFractionDigits: 2})} Efectivo</div>`;
+        }
+
+        const reservaTxt = (item.es_reserva === 1) ? '10%' : 'No';
         let miVolumen = calcularMiVolumen(item);
 
         html = `
             <div class="container-fluid px-0">
                 <div class="row mb-3 border-bottom pb-3 align-items-center">
                      <div class="col-6"><small class="text-muted d-block text-uppercase fw-bold">Fecha Venta</small><span class="fs-5 fw-bold text-dark">${item.fecha}</span></div>
-                     <div class="col-6 text-end">${statusBlock}<div>${exploreIndicator}</div></div>
+                     <div class="col-6 text-end">${statusBlock}<div class="d-flex flex-column align-items-end gap-1 mt-1">${exploreIndicator}${malibuIndicator}</div></div>
                 </div>
                 <div class="row mb-3">
                      <div class="col-md-7"><h6 class="text-primary fw-bold text-uppercase small mb-2">Información del Cliente</h6><div class="detail-card p-3"><div class="fs-5 fw-bold mb-1">${item.cliente_nombre}</div><div class="d-flex gap-2 mb-2"><span class="badge bg-secondary">${item.nacionalidad}</span><span class="badge bg-info text-dark">${item.tipo_socio || '--'}</span><span class="badge bg-light text-dark border">${item.pack_nivel} Pack</span></div></div></div>
                      <div class="col-md-5"><h6 class="text-primary fw-bold text-uppercase small mb-2">Equipo de Ventas</h6><div class="detail-card p-3"><div class="text-dark fw-bold">${item.vendedores || 'No asignado'}</div></div></div>
                 </div>
+                
                 <h6 class="text-primary fw-bold text-uppercase small mb-2 mt-4">Resumen Financiero</h6>
                 <div class="detail-card p-3 mb-3" style="background-color: #f0fdf4; border-color: #bbf7d0;">
-                     <div class="row text-center">
-                        <div class="col-4 border-end border-success-subtle">
+                     <div class="d-flex flex-column flex-md-row text-center justify-content-between gap-3">
+                        <div class="flex-fill">
                             <small class="d-block text-success fw-bold text-uppercase">Mi Volumen</small>
-                            <span class="fs-4 fw-bold text-dark">${fm(miVolumen)}</span>
+                            <span class="fs-3 fw-bold text-dark text-break" style="letter-spacing: -1px;">${fm(miVolumen)}</span>
                             <div class="small text-muted mt-1" style="font-size: 0.75rem; line-height: 1;">Total: ${fm(item.monto)}</div>
                         </div>
-                        <div class="col-4 border-end border-success-subtle"><small class="d-block text-success fw-bold text-uppercase">Pago Neto</small><span class="fs-4 fw-bold text-dark">${fm(item.pago_total)}</span></div>
-                        <div class="col-4"><small class="d-block text-muted text-uppercase fw-bold">Métodos</small><div class="mt-1">${item.amex ? '<span class="badge bg-primary">AMEX</span>' : ''} ${item.msi_6 ? '<span class="badge bg-info text-dark">6MSI</span>' : ''}</div></div>
+                        
+                        <div class="d-none d-md-block border-end border-success-subtle"></div>
+                        <div class="d-md-none border-bottom border-success-subtle w-100"></div>
+
+                        <div class="flex-fill">
+                            <small class="d-block text-success fw-bold text-uppercase">Pago Neto</small>
+                            <span class="fs-3 fw-bold text-dark text-break" style="letter-spacing: -1px;">${fm(item.pago_total)}</span>
+                        </div>
+                        
+                        <div class="d-none d-md-block border-end border-success-subtle"></div>
+                        <div class="d-md-none border-bottom border-success-subtle w-100"></div>
+
+                        <div class="flex-fill d-flex flex-column justify-content-center align-items-center">
+                            <small class="d-block text-muted text-uppercase fw-bold mb-2">Métodos</small>
+                            <div>
+                                ${item.amex ? '<span class="badge bg-primary me-1">AMEX</span>' : ''} 
+                                ${item.msi_6 ? '<span class="badge bg-info text-dark">6MSI</span>' : ''} 
+                                ${(!item.amex && !item.msi_6) ? '<span class="text-muted small">--</span>' : ''}
+                            </div>
+                        </div>
                      </div>
                 </div>
+                
                 <h6 class="text-primary fw-bold text-uppercase small mb-2 mt-4">Desglose de Deducciones</h6>
-                <div class="row g-2">
-                    <div class="col-4"><div class="p-2 border rounded bg-white"><small class="d-block text-muted">Regalos</small><strong class="text-dark">${fm(item.monto_regalos)}</strong></div></div>
-                    <div class="col-4"><div class="p-2 border rounded bg-white"><small class="d-block text-muted">Donativos</small><strong class="text-dark">${fm(item.monto_donativos)}</strong></div></div>
-                    <div class="col-4"><div class="p-2 border rounded bg-white"><small class="d-block text-muted">Move In</small><strong class="text-dark">${fm(item.monto_movein)}</strong></div></div>
-                    <div class="col-4"><div class="p-2 border rounded bg-white"><small class="d-block text-primary">Reserva</small><strong class="text-primary">${reservaTxt}</strong></div></div>
-                    <div class="col-4"><div class="p-2 border rounded bg-white"><small class="d-block text-danger">Impuestos</small><strong class="text-danger">${item.porcentaje_impuestos || 0}%</strong></div></div>
-                    <div class="col-4"><div class="p-2 border rounded bg-white"><small class="d-block text-success">Bonus Weeks</small><strong class="text-success">${item.bonus_weeks}</strong></div></div>
+                <div class="row g-2 text-center">
+                    <div class="col-6 col-md-4"><div class="p-2 border rounded bg-white"><small class="d-block text-muted">Regalos</small><strong class="text-dark text-break">${fm(item.monto_regalos)}</strong></div></div>
+                    <div class="col-6 col-md-4"><div class="p-2 border rounded bg-white"><small class="d-block text-muted">Donativos</small><strong class="text-dark text-break">${fm(item.monto_donativos)}</strong></div></div>
+                    <div class="col-6 col-md-4"><div class="p-2 border rounded bg-white"><small class="d-block text-muted">Move In</small><strong class="text-dark text-break">${fm(item.monto_movein)}</strong></div></div>
+                    <div class="col-6 col-md-4"><div class="p-2 border rounded bg-white"><small class="d-block text-primary">Reserva</small><strong class="text-primary">${reservaTxt}</strong></div></div>
+                    <div class="col-6 col-md-4"><div class="p-2 border rounded bg-white"><small class="d-block text-danger">Impuestos</small><strong class="text-danger">${item.porcentaje_impuestos || 0}%</strong></div></div>
+                    <div class="col-6 col-md-4"><div class="p-2 border rounded bg-white"><small class="d-block text-success">Bonus Weeks</small><strong class="text-success">${item.bonus_weeks}</strong></div></div>
                 </div>
+                
                 <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center">
                     <span class="fw-bold text-muted small text-uppercase">Deducciones Aplicadas:</span>
                     <div><span class="badge ${item.deduccion_meseros ? 'bg-secondary' : 'bg-light text-muted border'} me-2">Meseros</span><span class="badge ${item.deduccion_antilavado ? 'bg-secondary' : 'bg-light text-muted border'} me-2">Antilavado</span><span class="badge ${item.deduccion_explore ? 'bg-secondary' : 'bg-light text-muted border'}">Explore</span></div>
@@ -774,6 +838,13 @@ function iniciarEdicion(type, id) {
         }
         toggleExploreHoy();
 
+        const chkMalibu = document.getElementById('chkMalibu');
+        if(chkMalibu) {
+            chkMalibu.checked = (item.es_malibu === 1);
+            document.getElementById('txtMalibuMonto').value = item.monto_malibu || '';
+            toggleMalibu();
+        }
+
         document.getElementById('chkReserva').checked = (item.es_reserva === 1); 
         document.getElementById('txtImpuestosPorcentaje').value = item.porcentaje_impuestos || ''; 
         document.getElementById('txtRegalos').value = item.monto_regalos || 0;
@@ -841,6 +912,10 @@ function cancelarEdicion(mode) {
 
         toggleExplore(); 
         toggleExploreHoy(); 
+        
+        const chkMalibu = document.getElementById('chkMalibu');
+        if(chkMalibu) { chkMalibu.checked = false; toggleMalibu(); }
+
         togglePendiente('venta');
         calcularMatematica();
     } else {
@@ -883,6 +958,8 @@ async function guardarVenta() {
         deduccion_meseros: document.getElementById('chkMeseros').checked ? 1 : 0,
         es_explore_package: document.getElementById('chkExplore').checked ? 1 : 0,
         explore_es_hoy: document.getElementById('chkExploreHoy').checked ? 1 : 0,
+        es_malibu: document.getElementById('chkMalibu').checked ? 1 : 0,
+        monto_malibu: parseFloat(document.getElementById('txtMalibuMonto').value) || 0,
         amex: document.getElementById('chkAmex').checked ? 1 : 0,
         msi_6: document.getElementById('chkMSI').checked ? 1 : 0,
         num_vendedores: numVend,
@@ -983,12 +1060,22 @@ async function enviarDatos(url, method, data, mode) {
             body: JSON.stringify(data)
         });
         const result = await res.json();
+        
         if (result.message) {
-            Swal.fire({ icon: 'success', title: editId ? 'Registro Actualizado' : 'Registro Guardado', showConfirmButton: false, timer: 1500 });
+            let tipoAccion = mode === 'ventas' 
+                ? (editId ? 'update_venta' : 'nueva_venta') 
+                : (editId ? 'update_maquila' : 'nueva_maquila');
+                
+            detonarCelebracion(tipoAccion);
+            
             cancelarEdicion(mode); 
             cargarDatosUnificados(); 
-        } else { Swal.fire('Error', result.error, 'error'); }
-    } catch (e) { Swal.fire('Error', 'Problema de conexión', 'error'); }
+        } else { 
+            Swal.fire('Error', result.error, 'error'); 
+        }
+    } catch (e) { 
+        Swal.fire('Error', 'Problema de conexión', 'error'); 
+    }
 }
 
 function eliminarItem(type, id) {
@@ -1171,7 +1258,12 @@ async function resolverExplore(id, accion) {
         const result = await res.json();
         
         if (result.message) {
-            Swal.fire({ icon: 'success', title: accion === 'pagado' ? '¡Cobrado y Cerrado!' : 'Marcado como Caída', showConfirmButton: false, timer: 1500 });
+            Swal.close();
+            if (accion === 'pagado') {
+                detonarCelebracion('pago_explore');
+            } else {
+                Swal.fire({ icon: 'success', title: 'Marcado como Caída', showConfirmButton: false, timer: 1500 });
+            }
             cargarDatosUnificados(); 
         } else { 
             Swal.fire('Error', result.error, 'error'); 
