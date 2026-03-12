@@ -38,6 +38,7 @@ const VentaSchema = new mongoose.Schema({
     deduccion_antilavado: Number, 
     deduccion_explore: Number,
     deduccion_meseros: Number,
+    deduccion_rci: Number,
     es_explore_package: Number,
     explore_es_hoy: Number,
     es_malibu: Number,        
@@ -161,7 +162,6 @@ async function guardiaDeSeguridad(req, res, next) {
 
 // --- 4. ENDPOINTS API (FILTRADOS POR PROPIETARIO) ---
 
-// === VENTAS ===
 app.get('/api/ventas', guardiaDeSeguridad, async (req, res) => {
     try {
         const ventas = await Venta.find({ propietario: req.usuarioEmail }).sort({ fecha: -1 });
@@ -211,7 +211,6 @@ app.delete('/api/ventas/:id', guardiaDeSeguridad, async (req, res) => {
     }
 });
 
-// === MAQUILAS (PAPERWORK) ===
 app.get('/api/maquilas', guardiaDeSeguridad, async (req, res) => {
     try {
         const maquilas = await Maquila.find({ propietario: req.usuarioEmail }).sort({ fecha: -1 });
@@ -252,7 +251,6 @@ app.delete('/api/maquilas/:id', guardiaDeSeguridad, async (req, res) => {
     }
 });
 
-// === ENDPOINT DE INTELIGENCIA DE NEGOCIOS (KPIs) ===
 app.get('/api/kpi-totales', guardiaDeSeguridad, async (req, res) => {
     try {
         const { inicio, fin } = req.query;

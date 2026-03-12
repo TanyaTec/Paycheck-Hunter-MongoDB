@@ -18,6 +18,34 @@ const successMessages = {
     'pago_explore': { icon: '💰', title: '¡Explore Cobrado!', msg: 'Ese bono ya está en la bolsa. ¡Felicidades!', btn: '¡A celebrar! 🎉' }
 };
 
+// --- NAVEGACIÓN Y VISTAS ---
+function mostrarFormulario() {
+    document.getElementById('vistaDashboard').classList.add('d-none');
+    const fab = document.getElementById('fabMobile');
+    if(fab) fab.classList.add('d-none');
+    
+    const vistaForm = document.getElementById('vistaFormulario');
+    vistaForm.classList.remove('d-none');
+    
+    // CIRUGÍA UX: Scroll automático directo al formulario sin fricción
+    vistaForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function ocultarFormulario() {
+    document.getElementById('vistaFormulario').classList.add('d-none');
+    
+    const vistaDash = document.getElementById('vistaDashboard');
+    vistaDash.classList.remove('d-none');
+    
+    const fab = document.getElementById('fabMobile');
+    if(fab) fab.classList.remove('d-none');
+    
+    cancelarEdicion(currentMode);
+    
+    // Regresa al inicio del Dashboard
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 function detonarCelebracion(tipoAccion) {
     const config = successMessages[tipoAccion] || successMessages['nueva_venta'];
     
@@ -28,6 +56,12 @@ function detonarCelebracion(tipoAccion) {
 
     const modalEl = document.getElementById('modalCelebracion');
     const modal = new bootstrap.Modal(modalEl);
+    
+    modalEl.addEventListener('hidden.bs.modal', function onModalHidden() {
+        ocultarFormulario();
+        modalEl.removeEventListener('hidden.bs.modal', onModalHidden);
+    });
+
     modal.show();
 
     if (tipoAccion === 'nueva_venta' || tipoAccion === 'pago_explore') {
@@ -244,7 +278,9 @@ function calcularMatematica() {
 
     if (document.getElementById('chkCasado').checked) {
         const tipoCasado = document.getElementById('cmbTipoCasado').value;
-        if (tipoCasado === 'Comisión' || tipoCasado === 'Ambas') miParteDelPorcentaje = miParteDelPorcentaje / 2;
+        if (tipoCasado === 'Comisión' || tipoCasado === 'Ambas') {
+            miParteDelPorcentaje = miParteDelPorcentaje / 2;
+        }
     }
 
     const pack = document.getElementById('cmbPack').value;
@@ -259,6 +295,7 @@ function calcularMatematica() {
 
     let ingresoBrutoIndividual = miParteDelPorcentaje + bonusPack;
 
+    // 1. Gastos ANTES de impuestos
     let gastosAntesImpuestos = 0;
     gastosAntesImpuestos += parseFloat(document.getElementById('txtRegalos').value) || 0;
     gastosAntesImpuestos += parseFloat(document.getElementById('txtDonativos').value) || 0;
@@ -268,24 +305,31 @@ function calcularMatematica() {
     gastosAntesImpuestos += (bonusWeeks * 20);
 
     let miParteGastosAntes = gastosAntesImpuestos / numVendedores;
+    
+    // 2. Base Gravable Real
     let baseParaImpuestosYReserva = ingresoBrutoIndividual - miParteGastosAntes;
 
+    // 3. Impuestos
     const impuestoPorcentaje = parseFloat(document.getElementById('txtImpuestosPorcentaje').value) || 0;
     let deduccionImpuestos = 0;
     if (impuestoPorcentaje > 0 && baseParaImpuestosYReserva > 0) {
         deduccionImpuestos = baseParaImpuestosYReserva * (impuestoPorcentaje / 100);
     }
 
+    // 4. Reserva
     let deduccionReserva = 0;
     if (document.getElementById('chkReserva').checked && baseParaImpuestosYReserva > 0) {
         deduccionReserva = baseParaImpuestosYReserva * 0.10;
     }
 
+    // 5. Restar Impuestos y Reserva
     let subtotalPostImpuestos = baseParaImpuestosYReserva - deduccionImpuestos - deduccionReserva;
 
-    let gastosDespuesImpuestos = 20; 
+    // 6. Gastos Fijos Operativos
+    let gastosDespuesImpuestos = 20; // Meseros
     if (document.getElementById('chkAntilavado').checked) gastosDespuesImpuestos += 10;
     if (document.getElementById('chkExploreForm').checked) gastosDespuesImpuestos += 10;
+    if (document.getElementById('chkRCI') && document.getElementById('chkRCI').checked) gastosDespuesImpuestos += 10;
 
     let miParteGastosDespues = gastosDespuesImpuestos / numVendedores;
     let pagoNetoFinal = subtotalPostImpuestos - miParteGastosDespues;
@@ -317,7 +361,6 @@ function calcularMaquila() {
     document.getElementById('maqPago').value = pagoNeto.toFixed(2);
 }
 
-// CIRUGÍA UX: NUEVA FUNCIÓN PARA ACUMULADO DEL MES EN CURSO
 function actualizarTotalesMesActual() {
     const hoy = new Date();
     const mesActual = hoy.getMonth(); 
@@ -325,11 +368,36 @@ function actualizarTotalesMesActual() {
     const nombresMeses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
     
     let volMes = 0, comisionMes = 0, exploreMes = 0, malibuMes = 0;
+    let volYTD = 0, comisionYTD = 0, exploreYTD = 0, malibuYTD = 0;
 
     allDataGlobal.forEach(item => {
         if (item.status === 'Cerrada' && item.fecha) {
             let [yyyy, mm, dd] = item.fecha.split('-');
-            if (parseInt(yyyy) === anioActual && parseInt(mm) - 1 === mesActual) {
+            let añoVenta = parseInt(yyyy);
+            let mesVenta = parseInt(mm) - 1;
+
+            // Lógica YEAR TO DATE (Todo el año en curso)
+            if (añoVenta === anioActual) {
+                comisionYTD += (parseFloat(item.pago_total) || 0);
+                
+                if (item.type === 'venta') {
+                    volYTD += calcularMiVolumen(item);
+                    
+                    let esExplore = parseInt(item.es_explore_package) === 1;
+                    let esExploreHoy = parseInt(item.explore_es_hoy) === 1;
+                    let numVend = parseInt(item.num_vendedores) || 1;
+                    
+                    if (esExplore && esExploreHoy) {
+                        exploreYTD += ( (225 * 0.77) / numVend );
+                    }
+                    if (parseInt(item.es_malibu) === 1 && parseFloat(item.monto_malibu) > 0) {
+                        malibuYTD += parseFloat(item.monto_malibu);
+                    }
+                }
+            }
+
+            // Lógica MONTH TO DATE (Mes en curso)
+            if (añoVenta === anioActual && mesVenta === mesActual) {
                 comisionMes += (parseFloat(item.pago_total) || 0);
 
                 if (item.type === 'venta') {
@@ -337,13 +405,11 @@ function actualizarTotalesMesActual() {
 
                     let esExplore = parseInt(item.es_explore_package) === 1;
                     let esExploreHoy = parseInt(item.explore_es_hoy) === 1;
+                    let numVend = parseInt(item.num_vendedores) || 1;
 
                     if (esExplore && esExploreHoy) {
-                        let numVend = parseInt(item.num_vendedores) || 1;
-                        let bonoNeto = 225 * 0.77; 
-                        exploreMes += (bonoNeto / numVend);
+                        exploreMes += ( (225 * 0.77) / numVend );
                     }
-
                     if (parseInt(item.es_malibu) === 1 && parseFloat(item.monto_malibu) > 0) {
                         malibuMes += parseFloat(item.monto_malibu);
                     }
@@ -354,6 +420,26 @@ function actualizarTotalesMesActual() {
 
     const f = (v) => `$${v.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
     
+    // --- ASIGNACIÓN YTD (Muestra TODO) ---
+    const lblYTD = document.getElementById('lblYTDVolumen');
+    if(lblYTD) lblYTD.innerText = f(volYTD);
+    
+    const lblYTDCom = document.getElementById('lblYTDComision');
+    if(lblYTDCom) lblYTDCom.innerText = f(comisionYTD);
+    
+    const blockExpYTD = document.getElementById('ytdBlockExplore');
+    if (blockExpYTD) {
+        if (exploreYTD > 0) { blockExpYTD.classList.replace('d-none', 'd-flex'); document.getElementById('ytdExplore').innerText = f(exploreYTD); } 
+        else { blockExpYTD.classList.replace('d-flex', 'd-none'); }
+    }
+
+    const blockMalYTD = document.getElementById('ytdBlockMalibu');
+    if (blockMalYTD) {
+        if (malibuYTD > 0) { blockMalYTD.classList.replace('d-none', 'd-flex'); document.getElementById('ytdMalibu').innerText = f(malibuYTD); } 
+        else { blockMalYTD.classList.replace('d-flex', 'd-none'); }
+    }
+
+    // --- ASIGNACIÓN MTD ---
     const lblMesNombre = document.getElementById('lblMesActualNombre');
     if(lblMesNombre) lblMesNombre.innerText = nombresMeses[mesActual];
 
@@ -365,14 +451,14 @@ function actualizarTotalesMesActual() {
     
     const blockExp = document.getElementById('mesBlockExplore');
     if (blockExp) {
-        if (exploreMes > 0) { blockExp.classList.remove('d-none'); document.getElementById('mesExplore').innerText = f(exploreMes); } 
-        else { blockExp.classList.add('d-none'); }
+        if (exploreMes > 0) { blockExp.classList.replace('d-none', 'd-flex'); document.getElementById('mesExplore').innerText = f(exploreMes); } 
+        else { blockExp.classList.replace('d-flex', 'd-none'); }
     }
 
     const blockMal = document.getElementById('mesBlockMalibu');
     if (blockMal) {
-        if (malibuMes > 0) { blockMal.classList.remove('d-none'); document.getElementById('mesMalibu').innerText = f(malibuMes); } 
-        else { blockMal.classList.add('d-none'); }
+        if (malibuMes > 0) { blockMal.classList.replace('d-none', 'd-flex'); document.getElementById('mesMalibu').innerText = f(malibuMes); } 
+        else { blockMal.classList.replace('d-flex', 'd-none'); }
     }
 }
 
@@ -382,15 +468,21 @@ function actualizarTableroFinanciero(inicio = null, fin = null) {
     const lblExplore = document.getElementById('lblTotalExplore');
     const lblRango = document.getElementById('lblRangoFechas');
 
+    const blockDeducciones = document.getElementById('blockDeduccionesCalculadora');
+    const lineaBonusWks = document.getElementById('lineaBonusWeeks');
+    const lineaMeseros = document.getElementById('lineaMeseros');
+
     if (!inicio || !fin) {
         if (lblTotal) lblTotal.innerText = '$0.00';
         if (lblVolumen) lblVolumen.innerText = '$0.00';
         if (lblExplore) lblExplore.innerText = '$0.00';
         if (lblRango) lblRango.innerText = 'Selecciona un rango de fechas';
+        if (blockDeducciones) blockDeducciones.classList.add('d-none');
         return; 
     }
 
     let granTotalComision = 0, granTotalVolumen = 0, granTotalExplore = 0, granTotalMalibu = 0;
+    let totalBonusWks = 0, totalMeserosFijos = 0;
 
     filteredData.forEach(item => {
         if (item.status === 'Cerrada') {
@@ -398,12 +490,12 @@ function actualizarTableroFinanciero(inicio = null, fin = null) {
 
             if (item.type === 'venta') {
                 granTotalVolumen += calcularMiVolumen(item);
+                let numVend = parseInt(item.num_vendedores) || 1;
 
                 let esExplore = parseInt(item.es_explore_package) === 1;
                 let esExploreHoy = parseInt(item.explore_es_hoy) === 1;
 
                 if (esExplore && esExploreHoy) {
-                    let numVend = parseInt(item.num_vendedores) || 1;
                     let bonoNeto = 225 * 0.77; 
                     granTotalExplore += (bonoNeto / numVend);
                 }
@@ -411,21 +503,52 @@ function actualizarTableroFinanciero(inicio = null, fin = null) {
                 if (parseInt(item.es_malibu) === 1 && parseFloat(item.monto_malibu) > 0) {
                     granTotalMalibu += parseFloat(item.monto_malibu);
                 }
+
+                let bwks = parseInt(item.bonus_weeks) || 0;
+                totalBonusWks += (bwks * 20) / numVend;
+
+                let fijosItem = 20;
+                if(parseInt(item.deduccion_antilavado) === 1) fijosItem += 10;
+                if(parseInt(item.deduccion_explore) === 1) fijosItem += 10;
+                if(parseInt(item.deduccion_rci) === 1) fijosItem += 10;
+                totalMeserosFijos += (fijosItem / numVend);
             }
         }
     });
 
-    if (lblTotal) lblTotal.innerText = `$${granTotalComision.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-    if (lblVolumen) lblVolumen.innerText = `$${granTotalVolumen.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-    if (lblExplore) lblExplore.innerText = `$${granTotalExplore.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    const fm = (v) => `$${v.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+    if (lblTotal) lblTotal.innerText = fm(granTotalComision);
+    if (lblVolumen) lblVolumen.innerText = fm(granTotalVolumen);
+    if (lblExplore) lblExplore.innerText = fm(granTotalExplore);
     
     const blockMalibu = document.getElementById('blockTotalMalibu');
     const lblMalibu = document.getElementById('lblTotalMalibu');
     if (granTotalMalibu > 0) {
         if(blockMalibu) blockMalibu.classList.replace('d-none', 'd-flex');
-        if(lblMalibu) lblMalibu.innerText = `$${granTotalMalibu.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        if(lblMalibu) lblMalibu.innerText = fm(granTotalMalibu);
     } else {
         if(blockMalibu) blockMalibu.classList.replace('d-flex', 'd-none');
+    }
+
+    if (totalBonusWks > 0 || totalMeserosFijos > 0) {
+        blockDeducciones.classList.remove('d-none');
+        
+        if (totalBonusWks > 0) {
+            lineaBonusWks.classList.remove('d-none');
+            document.getElementById('calcBonusWeeks').innerText = fm(totalBonusWks);
+        } else {
+            lineaBonusWks.classList.add('d-none');
+        }
+
+        if (totalMeserosFijos > 0) {
+            lineaMeseros.classList.remove('d-none');
+            document.getElementById('calcMeseros').innerText = fm(totalMeserosFijos);
+        } else {
+            lineaMeseros.classList.add('d-none');
+        }
+    } else {
+        blockDeducciones.classList.add('d-none');
     }
 
     if (lblRango) lblRango.innerText = `Del ${inicio} al ${fin}`;
@@ -453,7 +576,7 @@ async function cargarDatosUnificados() {
         currentPage = 1;
         
         renderTable(); 
-        actualizarTotalesMesActual(); // CIRUGÍA: Calculamos el mes al cargar la app
+        actualizarTotalesMesActual(); 
         actualizarTableroFinanciero();
         verificarAlertas();
 
@@ -710,7 +833,12 @@ function verDetalle(type, id) {
                 
                 <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center">
                     <span class="fw-bold text-muted small text-uppercase">Deducciones Aplicadas:</span>
-                    <div><span class="badge ${item.deduccion_meseros ? 'bg-secondary' : 'bg-light text-muted border'} me-2">Meseros</span><span class="badge ${item.deduccion_antilavado ? 'bg-secondary' : 'bg-light text-muted border'} me-2">Antilavado</span><span class="badge ${item.deduccion_explore ? 'bg-secondary' : 'bg-light text-muted border'}">Explore</span></div>
+                    <div>
+                        <span class="badge ${item.deduccion_meseros ? 'bg-secondary' : 'bg-light text-muted border'} me-1 mb-1">Meseros</span>
+                        <span class="badge ${item.deduccion_antilavado ? 'bg-secondary' : 'bg-light text-muted border'} me-1 mb-1">Antilavado</span>
+                        <span class="badge ${item.deduccion_explore ? 'bg-secondary' : 'bg-light text-muted border'} me-1 mb-1">Explore</span>
+                        <span class="badge ${item.deduccion_rci ? 'bg-secondary' : 'bg-light text-muted border'} mb-1">RCI</span>
+                    </div>
                 </div>
                 ${item.comentarios ? `<div class="mt-4 p-3 bg-light rounded border"><h6 class="text-muted fw-bold small text-uppercase mb-1">Comentarios</h6><p class="mb-0 small text-dark">${item.comentarios}</p></div>` : ''}
             </div>
@@ -778,6 +906,8 @@ function iniciarEdicion(type, id) {
     const item = allDataGlobal.find(x => String(x._id || x.id) === String(id) && x.type === type);
     if(!item) return;
 
+    mostrarFormulario(); 
+
     if (type === 'venta' && currentMode !== 'ventas') switchTab('ventas');
     if (type === 'maquila' && currentMode !== 'maquila') switchTab('maquila');
 
@@ -826,6 +956,9 @@ function iniciarEdicion(type, id) {
         document.getElementById('chkExploreForm').checked = (item.deduccion_explore === 1);
         document.getElementById('chkMeseros').checked = (item.deduccion_meseros === 1);
         
+        const chkRCI = document.getElementById('chkRCI');
+        if (chkRCI) chkRCI.checked = (item.deduccion_rci === 1);
+
         const chkExplore = document.getElementById('chkExplore');
         chkExplore.checked = (item.es_explore_package === 1);
         toggleExplore(); 
@@ -858,7 +991,6 @@ function iniciarEdicion(type, id) {
 
         document.getElementById('btnGuardarVenta').innerHTML = '<i class="bi bi-pencil-square fs-5"></i><span>ACTUALIZAR DATOS</span>';
         document.getElementById('btnCancelarEditVenta').classList.remove('d-none');
-        document.getElementById('frmVenta').scrollIntoView({ behavior: 'smooth', block: 'start' });
         
         calcularMatematica(); 
 
@@ -890,7 +1022,6 @@ function iniciarEdicion(type, id) {
 
         document.getElementById('btnGuardarMaquila').innerHTML = '<i class="bi bi-pencil-square fs-5"></i><span>ACTUALIZAR DATOS</span>';
         document.getElementById('btnCancelarEditMaquila').classList.remove('d-none');
-        document.getElementById('frmMaquila').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 }
 
@@ -956,6 +1087,7 @@ async function guardarVenta() {
         deduccion_antilavado: document.getElementById('chkAntilavado').checked ? 1 : 0,
         deduccion_explore: document.getElementById('chkExploreForm').checked ? 1 : 0,
         deduccion_meseros: document.getElementById('chkMeseros').checked ? 1 : 0,
+        deduccion_rci: (document.getElementById('chkRCI') && document.getElementById('chkRCI').checked) ? 1 : 0,
         es_explore_package: document.getElementById('chkExplore').checked ? 1 : 0,
         explore_es_hoy: document.getElementById('chkExploreHoy').checked ? 1 : 0,
         es_malibu: document.getElementById('chkMalibu').checked ? 1 : 0,
@@ -1067,8 +1199,6 @@ async function enviarDatos(url, method, data, mode) {
                 : (editId ? 'update_maquila' : 'nueva_maquila');
                 
             detonarCelebracion(tipoAccion);
-            
-            cancelarEdicion(mode); 
             cargarDatosUnificados(); 
         } else { 
             Swal.fire('Error', result.error, 'error'); 

@@ -50,6 +50,7 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
+        /* CIRUGÍA UX: Verde Ejecutivo Restaurado Permanentemente */
         .text-success { color: #166534 !important; } 
         .bg-success { background: #166534 !important; color: #ffffff !important; border: none !important; }
         .bg-success-subtle { background-color: #d1fae5 !important; color: #065f46 !important; }
@@ -75,6 +76,28 @@
         .form-control, .form-select { border-radius: 12px; border: 1px solid #e2e8f0; font-size: 0.95rem; color: var(--text-main); transition: border-color 0.3s, box-shadow 0.3s; }
         .form-control:focus, .form-select:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 0.25rem rgba(0, 198, 255, 0.25); }
         
+        /* Botón CTA Premium (Elegante, VIP, Dark Gold - UNA SOLA LÍNEA) */
+        .btn-premium-cta {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: #fbbf24 !important;
+            font-weight: 800;
+            font-size: 0.85rem;
+            border: 1px solid rgba(251, 191, 36, 0.5);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+            padding: 0.6rem 1.5rem;
+            border-radius: 50px;
+            white-space: nowrap; 
+        }
+        .btn-premium-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(251, 191, 36, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            background: linear-gradient(135deg, #1e293b 0%, #1e293b 100%);
+            color: #ffffff !important;
+            border-color: #fbbf24;
+        }
+
         .btn-gradient { 
             background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); 
             color: white; 
@@ -151,7 +174,6 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 24px;
             padding: 0.75rem 1.25rem;
-            margin-bottom: 2rem;
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         }
         .nav-wrapper {
@@ -214,7 +236,33 @@
             box-shadow: 0 0 12px rgba(255, 255, 255, 0.2); 
         }
 
-        /* CIRUGÍA UX: Accesibilidad móvil (Tamaños y anti-zoom) */
+        /* Botón flotante móvil emparejado al diseño Dark Premium */
+        .fab-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: #fbbf24;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            border: 1px solid rgba(251, 191, 36, 0.5);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            z-index: 1000;
+        }
+        .fab-btn:hover {
+            transform: translateY(-5px);
+            color: #ffffff;
+            border-color: #fbbf24;
+            box-shadow: 0 12px 30px rgba(251, 191, 36, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
         @media (max-width: 768px) {
             label, .form-label, .small, small, .badge { font-size: 0.85rem !important; }
             .form-control, .form-select, .input-group-text { font-size: 1rem !important; padding: 0.6rem 0.75rem !important; }
@@ -224,10 +272,7 @@
             .form-control.d-flex.align-items-center { height: auto !important; padding: 0.6rem !important; }
             .row.g-3 > div { margin-bottom: 0.5rem; }
             
-            /* Mejoras visuales específicas para el acumulado mensual en celular */
-            .mes-stats { flex-direction: column !important; }
-            .mes-stats > div { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; padding-top: 15px; }
-            .mes-stats > div:last-child { border-bottom: none !important; }
+            .fab-btn { bottom: 20px; right: 20px; width: 55px; height: 55px; font-size: 1.6rem; }
         }
     </style>
 </head>
@@ -288,7 +333,7 @@
 
     <div id="appContent" class="container-fluid px-3 px-md-4 px-lg-5 py-4 d-none" style="max-width: 1440px; margin: 0 auto;">
         
-        <nav class="glass-nav mb-4 mb-md-5 pb-md-3">
+        <nav class="glass-nav mb-4 pb-md-3">
             <div class="nav-wrapper">
                 <div class="nav-brand-group">
                     <i class="bi bi-rocket-takeoff-fill rocket-icon" style="font-size: 1.8rem; line-height: 1; filter: none;"></i>
@@ -306,402 +351,442 @@
             </div>
         </nav>
 
-        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4 gap-3">
-            
-            <header class="text-start mb-0">
-                <h1 class="fw-bold text-white mb-1" style="line-height: 1.1; font-size: 1.8rem; letter-spacing: -0.5px;">
-                    Hola, <span id="userGreetingName" class="text-white">Closer</span> <i class="bi bi-patch-check-fill ms-1" style="font-size: 1.1rem; color: #fbbf24; filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.4));" title="Cuenta VIP Verificada"></i>
-                </h1>
-                <p class="text-white-50 mb-0" style="font-size: 0.95rem; letter-spacing: 0.5px; font-weight: 600;">Te damos la bienvenida a tu centro de mando financiero.</p>
-            </header>
+        <div class="mb-4 text-start">
+            <h1 class="fw-bold text-white mb-1" style="line-height: 1.1; font-size: 1.8rem; letter-spacing: -0.5px;">
+                Hola, <span id="userGreetingName" class="text-white">Closer</span> <i class="bi bi-patch-check-fill ms-1" style="font-size: 1.1rem; color: #fbbf24; filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.4));" title="Cuenta VIP Verificada"></i>
+            </h1>
+            <p class="text-white-50 mb-0" style="font-size: 0.95rem; letter-spacing: 0.5px; font-weight: 600;">Te damos la bienvenida a tu centro de mando financiero.</p>
+        </div>
 
-            <div class="d-flex flex-column align-items-start align-items-lg-end mt-3 mt-lg-0">
-                <h6 class="text-uppercase fw-bold text-white-50 mb-2" style="letter-spacing: 1px; font-size: 0.7rem;">
-                    <i class="bi bi-fire me-1" style="color: #ea580c;"></i>Tu acumulado de <span id="lblMesActualNombre"></span>
-                </h6>
+        <div class="p-2 p-md-3 rounded-4 shadow-sm mb-4" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px);">
+            <div class="row align-items-center m-0">
                 
-                <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-2 gap-md-3 px-3 py-2 rounded-4 shadow-sm" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);">
-                    
-                    <div class="d-flex align-items-center">
-                        <div class="d-flex align-items-baseline gap-2">
-                            <small class="text-uppercase fw-bold" style="color: #cbd5e1; font-size: 0.65rem;">Volumen</small>
-                            <span class="fw-bold text-white" style="font-size: 1.1rem; line-height: 1;" id="mesVolumen">$0.00</span>
-                        </div>
-                        <div class="border-start border-secondary border-opacity-50 d-none d-md-block ms-3" style="height: 15px;"></div>
-                    </div>
-                    
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="d-flex align-items-baseline gap-2">
-                            <small class="text-uppercase fw-bold" style="color: #cbd5e1; font-size: 0.65rem;">Neto</small>
-                            <span class="fw-bold" style="color: #10b981; font-size: 1.1rem; line-height: 1;" id="mesComision">$0.00</span>
-                        </div>
+                <div class="col-12 col-lg-9 border-lg-end border-secondary border-opacity-25 px-0 px-md-3">
 
-                        <div id="mesBlockExplore" class="d-none">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="border-start border-secondary border-opacity-50 d-none d-md-block" style="height: 15px;"></div>
-                                <div class="d-flex align-items-baseline gap-2">
-                                    <small class="text-info text-uppercase fw-bold" style="font-size: 0.65rem;">Explore</small>
-                                    <span class="fw-bold text-info" style="font-size: 1.1rem; line-height: 1;" id="mesExplore">$0.00</span>
+                    <div class="row align-items-center mb-2">
+                        <div class="col-12 col-sm-3 text-start mb-2 mb-sm-0">
+                            <h6 class="text-uppercase fw-bold mb-0" style="letter-spacing: 0.5px; font-size: 0.65rem; color: #38bdf8;">
+                                <i class="bi bi-calendar3 me-1"></i> Year To Date
+                            </h6>
+                        </div>
+                        <div class="col-12 col-sm-9">
+                            <div class="row gy-2 gy-sm-0">
+                                <div class="col-12 col-sm-4 d-flex flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start text-start">
+                                    <small class="text-uppercase fw-bold mb-1" style="font-size: 0.65rem; color: #cbd5e1;">Volumen</small>
+                                    <span class="fw-bold text-white" style="font-size: 0.95rem; line-height: 1;" id="lblYTDVolumen">$0.00</span>
+                                </div>
+                                <div class="col-12 col-sm-4 d-flex flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start text-start">
+                                    <small class="text-uppercase fw-bold mb-1" style="font-size: 0.65rem; color: #cbd5e1;">Pago Neto</small>
+                                    <span class="fw-bold" style="color: #166534; font-size: 0.95rem; line-height: 1;" id="lblYTDComision">$0.00</span>
+                                </div>
+                                <div class="col-12 col-sm-4 text-start d-flex flex-column gap-1">
+                                    <div id="ytdBlockExplore" class="d-none w-100 d-flex flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start">
+                                        <small class="text-uppercase fw-bold text-info mb-1" style="font-size: 0.65rem;">Explore</small>
+                                        <span class="fw-bold text-info" style="font-size: 0.85rem; line-height: 1;" id="ytdExplore">$0.00</span>
+                                    </div>
+                                    <div id="ytdBlockMalibu" class="d-none w-100 d-flex flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start mt-1 mt-sm-0">
+                                        <small class="text-uppercase fw-bold mb-1" style="color: #fbbf24; font-size: 0.65rem;">Malibu</small>
+                                        <span class="fw-bold" style="color: #fbbf24; font-size: 0.85rem; line-height: 1;" id="ytdMalibu">$0.00</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div id="mesBlockMalibu" class="d-none">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="border-start border-secondary border-opacity-50 d-none d-md-block" style="height: 15px;"></div>
-                            <div class="d-flex align-items-baseline gap-2">
-                                <small class="text-uppercase fw-bold" style="color: #fbbf24; font-size: 0.65rem;">Malibu</small>
-                                <span class="fw-bold" style="color: #fbbf24; font-size: 1.1rem; line-height: 1;" id="mesMalibu">$0.00</span>
+                    <div class="border-top border-secondary border-opacity-25 my-2 w-100"></div>
+
+                    <div class="row align-items-start align-items-sm-center">
+                        <div class="col-12 col-sm-3 text-start mb-2 mb-sm-0 pt-1 pt-sm-0">
+                            <h6 class="text-uppercase fw-bold mb-1 mb-sm-0" style="letter-spacing: 0.5px; font-size: 0.65rem; color: #fbbf24;">
+                                <i class="bi bi-fire me-1"></i> Month To Date
+                            </h6>
+                            <div class="text-white-50 text-capitalize mt-1 d-none d-sm-block" style="font-size: 0.6rem; font-weight: 600; line-height: 1;" id="lblMesActualNombre"></div>
+                        </div>
+                        
+                        <div class="col-12 col-sm-9">
+                            <div class="row gy-2 gy-sm-0">
+                                <div class="col-12 col-sm-4 d-flex flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start text-start">
+                                    <small class="text-uppercase fw-bold mb-1" style="font-size: 0.65rem; color: #cbd5e1;">Volumen</small>
+                                    <span class="fw-bold text-white" style="font-size: 0.95rem; line-height: 1;" id="mesVolumen">$0.00</span>
+                                </div>
+                                
+                                <div class="col-12 col-sm-4 d-flex flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start text-start">
+                                    <small class="text-uppercase fw-bold mb-1" style="font-size: 0.65rem; color: #cbd5e1;">Pago Neto</small>
+                                    <span class="fw-bold" style="color: #166534; font-size: 0.95rem; line-height: 1;" id="mesComision">$0.00</span>
+                                </div>
+
+                                <div class="col-12 col-sm-4 text-start d-flex flex-column gap-1">
+                                    <div id="mesBlockExplore" class="d-none w-100 d-flex flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start">
+                                        <small class="text-uppercase fw-bold text-info mb-1" style="font-size: 0.65rem;">Explore</small>
+                                        <span class="fw-bold text-info" style="font-size: 0.85rem; line-height: 1;" id="mesExplore">$0.00</span>
+                                    </div>
+                                    <div id="mesBlockMalibu" class="d-none w-100 d-flex flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start mt-1 mt-sm-0">
+                                        <small class="text-uppercase fw-bold mb-1" style="color: #fbbf24; font-size: 0.65rem;">Malibu</small>
+                                        <span class="fw-bold" style="color: #fbbf24; font-size: 0.85rem; line-height: 1;" id="mesMalibu">$0.00</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-
                 </div>
-            </div>
 
-        </div>
-
-        <div id="alertasContainer" class="row mb-4 d-none">
-            <div class="col-12" id="alertasLista"></div>
-        </div>
-
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card card-custom p-3 p-md-4">
-                    <ul class="nav nav-tabs mb-4 w-100 d-flex flex-nowrap">
-                        <li class="nav-item flex-fill"><button type="button" class="nav-link w-100 active" id="nav-ventas" onclick="switchTab('ventas')"><i class="bi bi-graph-up-arrow me-1"></i> Ventas</button></li>
-                        <li class="nav-item flex-fill"><button type="button" class="nav-link w-100" id="nav-maquila" onclick="switchTab('maquila')"><i class="bi bi-file-earmark-text me-1"></i> Paperwork</button></li>
-                    </ul>
-
-                    <div id="tabVentas">
-                        <form id="frmVenta" onsubmit="return false;">
-                            <div class="row g-3 mb-3 bg-light p-3 rounded mx-0 border border-primary-subtle shadow-sm">
-                                <div class="col-md-2 col-6"><label class="form-label text-primary fw-bold"># Vendedores</label><select class="form-select border-primary" id="cmbNumVendedores" onchange="renderVendedoresInputs()"><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
-                                <div class="col-md-5 col-12" id="containerVendedores"><label class="form-label text-muted small">Nombre Vendedor 1</label><input type="text" class="form-control mb-2 form-control-sm" id="vend_1" placeholder="Nombre..."></div>
-                                <div class="col-md-5 col-12">
-                                    <div class="d-flex gap-3 flex-wrap align-items-start mt-2 mt-md-4">
-                                        <div class="flex-grow-1"><div class="form-check bg-white border p-2 rounded shadow-sm"><input class="form-check-input border-secondary" type="checkbox" id="chkLiner" onchange="toggleLiner()"><label class="form-check-label fw-bold text-dark small">Liner (-3.5%)</label></div><input type="text" class="form-control form-control-sm mt-1 d-none" id="txtLinerName" placeholder="Nombre Liner"></div>
-                                        <div class="flex-grow-1">
-                                            <div class="form-check bg-white border p-2 rounded shadow-sm">
-                                                <input class="form-check-input border-secondary" type="checkbox" id="chkCasado" onchange="toggleCasado()">
-                                                <label class="form-check-label fw-bold text-dark small">Casado</label>
-                                            </div>
-                                            <div id="divCasadoOptions" class="d-none mt-2 p-2 bg-white border rounded shadow-sm">
-                                                <input type="text" class="form-control form-control-sm mb-2" id="txtCasadoName" placeholder="Nombre Casado">
-                                                <select class="form-select form-select-sm border-secondary text-dark fw-bold" id="cmbTipoCasado" onchange="calcularMatematica()">
-                                                    <option value="Comisión">1. Sólo Comisión</option>
-                                                    <option value="Volumen">2. Sólo Volumen</option>
-                                                    <option value="Ambas">3. Ambas (Comisión + Volumen)</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row g-3 mb-3">
-                                <div class="col-md-2 col-6"><label class="form-label">Fecha</label><input type="date" class="form-control" id="txtFecha" required></div>
-                                <div class="col-md-2 col-6"><label class="form-label">Contrato</label><input type="text" class="form-control fw-bold" id="txtContrato" required></div>
-                                <div class="col-md-4 col-12"><label class="form-label">Cliente</label><input type="text" class="form-control" id="txtCliente" required>
-                                    <div class="d-flex gap-4 mt-2 align-items-center"><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="nacionalidad" id="nacExtranjero" value="Extranjero" checked><label class="form-check-label small text-dark fw-semibold">Extranjero</label></div><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="nacionalidad" id="nacMexicano" value="Mexicano"><label class="form-check-label small text-dark fw-semibold">Mexicano</label></div></div>
-                                </div>
-                                <div class="col-md-4 col-12"><label class="form-label text-dark">Socio</label><div class="d-flex gap-3 mt-1"><div class="form-check"><input class="form-check-input" type="radio" name="tipoSocio" id="radioNew" value="New" checked onchange="calcularMatematica()"><label class="form-check-label text-dark fw-semibold">New (9%)</label></div><div class="form-check"><input class="form-check-input" type="radio" name="tipoSocio" id="radioUpgrade" value="Upgrade" onchange="calcularMatematica()"><label class="form-check-label text-dark fw-semibold">Upgrade (8%)</label></div></div></div>
-                            </div>
-                            <div class="row g-3 mb-3">
-                                <div class="col-md-3 col-12"><label class="form-label">Monto Venta (USD)</label><div class="input-group shadow-sm"><span class="input-group-text bg-light text-muted border-secondary-subtle">$</span><input type="number" class="form-control fw-bold text-dark fs-5 border-secondary-subtle" id="txtMonto" required oninput="calcularMatematica()"></div></div>
-                                <div class="col-md-3 col-12"><label class="form-label text-primary fw-bold" style="font-size: 0.7rem;">Importe Base (-13.79%)</label><div class="input-group shadow-sm"><span class="input-group-text bg-primary-subtle text-primary">$</span><input type="text" class="form-control bg-white fw-bold text-primary" id="txtImporteBase" readonly></div></div>
-                                <div class="col-md-3 col-6"><label class="form-label">Status</label><select class="form-select shadow-sm" id="cmbStatus" onchange="togglePendiente('venta')"><option value="Cerrada">✅ Cerrada</option><option value="Pendiente">⏳ Pendiente</option><option value="Caída">❌ Caída</option></select><div id="divFechaPendienteVenta" class="d-none mt-2"><input type="date" class="form-control form-control-sm border-warning shadow-sm" id="txtFechaPendienteVenta"></div></div>
-                                <div class="col-md-3 col-6"><label class="form-label">Pack</label><select class="form-select shadow-sm" id="cmbPack" onchange="calcularMatematica()"><option value="None">None</option><option value="Full">Full</option><option value="1/2">1/2</option><option value="1/3">1/3</option><option value="1/4">1/4</option></select></div>
-                            </div>
-                            <div class="row g-3 mb-3 mx-0"><div class="col-12"><div class="bg-light p-2 rounded border shadow-sm d-flex flex-wrap gap-3 align-items-center px-3"><span class="text-muted small fw-bold">OPCIONES:</span><div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" id="chkAmex" onchange="calcularMatematica()"><label class="form-check-label fw-bold text-primary" for="chkAmex">AMEX</label></div><div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" id="chkMSI" onchange="calcularMatematica()"><label class="form-check-label fw-bold text-info" for="chkMSI">6MSI (-1.5%)</label></div></div></div></div>
-                            
-                            <div class="row g-3 mb-4 bg-light p-3 rounded mx-0 border border-danger-subtle shadow-sm">
-                                <div class="col-12 mb-0"><span class="text-danger fw-bold small text-uppercase"><i class="bi bi-dash-circle me-1"></i>Deducciones</span></div>
-                                <div class="col-6 col-md-2">
-                                    <label class="form-label text-primary small fw-bold mb-1 text-truncate w-100" for="chkReserva" style="cursor: pointer;">Reserva (-10%)</label>
-                                    <div class="form-control form-control-sm border-primary d-flex align-items-center justify-content-center bg-white" style="height: 31px;">
-                                        <div class="form-check form-switch mb-0 ps-0 d-flex justify-content-center">
-                                            <input class="form-check-input ms-0 mt-0 border-primary" type="checkbox" role="switch" id="chkReserva" onchange="calcularMatematica()" style="cursor: pointer; transform: scale(1.1);">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-6 col-md-2">
-                                    <label class="form-label text-danger small fw-bold mb-1 text-truncate w-100">Impuestos %</label>
-                                    <input type="number" class="form-control form-control-sm border-danger text-center fw-bold text-danger shadow-sm" id="txtImpuestosPorcentaje" oninput="calcularMatematica()" style="height: 31px;" placeholder="Ej. 20">
-                                </div>
-                                <div class="col-6 col-md-2">
-                                    <label class="form-label text-muted small fw-bold mb-1 text-truncate w-100">Regalos ($)</label>
-                                    <input type="number" class="form-control form-control-sm text-center shadow-sm" id="txtRegalos" oninput="calcularMatematica()" style="height: 31px;" placeholder="0">
-                                </div>
-                                <div class="col-6 col-md-2">
-                                    <label class="form-label text-muted small fw-bold mb-1 text-truncate w-100">Donativos ($)</label>
-                                    <input type="number" class="form-control form-control-sm text-center shadow-sm" id="txtDonativos" oninput="calcularMatematica()" style="height: 31px;" placeholder="0">
-                                </div>
-                                <div class="col-6 col-md-2">
-                                    <label class="form-label text-muted small fw-bold mb-1 text-truncate w-100">Move In ($)</label>
-                                    <input type="number" class="form-control form-control-sm text-center shadow-sm" id="txtMoveIn" oninput="calcularMatematica()" style="height: 31px;" placeholder="0">
-                                </div>
-                                <div class="col-6 col-md-2">
-                                    <label class="form-label text-success fw-bold small mb-1 text-truncate w-100">Bonus Wk</label>
-                                    <select class="form-select form-select-sm border-success text-success fw-bold text-center shadow-sm" id="cmbBonusWeeks" onchange="calcularMatematica()" style="height: 31px;">
-                                        <option value="0">0</option>
-                                        <option value="1">1</option>
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                        <option value="5">5</option>
-                                        <option value="6">6</option>
-                                        <option value="7">7</option>
-                                        <option value="8">8</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="row g-3 mb-3 mx-0">
-                                <div class="col-12 d-flex flex-wrap gap-3">
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" id="chkMeseros" checked disabled><label class="form-check-label text-dark fw-bold small">Meseros <span class="badge bg-light text-dark border ms-1">-$20</span></label></div>
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" id="chkAntilavado" onchange="calcularMatematica()"><label class="form-check-label text-dark small fw-semibold">Antilavado <span class="badge bg-light text-dark border ms-1">-$10</span></label></div>
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" id="chkExploreForm" onchange="calcularMatematica()"><label class="form-check-label text-dark small fw-semibold">Explore Form <span class="badge bg-light text-dark border ms-1">-$10</span></label></div>
-                                </div>
-                            </div>
-                            <div class="row g-3 mb-4 mx-0 justify-content-center justify-content-md-end">
-                                <div class="col-md-6 px-0">
-                                    <div class="p-4 bg-white border border-success-subtle rounded-4 shadow text-center" style="background: linear-gradient(to right, #f0fdf4, #ffffff);">
-                                        <label class="small fw-bold text-uppercase mb-2 d-block text-success opacity-75" style="letter-spacing: 1px;">Pago Neto Final</label>
-                                        <div class="d-flex align-items-center justify-content-center text-success"><span class="fs-1 fw-bold me-1">$</span><input type="text" class="form-control-plaintext fw-bold text-success text-center p-0 fs-1" id="txtPagoTotal" readonly style="width: auto; letter-spacing: -1px;" value="0.00"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="row g-3 mb-4">
-                                <div class="col-md-3 col-12">
-                                    <div class="form-check mt-1"><input class="form-check-input border-primary" type="checkbox" id="chkExplore" onchange="toggleExplore()"><label class="form-check-label fw-bold text-primary">¿Explore Package?</label></div>
-                                    <div id="exploreFields" class="d-none bg-info-subtle p-3 rounded-4 mt-2 shadow-sm border border-info-subtle"><div class="d-flex flex-wrap align-items-end gap-2"><div class="flex-grow-1"><label class="small fw-bold text-dark">Fecha Promesa</label><input type="date" class="form-control form-control-sm border-info" id="txtFechaPromesa"></div><div class="form-check mb-1 bg-white px-2 py-1 rounded border"><input class="form-check-input ms-1" type="checkbox" id="chkExploreHoy" onchange="toggleExploreHoy()"><label class="form-check-label small fw-bold ms-2">Hoy</label></div></div></div>
-                                </div>
-                                <div class="col-md-3 col-12">
-                                    <div class="form-check mt-1"><input class="form-check-input" type="checkbox" id="chkMalibu" onchange="toggleMalibu()" style="border-color: #800000;"><label class="form-check-label fw-bold" style="color: #800000;">¿Malibu?</label></div>
-                                    <div id="malibuFields" class="d-none p-3 rounded-4 mt-2 shadow-sm" style="background-color: #fff0f0; border: 1px solid #fecaca;">
-                                        <label class="small fw-bold" style="color: #800000;">Bono Efectivo ($)</label>
-                                        <input type="number" class="form-control form-control-sm" id="txtMalibuMonto" placeholder="Ej. 200" style="border-color: #fca5a5;">
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-12"><label class="form-label text-muted small fw-bold">Comentarios</label><textarea class="form-control shadow-sm" id="txtComentarios" rows="2"></textarea></div>
-                            </div>
-
-                            <div class="mt-2 pb-2 d-grid gap-2 d-md-flex justify-content-md-end">
-                                <button id="btnCancelarEditVenta" onclick="cancelarEdicion('ventas')" class="btn btn-light border border-danger-subtle text-danger px-4 py-2 rounded-pill fw-bold shadow-sm d-none">CANCELAR</button>
-                                <button id="btnGuardarVenta" onclick="guardarVenta()" class="btn-gradient px-5 py-2 rounded-pill shadow d-flex align-items-center justify-content-center gap-2" style="font-size: 1.05rem;"><i class="bi bi-floppy-fill"></i> GUARDAR VENTA</button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <div id="tabMaquila" class="d-none">
-                        <form id="frmMaquila" onsubmit="return false;">
-                            <div class="alert text-success border-0 shadow-sm mb-4 fw-bold rounded-4" style="background: linear-gradient(to right, #d1fae5, #f0fdf4);"><i class="bi bi-calculator me-2"></i>Calculadora de Paperwork</div>
-                            
-                            <div class="row g-3 mb-3">
-                                <div class="col-md-3 col-6"><label class="form-label">Fecha</label><input type="date" class="form-control" id="maqFecha" required></div>
-                                <div class="col-md-3 col-6"><label class="form-label">Contrato</label><input type="text" class="form-control fw-bold" id="maqContrato" required></div>
-                                <div class="col-md-6 col-12"><label class="form-label">Nombre del Socio</label><input type="text" class="form-control" id="maqSocio" required></div>
-                            </div>
-                            
-                            <div class="row g-3 mb-3">
-                                <div class="col-md-6 col-12"><label class="form-label">Vendedores Involucrados</label><input type="text" class="form-control" id="maqVendedores"></div>
-                                <div class="col-md-6 col-12">
-                                    <label class="form-label">Status</label>
-                                    <select class="form-select" id="maqStatus" onchange="togglePendiente('maquila')">
-                                        <option value="Cerrada">✅ Cerrada</option>
-                                        <option value="Pendiente">⏳ Pendiente</option>
-                                        <option value="Cancelada">🚫 Cancelada</option>
-                                    </select>
-                                    <div id="divFechaPendienteMaq" class="d-none mt-2"><input type="date" class="form-control form-control-sm border-warning shadow-sm" id="txtFechaPendienteMaq"></div>
-                                </div>
-                            </div>
-
-                            <div class="row g-3 mb-3 mt-2">
-                                <div class="col-12">
-                                    <label class="form-label fw-bold text-primary small text-uppercase">Método de Pago Acordado</label>
-                                    <div class="d-flex flex-wrap gap-3 p-3 rounded-3 border bg-light shadow-sm">
-                                        <div class="form-check">
-                                            <input class="form-check-input border-primary" type="radio" name="maqTipoPago" id="maqTipoPack" value="pack" checked onchange="toggleTipoPagoMaquila()">
-                                            <label class="form-check-label fw-bold text-dark">Por Pack ($150.88)</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input border-primary" type="radio" name="maqTipoPago" id="maqTipoPorcentaje" value="porcentaje" onchange="toggleTipoPagoMaquila()">
-                                            <label class="form-check-label fw-bold text-dark">Por Porcentaje (%)</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row g-3 mb-3" id="maqPackContainer">
-                                <div class="col-md-4 col-12">
-                                    <label class="form-label">Nivel de Pack</label>
-                                    <select class="form-select border-primary shadow-sm" id="maqPack" onchange="calcularMaquila()">
-                                        <option value="None" selected>None</option>
-                                        <option value="Full">Full ($150.88)</option>
-                                        <option value="1/2">1/2 ($75.44)</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="row g-3 mb-3 d-none mx-0 bg-info-subtle p-3 rounded-4 border border-info shadow-sm" id="maqPorcentajeContainer">
-                                <div class="col-md-6 col-12">
-                                    <label class="form-label text-dark fw-bold small">Volumen Venta <span class="badge bg-light text-muted fw-normal ms-1 border">No suma a KPI</span></label>
-                                    <div class="input-group shadow-sm">
-                                        <span class="input-group-text bg-white border-info">$</span>
-                                        <input type="number" class="form-control border-info fw-bold" id="maqVolumen" placeholder="Ej. 10000" oninput="calcularMaquila()">
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-12">
-                                    <label class="form-label text-dark fw-bold small">Porcentaje Ofrecido</label>
-                                    <div class="input-group shadow-sm">
-                                        <input type="number" step="0.1" class="form-control border-info fw-bold text-center" id="maqPorcentaje" placeholder="Ej. 1.5" oninput="calcularMaquila()">
-                                        <span class="input-group-text bg-info text-dark border-info fw-bold">%</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="bg-light p-3 rounded-4 border border-danger-subtle mb-4 mt-2 shadow-sm">
-                                <div class="text-danger fw-bold small text-uppercase mb-3"><i class="bi bi-dash-circle me-1"></i>Deducciones Aplicables</div>
-                                <div class="row g-3">
-                                    <div class="col-6 col-md-6">
-                                        <label class="form-label text-primary small fw-bold mb-1 text-truncate w-100" for="maqReserva" style="cursor: pointer;">Fondo Reserva (-10%)</label>
-                                        <div class="form-control border-primary d-flex align-items-center justify-content-center bg-white shadow-sm" style="height: 42px;">
-                                            <div class="form-check form-switch mb-0 ps-0 d-flex justify-content-center">
-                                                <input class="form-check-input ms-0 mt-0 border-primary" type="checkbox" role="switch" id="maqReserva" onchange="calcularMaquila()" style="cursor: pointer; transform: scale(1.4);">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-6 col-md-6">
-                                        <label class="form-label text-danger small fw-bold mb-1 text-truncate w-100">Impuestos a Retener</label>
-                                        <div class="input-group shadow-sm" style="height: 42px;">
-                                            <input type="number" class="form-control border-danger h-100 text-center fw-bold text-danger" id="maqImpuestos" placeholder="Ej. 20" oninput="calcularMaquila()">
-                                            <span class="input-group-text bg-danger text-white border-danger fw-bold h-100">%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row g-3 mb-4 mx-0 justify-content-center justify-content-md-end">
-                                <div class="col-md-6 px-0">
-                                    <div class="p-4 bg-white border border-success-subtle rounded-4 shadow text-center" style="background: linear-gradient(to right, #f0fdf4, #ffffff);">
-                                        <label class="small fw-bold text-uppercase mb-2 d-block text-success opacity-75" style="letter-spacing: 1px;">Pago Neto Paperwork</label>
-                                        <div class="d-flex align-items-center justify-content-center text-success">
-                                            <span class="fs-1 fw-bold me-1">$</span>
-                                            <input type="text" class="form-control-plaintext fw-bold text-success text-center p-0 fs-1" id="maqPago" readonly style="width: auto; letter-spacing: -1px;" value="0.00">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mt-4 pb-2 d-grid gap-2 d-md-flex justify-content-md-end">
-                                <button id="btnCancelarEditMaquila" onclick="cancelarEdicion('maquila')" class="btn btn-light border border-danger-subtle text-danger px-4 py-2 rounded-pill fw-bold shadow-sm d-none">CANCELAR</button>
-                                <button id="btnGuardarMaquila" onclick="guardarMaquila()" class="btn btn-secondary px-5 py-2 rounded-pill shadow d-flex align-items-center justify-content-center gap-2" style="background: linear-gradient(135deg, #166534 0%, #0f172a 100%); border:none; font-size: 1.05rem; font-weight: 700;"><i class="bi bi-floppy-fill"></i> GUARDAR PAPERWORK</button>
-                            </div>
-                        </form>
-                    </div>
+                <div class="col-12 col-lg-3 text-center mt-3 mt-lg-0 d-none d-lg-flex align-items-center justify-content-center">
+                    <button class="btn-premium-cta d-flex align-items-center justify-content-center gap-2 text-nowrap w-100" onclick="mostrarFormulario()" style="max-width: 200px;">
+                        <i class="bi bi-plus-lg fs-6"></i> 
+                        <span>NUEVA VENTA</span>
+                    </button>
                 </div>
             </div>
         </div>
 
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card p-4 border-0 shadow-lg" style="background: #ffffff; border-radius: 28px; color: #0f172a; border-top: 4px solid var(--primary-color) !important;">
-                    <div class="row align-items-stretch">
-                        <div class="col-md-7 mb-4 mb-md-0 border-md-end border-light-subtle d-md-flex flex-md-column py-md-2">
-                            <h6 class="fw-bold mb-3 mb-md-0 text-dark text-uppercase" style="letter-spacing: 1px;"><i class="bi bi-calculator me-2" style="color: var(--primary-color);"></i>Calculadora de Comisiones</h6>
+        <div id="alertasContainer" class="mb-4 d-none">
+            <div id="alertasLista"></div>
+        </div>
+
+        <div id="vistaDashboard">
+            
+            <div class="card p-3 p-md-4 border-0 shadow-lg mb-4" style="background: #ffffff; border-radius: 28px; color: #0f172a; border-top: 4px solid var(--primary-color) !important;">
+                <div class="row align-items-stretch">
+                    <div class="col-md-7 mb-4 mb-md-0 border-md-end border-light-subtle d-md-flex flex-md-column py-md-2">
+                        <h6 class="fw-bold mb-3 mb-md-0 text-dark text-uppercase" style="letter-spacing: 1px;"><i class="bi bi-calculator me-2" style="color: var(--primary-color);"></i>Calculadora de Comisiones</h6>
+                        
+                        <div class="d-flex flex-column flex-md-row gap-2 my-md-auto py-md-3 w-100">
+                            <div class="w-100">
+                                <label class="d-md-none text-muted small fw-bold mb-1"><i class="bi bi-calendar-range me-1"></i>Desde:</label>
+                                <input type="date" class="form-control form-control-sm shadow-sm w-100" id="filtroInicio">
+                            </div>
+                            <div class="w-100">
+                                <label class="d-md-none text-muted small fw-bold mb-1"><i class="bi bi-calendar-range-fill me-1"></i>Hasta:</label>
+                                <input type="date" class="form-control form-control-sm shadow-sm w-100" id="filtroFin">
+                            </div>
+                            <div class="d-flex gap-2 w-100 mt-2 mt-md-0 align-items-end">
+                                <button class="btn btn-sm btn-dark flex-grow-1 px-3 fw-bold shadow-sm h-100" onclick="aplicarFiltro()" style="background: #0f172a; min-height: 36px;">Calcular</button>
+                                <button class="btn btn-sm btn-outline-secondary px-3 shadow-sm h-100" onclick="limpiarFiltro()" style="min-height: 36px;">Limpiar</button>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 mt-md-0 text-center text-md-start">
+                            <span class="badge bg-light text-dark border px-3 py-2 shadow-sm rounded-pill" id="lblRangoFechas">Selecciona fechas</span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-5 text-center text-md-end ps-md-4 d-md-flex flex-md-column justify-content-md-center">
+                        <div class="d-flex flex-column gap-3 align-items-center align-items-md-end">
+                            <div>
+                                <h6 class="text-uppercase text-muted fw-bold small mb-0" style="letter-spacing: 1.5px;">Volumen Rango</h6>
+                                <h3 class="fw-bold mb-0" id="lblTotalVolumen" style="color: var(--primary-color); letter-spacing: -1px;">$0.00</h3>
+                            </div>
+                            <div class="border-top pt-2 w-100 d-md-none opacity-50"></div>
+                            <div>
+                                <h6 class="text-uppercase text-muted fw-bold small mb-0 mt-1" style="letter-spacing: 1.5px;">Comisión Total</h6>
+                                <h2 class="fw-bold text-success mb-0" id="lblTotalCobrar" style="letter-spacing: -1.5px;">$0.00</h2>
+                            </div>
                             
-                            <div class="d-flex flex-column flex-md-row gap-2 my-md-auto py-md-3 w-100">
-                                <div class="w-100">
-                                    <label class="d-md-none text-muted small fw-bold mb-1"><i class="bi bi-calendar-range me-1"></i>Desde:</label>
-                                    <input type="date" class="form-control form-control-sm shadow-sm w-100" id="filtroInicio">
-                                </div>
-                                <div class="w-100">
-                                    <label class="d-md-none text-muted small fw-bold mb-1"><i class="bi bi-calendar-range-fill me-1"></i>Hasta:</label>
-                                    <input type="date" class="form-control form-control-sm shadow-sm w-100" id="filtroFin">
-                                </div>
-                                <div class="d-flex gap-2 w-100 mt-2 mt-md-0 align-items-end">
-                                    <button class="btn btn-sm btn-dark flex-grow-1 px-3 fw-bold shadow-sm h-100" onclick="aplicarFiltro()" style="background: #0f172a; min-height: 36px;">Calcular</button>
-                                    <button class="btn btn-sm btn-outline-secondary px-3 shadow-sm h-100" onclick="limpiarFiltro()" style="min-height: 36px;">Limpiar</button>
-                                </div>
+                            <div id="blockDeduccionesCalculadora" class="d-none w-100 mt-2 p-2 bg-light rounded border border-danger-subtle text-end">
+                                <small class="text-uppercase fw-bold text-danger d-block mb-1" style="font-size: 0.65rem;">Deducciones (Tu parte)</small>
+                                <div id="lineaBonusWeeks" class="d-none small text-muted">Total Bonus Wks: <strong class="text-dark" id="calcBonusWeeks">$0</strong></div>
+                                <div id="lineaMeseros" class="d-none small text-muted">Fijos (Meseros/Antilav/Exp/RCI): <strong class="text-dark" id="calcMeseros">$0</strong></div>
                             </div>
 
-                            <div class="mt-3 mt-md-0 text-center text-md-start">
-                                <span class="badge bg-light text-dark border px-3 py-2 shadow-sm rounded-pill" id="lblRangoFechas">Selecciona fechas</span>
+                            <div class="border-top pt-2 w-100 d-md-none opacity-50"></div>
+                            
+                            <div class="w-100 d-flex flex-column align-items-center align-items-md-end">
+                                <h6 class="text-uppercase text-muted fw-bold small mb-0 mt-1" style="letter-spacing: 1.5px;">Bono Explore</h6>
+                                <h4 class="fw-bold mb-0 text-primary" id="lblTotalExplore" style="letter-spacing: -1px;">$0.00</h4>
+                            </div>
+                            
+                            <div id="blockTotalMalibu" class="d-none w-100 flex-column align-items-center align-items-md-end mt-2">
+                                <div class="border-top pt-2 w-100 d-md-none opacity-50 mb-1"></div>
+                                <h6 class="text-uppercase fw-bold small mb-0 mt-1" style="letter-spacing: 1.5px; color: #800000;">Bono Malibu</h6>
+                                <h4 class="fw-bold mb-0" id="lblTotalMalibu" style="letter-spacing: -1px; color: #800000;">$0.00</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card card-custom p-3 p-md-4 mb-4">
+                <div class="row mb-3 align-items-center border-bottom pb-3">
+                    <div class="col-md-5 col-12 mb-2 mb-md-0">
+                        <h6 class="fw-bold mb-0 text-dark text-uppercase" style="letter-spacing: 0.5px;"><i class="bi bi-search me-2" style="color: var(--primary-color);"></i>Buscador de Contratos</h6>
+                    </div>
+                    <div class="col-md-7 col-12">
+                        <div class="input-group shadow-sm rounded-pill overflow-hidden border">
+                            <span class="input-group-text bg-white border-0 text-muted ps-3"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control border-0 ps-1 shadow-none" id="txtBuscador" placeholder="Cliente, socio, # contrato o fecha..." onkeyup="buscarContrato()">
+                            <button class="btn btn-white border-0 text-danger pe-3" type="button" onclick="limpiarBuscador()" title="Limpiar"><i class="bi bi-x-circle-fill"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-100 overflow-hidden">
+                    <table class="table table-hover align-middle mb-0 w-100">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="text-uppercase small fw-bold text-muted">Fecha / Contrato</th>
+                                <th class="d-none d-md-table-cell text-uppercase small fw-bold text-muted">Detalles</th>
+                                <th class="d-none d-md-table-cell text-uppercase small fw-bold text-muted">Status</th>
+                                <th class="text-end text-md-start text-uppercase small fw-bold text-muted">Total / Acciones</th>
+                                <th class="text-end d-none d-md-table-cell text-uppercase small fw-bold text-muted">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaResultados"></tbody>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top flex-wrap gap-2">
+                    <small class="text-muted w-100 text-center w-md-auto text-md-start fw-semibold" id="pageInfo">Mostrando 0 - 0 de 0</small>
+                    <div class="w-100 d-flex justify-content-center w-md-auto justify-content-md-end">
+                        <button class="btn btn-sm btn-outline-secondary me-2 rounded-pill px-3 fw-bold" onclick="cambiarPagina(-1)" id="btnPrev">Anterior</button>
+                        <button class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold" onclick="cambiarPagina(1)" id="btnNext" style="border-color: var(--primary-color); color: var(--primary-color);">Siguiente</button>
+                    </div>
+                </div>
+                <div id="emptyState" class="text-center py-5 d-none"><i class="bi bi-inbox text-muted display-4 opacity-25"></i><p class="text-muted mt-2 small fw-semibold">No hay registros.</p></div>
+            </div>
+        </div>
+
+        <div id="vistaFormulario" class="d-none">
+            
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold text-white mb-0" style="letter-spacing: -0.5px;"><i class="bi bi-clipboard2-data-fill me-2 text-info"></i>Nueva Operación</h4>
+                <button class="btn btn-outline-light rounded-pill px-3 fw-bold shadow-sm" onclick="ocultarFormulario()">
+                    <i class="bi bi-arrow-left me-1"></i> <span class="d-none d-md-inline">Volver</span>
+                </button>
+            </div>
+
+            <div class="card card-custom p-3 p-md-4 mb-4">
+                <ul class="nav nav-tabs mb-4 w-100 d-flex flex-nowrap">
+                    <li class="nav-item flex-fill"><button type="button" class="nav-link w-100 active" id="nav-ventas" onclick="switchTab('ventas')"><i class="bi bi-graph-up-arrow me-1"></i> Ventas</button></li>
+                    <li class="nav-item flex-fill"><button type="button" class="nav-link w-100" id="nav-maquila" onclick="switchTab('maquila')"><i class="bi bi-file-earmark-text me-1"></i> Paperwork</button></li>
+                </ul>
+
+                <div id="tabVentas">
+                    <form id="frmVenta" onsubmit="return false;">
+                        <div class="row g-3 mb-3 bg-light p-3 rounded mx-0 border border-primary-subtle shadow-sm">
+                            <div class="col-md-2 col-6"><label class="form-label text-primary fw-bold"># Vendedores</label><select class="form-select border-primary" id="cmbNumVendedores" onchange="renderVendedoresInputs()"><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
+                            <div class="col-md-5 col-12" id="containerVendedores"><label class="form-label text-muted small">Nombre Vendedor 1</label><input type="text" class="form-control mb-2 form-control-sm" id="vend_1" placeholder="Nombre..."></div>
+                            <div class="col-md-5 col-12">
+                                <div class="d-flex gap-3 flex-wrap align-items-start mt-2 mt-md-4">
+                                    <div class="flex-grow-1"><div class="form-check bg-white border p-2 rounded shadow-sm"><input class="form-check-input border-secondary" type="checkbox" id="chkLiner" onchange="toggleLiner()"><label class="form-check-label fw-bold text-dark small">Liner (-3.5%)</label></div><input type="text" class="form-control form-control-sm mt-1 d-none" id="txtLinerName" placeholder="Nombre Liner"></div>
+                                    <div class="flex-grow-1">
+                                        <div class="form-check bg-white border p-2 rounded shadow-sm">
+                                            <input class="form-check-input border-secondary" type="checkbox" id="chkCasado" onchange="toggleCasado()">
+                                            <label class="form-check-label fw-bold text-dark small">Casado</label>
+                                        </div>
+                                        <div id="divCasadoOptions" class="d-none mt-2 p-2 bg-white border rounded shadow-sm">
+                                            <input type="text" class="form-control form-control-sm mb-2" id="txtCasadoName" placeholder="Nombre Casado">
+                                            <select class="form-select form-select-sm border-secondary text-dark fw-bold" id="cmbTipoCasado" onchange="calcularMatematica()">
+                                                <option value="Comisión">1. Sólo Comisión</option>
+                                                <option value="Volumen">2. Sólo Volumen</option>
+                                                <option value="Ambas">3. Ambas (Comisión + Volumen)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-2 col-6"><label class="form-label">Fecha</label><input type="date" class="form-control" id="txtFecha" required></div>
+                            <div class="col-md-2 col-6"><label class="form-label">Contrato</label><input type="text" class="form-control fw-bold" id="txtContrato" required></div>
+                            <div class="col-md-4 col-12"><label class="form-label">Cliente</label><input type="text" class="form-control" id="txtCliente" required>
+                                <div class="d-flex gap-4 mt-2 align-items-center"><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="nacionalidad" id="nacExtranjero" value="Extranjero" checked><label class="form-check-label small text-dark fw-semibold">Extranjero</label></div><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="nacionalidad" id="nacMexicano" value="Mexicano"><label class="form-check-label small text-dark fw-semibold">Mexicano</label></div></div>
+                            </div>
+                            <div class="col-md-4 col-12"><label class="form-label text-dark">Socio</label><div class="d-flex gap-3 mt-1"><div class="form-check"><input class="form-check-input" type="radio" name="tipoSocio" id="radioNew" value="New" checked onchange="calcularMatematica()"><label class="form-check-label text-dark fw-semibold">New (9%)</label></div><div class="form-check"><input class="form-check-input" type="radio" name="tipoSocio" id="radioUpgrade" value="Upgrade" onchange="calcularMatematica()"><label class="form-check-label text-dark fw-semibold">Upgrade (8%)</label></div></div></div>
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-3 col-12"><label class="form-label">Monto Venta (USD)</label><div class="input-group shadow-sm"><span class="input-group-text bg-light text-muted border-secondary-subtle">$</span><input type="number" class="form-control fw-bold text-dark fs-5 border-secondary-subtle" id="txtMonto" required oninput="calcularMatematica()"></div></div>
+                            <div class="col-md-3 col-12"><label class="form-label text-primary fw-bold" style="font-size: 0.7rem;">Importe Base (-13.79%)</label><div class="input-group shadow-sm"><span class="input-group-text bg-primary-subtle text-primary">$</span><input type="text" class="form-control bg-white fw-bold text-primary" id="txtImporteBase" readonly></div></div>
+                            <div class="col-md-3 col-6"><label class="form-label">Status</label><select class="form-select shadow-sm" id="cmbStatus" onchange="togglePendiente('venta')"><option value="Cerrada">✅ Cerrada</option><option value="Pendiente">⏳ Pendiente</option><option value="Caída">❌ Caída</option></select><div id="divFechaPendienteVenta" class="d-none mt-2"><input type="date" class="form-control form-control-sm border-warning shadow-sm" id="txtFechaPendienteVenta"></div></div>
+                            <div class="col-md-3 col-6"><label class="form-label">Pack</label><select class="form-select shadow-sm" id="cmbPack" onchange="calcularMatematica()"><option value="None">None</option><option value="Full">Full</option><option value="1/2">1/2</option><option value="1/3">1/3</option><option value="1/4">1/4</option></select></div>
+                        </div>
+                        <div class="row g-3 mb-3 mx-0"><div class="col-12"><div class="bg-light p-2 rounded border shadow-sm d-flex flex-wrap gap-3 align-items-center px-3"><span class="text-muted small fw-bold">OPCIONES:</span><div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" id="chkAmex" onchange="calcularMatematica()"><label class="form-check-label fw-bold text-primary" for="chkAmex">AMEX</label></div><div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" id="chkMSI" onchange="calcularMatematica()"><label class="form-check-label fw-bold text-info" for="chkMSI">6MSI (-1.5%)</label></div></div></div></div>
+                        
+                        <div class="row g-3 mb-4 bg-light p-3 rounded mx-0 border border-danger-subtle shadow-sm">
+                            <div class="col-12 mb-0"><span class="text-danger fw-bold small text-uppercase"><i class="bi bi-dash-circle me-1"></i>Deducciones Variables</span></div>
+                            <div class="col-6 col-md-2">
+                                <label class="form-label text-primary small fw-bold mb-1 text-truncate w-100" for="chkReserva" style="cursor: pointer;">Reserva (-10%)</label>
+                                <div class="form-control form-control-sm border-primary d-flex align-items-center justify-content-center bg-white" style="height: 31px;">
+                                    <div class="form-check form-switch mb-0 ps-0 d-flex justify-content-center">
+                                        <input class="form-check-input ms-0 mt-0 border-primary" type="checkbox" role="switch" id="chkReserva" onchange="calcularMatematica()" style="cursor: pointer; transform: scale(1.1);">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-2">
+                                <label class="form-label text-danger small fw-bold mb-1 text-truncate w-100">Impuestos %</label>
+                                <input type="number" class="form-control form-control-sm border-danger text-center fw-bold text-danger shadow-sm" id="txtImpuestosPorcentaje" oninput="calcularMatematica()" style="height: 31px;" placeholder="Ej. 20">
+                            </div>
+                            <div class="col-6 col-md-2">
+                                <label class="form-label text-muted small fw-bold mb-1 text-truncate w-100">Regalos ($)</label>
+                                <input type="number" class="form-control form-control-sm text-center shadow-sm" id="txtRegalos" oninput="calcularMatematica()" style="height: 31px;" placeholder="0">
+                            </div>
+                            <div class="col-6 col-md-2">
+                                <label class="form-label text-muted small fw-bold mb-1 text-truncate w-100">Donativos ($)</label>
+                                <input type="number" class="form-control form-control-sm text-center shadow-sm" id="txtDonativos" oninput="calcularMatematica()" style="height: 31px;" placeholder="0">
+                            </div>
+                            <div class="col-6 col-md-2">
+                                <label class="form-label text-muted small fw-bold mb-1 text-truncate w-100">Move In ($)</label>
+                                <input type="number" class="form-control form-control-sm text-center shadow-sm" id="txtMoveIn" oninput="calcularMatematica()" style="height: 31px;" placeholder="0">
+                            </div>
+                            <div class="col-6 col-md-2">
+                                <label class="form-label text-success fw-bold small mb-1 text-truncate w-100">Bonus Wk</label>
+                                <select class="form-select form-select-sm border-success text-success fw-bold text-center shadow-sm" id="cmbBonusWeeks" onchange="calcularMatematica()" style="height: 31px;">
+                                    <option value="0">0</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3 mx-0">
+                            <div class="col-12 d-flex flex-wrap gap-3">
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="chkMeseros" checked disabled><label class="form-check-label text-dark fw-bold small">Meseros <span class="badge bg-light text-dark border ms-1">-$20</span></label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="chkAntilavado" onchange="calcularMatematica()"><label class="form-check-label text-dark small fw-semibold">Antilavado <span class="badge bg-light text-dark border ms-1">-$10</span></label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="chkExploreForm" onchange="calcularMatematica()"><label class="form-check-label text-dark small fw-semibold">Explore Form <span class="badge bg-light text-dark border ms-1">-$10</span></label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="chkRCI" onchange="calcularMatematica()"><label class="form-check-label text-dark small fw-semibold">RCI Form <span class="badge bg-light text-dark border ms-1">-$10</span></label></div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-4 mx-0 justify-content-center justify-content-md-end">
+                            <div class="col-md-6 px-0">
+                                <div class="p-4 bg-white border border-success-subtle rounded-4 shadow text-center" style="background: linear-gradient(to right, #f0fdf4, #ffffff);">
+                                    <label class="small fw-bold text-uppercase mb-2 d-block text-success opacity-75" style="letter-spacing: 1px;">Pago Neto Final</label>
+                                    <div class="d-flex align-items-center justify-content-center text-success"><span class="fs-1 fw-bold me-1">$</span><input type="text" class="form-control-plaintext fw-bold text-success text-center p-0 fs-1" id="txtPagoTotal" readonly style="width: auto; letter-spacing: -1px;" value="0.00"></div>
+                                </div>
                             </div>
                         </div>
                         
-                        <div class="col-md-5 text-center text-md-end ps-md-4 d-md-flex flex-md-column justify-content-md-center">
-                            <div class="d-flex flex-column gap-3 align-items-center align-items-md-end">
-                                <div>
-                                    <h6 class="text-uppercase text-muted fw-bold small mb-0" style="letter-spacing: 1.5px;">Volumen Rango</h6>
-                                    <h3 class="fw-bold mb-0" id="lblTotalVolumen" style="color: var(--primary-color); letter-spacing: -1px;">$0.00</h3>
-                                </div>
-                                <div class="border-top pt-2 w-100 d-md-none opacity-50"></div>
-                                <div>
-                                    <h6 class="text-uppercase text-muted fw-bold small mb-0 mt-1" style="letter-spacing: 1.5px;">Comisión Total</h6>
-                                    <h2 class="fw-bold text-success mb-0" id="lblTotalCobrar" style="letter-spacing: -1.5px;">$0.00</h2>
-                                </div>
-                                <div class="border-top pt-2 w-100 d-md-none opacity-50"></div>
-                                
-                                <div class="w-100 d-flex flex-column align-items-center align-items-md-end">
-                                    <h6 class="text-uppercase text-muted fw-bold small mb-0 mt-1" style="letter-spacing: 1.5px;">Bono Explore</h6>
-                                    <h4 class="fw-bold mb-0 text-primary" id="lblTotalExplore" style="letter-spacing: -1px;">$0.00</h4>
-                                </div>
-                                
-                                <div id="blockTotalMalibu" class="d-none w-100 flex-column align-items-center align-items-md-end mt-2">
-                                    <div class="border-top pt-2 w-100 d-md-none opacity-50 mb-1"></div>
-                                    <h6 class="text-uppercase fw-bold small mb-0 mt-1" style="letter-spacing: 1.5px; color: #800000;">Bono Malibu</h6>
-                                    <h4 class="fw-bold mb-0" id="lblTotalMalibu" style="letter-spacing: -1px; color: #800000;">$0.00</h4>
-                                </div>
-
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-3 col-12">
+                                <div class="form-check mt-1"><input class="form-check-input border-primary" type="checkbox" id="chkExplore" onchange="toggleExplore()"><label class="form-check-label fw-bold text-primary">¿Explore Package?</label></div>
+                                <div id="exploreFields" class="d-none bg-info-subtle p-3 rounded-4 mt-2 shadow-sm border border-info-subtle"><div class="d-flex flex-wrap align-items-end gap-2"><div class="flex-grow-1"><label class="small fw-bold text-dark">Fecha Promesa</label><input type="date" class="form-control form-control-sm border-info" id="txtFechaPromesa"></div><div class="form-check mb-1 bg-white px-2 py-1 rounded border"><input class="form-check-input ms-1" type="checkbox" id="chkExploreHoy" onchange="toggleExploreHoy()"><label class="form-check-label small fw-bold ms-2">Hoy</label></div></div></div>
                             </div>
+                            <div class="col-md-3 col-12">
+                                <div class="form-check mt-1"><input class="form-check-input" type="checkbox" id="chkMalibu" onchange="toggleMalibu()" style="border-color: #800000;"><label class="form-check-label fw-bold" style="color: #800000;">¿Malibu?</label></div>
+                                <div id="malibuFields" class="d-none p-3 rounded-4 mt-2 shadow-sm" style="background-color: #fff0f0; border: 1px solid #fecaca;">
+                                    <label class="small fw-bold" style="color: #800000;">Bono Efectivo ($)</label>
+                                    <input type="number" class="form-control form-control-sm" id="txtMalibuMonto" placeholder="Ej. 200" style="border-color: #fca5a5;">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-12"><label class="form-label text-muted small fw-bold">Comentarios</label><textarea class="form-control shadow-sm" id="txtComentarios" rows="2"></textarea></div>
                         </div>
-                    </div>
+
+                        <div class="mt-2 pb-2 d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button id="btnCancelarEditVenta" onclick="cancelarEdicion('ventas')" class="btn btn-light border border-danger-subtle text-danger px-4 py-2 rounded-pill fw-bold shadow-sm d-none">CANCELAR</button>
+                            <button id="btnGuardarVenta" onclick="guardarVenta()" class="btn-gradient px-5 py-3 rounded-pill shadow d-flex align-items-center justify-content-center gap-2" style="font-size: 1.05rem;"><i class="bi bi-floppy-fill"></i> GUARDAR VENTA</button>
+                        </div>
+                    </form>
                 </div>
-            </div>
-        </div>
 
-        <div class="row">
-            <div class="col-12">
-                <div class="card card-custom p-3 p-md-4">
-                    
-                    <div class="row mb-3 align-items-center border-bottom pb-3">
-                        <div class="col-md-5 col-12 mb-2 mb-md-0">
-                            <h6 class="fw-bold mb-0 text-dark text-uppercase" style="letter-spacing: 0.5px;"><i class="bi bi-search me-2" style="color: var(--primary-color);"></i>Buscador de Contratos</h6>
+                <div id="tabMaquila" class="d-none">
+                    <form id="frmMaquila" onsubmit="return false;">
+                        <div class="alert text-success border-0 shadow-sm mb-4 fw-bold rounded-4" style="background: linear-gradient(to right, #d1fae5, #f0fdf4);"><i class="bi bi-calculator me-2"></i>Calculadora de Paperwork</div>
+                        
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-3 col-6"><label class="form-label">Fecha</label><input type="date" class="form-control" id="maqFecha" required></div>
+                            <div class="col-md-3 col-6"><label class="form-label">Contrato</label><input type="text" class="form-control fw-bold" id="maqContrato" required></div>
+                            <div class="col-md-6 col-12"><label class="form-label">Nombre del Socio</label><input type="text" class="form-control" id="maqSocio" required></div>
                         </div>
-                        <div class="col-md-7 col-12">
-                            <div class="input-group shadow-sm rounded-pill overflow-hidden border">
-                                <span class="input-group-text bg-white border-0 text-muted ps-3"><i class="bi bi-search"></i></span>
-                                <input type="text" class="form-control border-0 ps-1 shadow-none" id="txtBuscador" placeholder="Cliente, socio, # contrato o fecha..." onkeyup="buscarContrato()">
-                                <button class="btn btn-white border-0 text-danger pe-3" type="button" onclick="limpiarBuscador()" title="Limpiar"><i class="bi bi-x-circle-fill"></i></button>
+                        
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6 col-12"><label class="form-label">Vendedores Involucrados</label><input type="text" class="form-control" id="maqVendedores"></div>
+                            <div class="col-md-6 col-12">
+                                <label class="form-label">Status</label>
+                                <select class="form-select" id="maqStatus" onchange="togglePendiente('maquila')">
+                                    <option value="Cerrada">✅ Cerrada</option>
+                                    <option value="Pendiente">⏳ Pendiente</option>
+                                    <option value="Cancelada">🚫 Cancelada</option>
+                                </select>
+                                <div id="divFechaPendienteMaq" class="d-none mt-2"><input type="date" class="form-control form-control-sm border-warning shadow-sm" id="txtFechaPendienteMaq"></div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="w-100 overflow-hidden">
-                        <table class="table table-hover align-middle mb-0 w-100">
-                            <thead class="table-light">
-                                <tr>
-                                    <th class="text-uppercase small fw-bold text-muted">Fecha / Contrato</th>
-                                    <th class="d-none d-md-table-cell text-uppercase small fw-bold text-muted">Detalles</th>
-                                    <th class="d-none d-md-table-cell text-uppercase small fw-bold text-muted">Status</th>
-                                    <th class="text-end text-md-start text-uppercase small fw-bold text-muted">Total / Acciones</th>
-                                    <th class="text-end d-none d-md-table-cell text-uppercase small fw-bold text-muted">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tablaResultados"></tbody>
-                        </table>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top flex-wrap gap-2">
-                        <small class="text-muted w-100 text-center w-md-auto text-md-start fw-semibold" id="pageInfo">Mostrando 0 - 0 de 0</small>
-                        <div class="w-100 d-flex justify-content-center w-md-auto justify-content-md-end">
-                            <button class="btn btn-sm btn-outline-secondary me-2 rounded-pill px-3 fw-bold" onclick="cambiarPagina(-1)" id="btnPrev">Anterior</button>
-                            <button class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold" onclick="cambiarPagina(1)" id="btnNext" style="border-color: var(--primary-color); color: var(--primary-color);">Siguiente</button>
+                        <div class="row g-3 mb-3 mt-2">
+                            <div class="col-12">
+                                <label class="form-label fw-bold text-primary small text-uppercase">Método de Pago Acordado</label>
+                                <div class="d-flex flex-wrap gap-3 p-3 rounded-3 border bg-light shadow-sm">
+                                    <div class="form-check">
+                                        <input class="form-check-input border-primary" type="radio" name="maqTipoPago" id="maqTipoPack" value="pack" checked onchange="toggleTipoPagoMaquila()">
+                                        <label class="form-check-label fw-bold text-dark">Por Pack ($150.88)</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input border-primary" type="radio" name="maqTipoPago" id="maqTipoPorcentaje" value="porcentaje" onchange="toggleTipoPagoMaquila()">
+                                        <label class="form-check-label fw-bold text-dark">Por Porcentaje (%)</label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div id="emptyState" class="text-center py-5 d-none"><i class="bi bi-inbox text-muted display-4 opacity-25"></i><p class="text-muted mt-2 small fw-semibold">No hay registros.</p></div>
+
+                        <div class="row g-3 mb-3" id="maqPackContainer">
+                            <div class="col-md-4 col-12">
+                                <label class="form-label">Nivel de Pack</label>
+                                <select class="form-select border-primary shadow-sm" id="maqPack" onchange="calcularMaquila()">
+                                    <option value="None" selected>None</option>
+                                    <option value="Full">Full ($150.88)</option>
+                                    <option value="1/2">1/2 ($75.44)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3 d-none mx-0 bg-info-subtle p-3 rounded-4 border border-info shadow-sm" id="maqPorcentajeContainer">
+                            <div class="col-md-6 col-12">
+                                <label class="form-label text-dark fw-bold small">Volumen Venta <span class="badge bg-light text-muted fw-normal ms-1 border">No suma a KPI</span></label>
+                                <div class="input-group shadow-sm">
+                                    <span class="input-group-text bg-white border-info">$</span>
+                                    <input type="number" class="form-control border-info fw-bold" id="maqVolumen" placeholder="Ej. 10000" oninput="calcularMaquila()">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-12">
+                                <label class="form-label text-dark fw-bold small">Porcentaje Ofrecido</label>
+                                <div class="input-group shadow-sm">
+                                    <input type="number" step="0.1" class="form-control border-info fw-bold text-center" id="maqPorcentaje" placeholder="Ej. 1.5" oninput="calcularMaquila()">
+                                    <span class="input-group-text bg-info text-dark border-info fw-bold">%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-light p-3 rounded-4 border border-danger-subtle mb-4 mt-2 shadow-sm">
+                            <div class="text-danger fw-bold small text-uppercase mb-3"><i class="bi bi-dash-circle me-1"></i>Deducciones Aplicables</div>
+                            <div class="row g-3">
+                                <div class="col-6 col-md-6">
+                                    <label class="form-label text-primary small fw-bold mb-1 text-truncate w-100" for="maqReserva" style="cursor: pointer;">Fondo Reserva (-10%)</label>
+                                    <div class="form-control border-primary d-flex align-items-center justify-content-center bg-white shadow-sm" style="height: 42px;">
+                                        <div class="form-check form-switch mb-0 ps-0 d-flex justify-content-center">
+                                            <input class="form-check-input ms-0 mt-0 border-primary" type="checkbox" role="switch" id="maqReserva" onchange="calcularMaquila()" style="cursor: pointer; transform: scale(1.4);">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-6">
+                                    <label class="form-label text-danger small fw-bold mb-1 text-truncate w-100">Impuestos a Retener</label>
+                                    <div class="input-group shadow-sm" style="height: 42px;">
+                                        <input type="number" class="form-control border-danger h-100 text-center fw-bold text-danger" id="maqImpuestos" placeholder="Ej. 20" oninput="calcularMaquila()">
+                                        <span class="input-group-text bg-danger text-white border-danger fw-bold h-100">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-4 mx-0 justify-content-center justify-content-md-end">
+                            <div class="col-md-6 px-0">
+                                <div class="p-4 bg-white border border-success-subtle rounded-4 shadow text-center" style="background: linear-gradient(to right, #f0fdf4, #ffffff);">
+                                    <label class="small fw-bold text-uppercase mb-2 d-block text-success opacity-75" style="letter-spacing: 1px;">Pago Neto Paperwork</label>
+                                    <div class="d-flex align-items-center justify-content-center text-success">
+                                        <span class="fs-1 fw-bold me-1">$</span>
+                                        <input type="text" class="form-control-plaintext fw-bold text-success text-center p-0 fs-1" id="maqPago" readonly style="width: auto; letter-spacing: -1px;" value="0.00">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pb-2 d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button id="btnCancelarEditMaquila" onclick="cancelarEdicion('maquila')" class="btn btn-light border border-danger-subtle text-danger px-4 py-2 rounded-pill fw-bold shadow-sm d-none">CANCELAR</button>
+                            <button id="btnGuardarMaquila" onclick="guardarMaquila()" class="btn btn-secondary px-5 py-3 rounded-pill shadow d-flex align-items-center justify-content-center gap-2" style="background: linear-gradient(135deg, #166534 0%, #0f172a 100%); border:none; font-size: 1.05rem; font-weight: 700;"><i class="bi bi-floppy-fill"></i> GUARDAR PAPERWORK</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -717,6 +802,10 @@
 
     </div>
 
+    <div id="fabMobile" class="fab-btn d-md-none" onclick="mostrarFormulario()">
+        <i class="bi bi-plus"></i>
+    </div>
+
     <div class="modal fade" id="modalDetalle" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content"><div class="modal-header bg-light border-0"><h5 class="modal-title fw-bold text-primary" id="modalTitulo">Detalle</h5><button class="btn-close shadow-none" data-bs-dismiss="modal"></button></div><div class="modal-body p-4" id="modalCuerpo"></div><div class="modal-footer border-0 bg-light"><button class="btn btn-dark rounded-pill px-4 fw-bold shadow-sm" data-bs-dismiss="modal">Cerrar</button></div></div></div></div>
 
     <div class="modal fade" id="modalCelebracion" tabindex="-1" aria-hidden="true" style="z-index: 1055;">
@@ -726,7 +815,7 @@
                     <div id="celIcon" style="font-size: 4.5rem; filter: drop-shadow(0 0 15px rgba(0, 198, 255, 0.5)); margin-bottom: 1rem;">🚀</div>
                     <h2 id="celTitle" class="fw-bold mb-2" style="background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">¡Felicidades!</h2>
                     <p id="celMessage" class="text-white-50 mb-4" style="font-size: 1.05rem;">Tu venta ha sido registrada exitosamente.</p>
-                    <button type="button" class="btn px-5 py-2 rounded-pill fw-bold shadow-sm text-white" data-bs-dismiss="modal" id="celButton" style="background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%); border: none; letter-spacing: 0.5px;">¡A seguir facturando!</button>
+                    <button type="button" class="btn px-5 py-2 rounded-pill fw-bold shadow-sm text-white" data-bs-dismiss="modal" id="celButton" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1px solid rgba(251, 191, 36, 0.5); color: #fbbf24 !important; letter-spacing: 0.5px;">¡A seguir facturando!</button>
                 </div>
             </div>
         </div>
@@ -736,7 +825,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
-    <script src="js/app.js?v=acumuladoMensual"></script>
+    <script src="js/app.js?v=enterpriseUX_vFINAL"></script>
     
     <script>
         document.getElementById('txtFecha').valueAsDate = new Date();
