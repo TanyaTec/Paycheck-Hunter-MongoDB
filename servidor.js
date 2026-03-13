@@ -38,7 +38,7 @@ const VentaSchema = new mongoose.Schema({
     deduccion_antilavado: Number, 
     deduccion_explore: Number,
     deduccion_meseros: Number,
-    deduccion_rci: Number,
+    deduccion_rci: Number,     // <-- CIRUGÍA: NUEVA DEDUCCIÓN RCI
     es_explore_package: Number,
     explore_es_hoy: Number,
     es_malibu: Number,        

@@ -1,559 +1,3 @@
-// --- CONFIGURACIÓN GLOBAL ---
-const BASE_URL = '';
-let currentMode = 'ventas'; 
-let editId = null;
-
-let allDataGlobal = []; 
-let filteredData = [];  
-let currentPage = 1;
-const itemsPerPage = 10;
-
-let currentUserNombre = "";
-
-const successMessages = {
-    'nueva_venta': { icon: '🚀', title: '¡Venta Cerrada!', msg: '¡Excelente trabajo, Closer! Una comisión más al bolsillo.', btn: '¡A seguir facturando! 💸' },
-    'update_venta': { icon: '📝', title: '¡Datos Actualizados!', msg: 'Los datos de la venta han sido ajustados con precisión.', btn: 'Entendido' },
-    'nueva_maquila': { icon: '🤝', title: '¡Paperwork Listo!', msg: 'Un trámite menos, un paso más cerca de tu meta.', btn: '¡Excelente!' },
-    'update_maquila': { icon: '📝', title: '¡Paperwork Actualizado!', msg: 'Documentación al día y en orden.', btn: 'Entendido' },
-    'pago_explore': { icon: '💰', title: '¡Explore Cobrado!', msg: 'Ese bono ya está en la bolsa. ¡Felicidades!', btn: '¡A celebrar! 🎉' }
-};
-
-// --- NAVEGACIÓN Y VISTAS ---
-function mostrarFormulario() {
-    document.getElementById('vistaDashboard').classList.add('d-none');
-    const fab = document.getElementById('fabMobile');
-    if(fab) fab.classList.add('d-none');
-    
-    const vistaForm = document.getElementById('vistaFormulario');
-    vistaForm.classList.remove('d-none');
-    
-    // CIRUGÍA UX: Scroll automático directo al formulario sin fricción
-    vistaForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-function ocultarFormulario() {
-    document.getElementById('vistaFormulario').classList.add('d-none');
-    
-    const vistaDash = document.getElementById('vistaDashboard');
-    vistaDash.classList.remove('d-none');
-    
-    const fab = document.getElementById('fabMobile');
-    if(fab) fab.classList.remove('d-none');
-    
-    cancelarEdicion(currentMode);
-    
-    // Regresa al inicio del Dashboard
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function detonarCelebracion(tipoAccion) {
-    const config = successMessages[tipoAccion] || successMessages['nueva_venta'];
-    
-    document.getElementById('celIcon').innerText = config.icon;
-    document.getElementById('celTitle').innerText = config.title;
-    document.getElementById('celMessage').innerText = config.msg;
-    document.getElementById('celButton').innerText = config.btn;
-
-    const modalEl = document.getElementById('modalCelebracion');
-    const modal = new bootstrap.Modal(modalEl);
-    
-    modalEl.addEventListener('hidden.bs.modal', function onModalHidden() {
-        ocultarFormulario();
-        modalEl.removeEventListener('hidden.bs.modal', onModalHidden);
-    });
-
-    modal.show();
-
-    if (tipoAccion === 'nueva_venta' || tipoAccion === 'pago_explore') {
-        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#00c6ff', '#0072ff', '#fbbf24', '#ffffff'], zIndex: 10000 });
-    }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    const tokenGuardado = localStorage.getItem('paycheckToken');
-    const nombreGuardado = localStorage.getItem('paycheckUserName');
-
-    if (tokenGuardado && nombreGuardado) {
-        currentUserNombre = nombreGuardado;
-        mostrarDashboard();
-    }
-});
-
-async function handleCredentialResponse(response) {
-    const googleToken = response.credential;
-    try {
-        const res = await fetch(`${BASE_URL}/api/auth/google`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ googleToken })
-        });
-        const data = await res.json();
-        
-        if (res.ok && data.token) {
-            currentUserNombre = data.nombre.toLowerCase();
-            localStorage.setItem('paycheckToken', data.token); 
-            localStorage.setItem('paycheckUserName', currentUserNombre);
-            localStorage.setItem('paycheckUserPic', data.picture || "");
-            mostrarDashboard();
-        } else {
-            throw new Error(data.error || "Acceso denegado por el servidor");
-        }
-    } catch (e) {
-        const errorMsg = document.getElementById('loginError');
-        if(errorMsg) {
-            errorMsg.innerHTML = `<p class="text-danger fw-bold bg-danger-subtle p-2 rounded-3 small mb-0 border border-danger-subtle d-flex align-items-center justify-content-center gap-1"><i class="bi bi-exclamation-triangle-fill"></i> ${e.message}</p>`;
-            errorMsg.classList.remove('d-none');
-        }
-    }
-}
-
-function mostrarDashboard() {
-    const loginScreen = document.getElementById('loginScreen');
-    const appContent = document.getElementById('appContent');
-    
-    if(loginScreen) loginScreen.classList.add('d-none');
-    if(appContent) appContent.classList.remove('d-none');
-
-    const greetingEl = document.getElementById('userGreetingName');
-    const profilePicEl = document.getElementById('userProfilePic');
-    const userInitialsEl = document.getElementById('userInitials');
-    const picUrl = localStorage.getItem('paycheckUserPic');
-
-    if (currentUserNombre) {
-        const nombreFormateado = currentUserNombre.charAt(0).toUpperCase() + currentUserNombre.slice(1);
-        if(greetingEl) greetingEl.innerText = nombreFormateado;
-        
-        if (picUrl && profilePicEl) {
-            profilePicEl.src = picUrl;
-            profilePicEl.classList.remove('d-none');
-            if(userInitialsEl) userInitialsEl.classList.add('d-none');
-        } else if (userInitialsEl) {
-            userInitialsEl.innerText = nombreFormateado.charAt(0);
-            userInitialsEl.classList.remove('d-none');
-            if(profilePicEl) profilePicEl.classList.add('d-none');
-        }
-    }
-    
-    cargarDatosUnificados(); 
-}
-
-function cerrarSesion() {
-    localStorage.removeItem('paycheckToken');
-    localStorage.removeItem('paycheckUserName');
-    localStorage.removeItem('paycheckUserPic');
-    location.reload(); 
-}
-
-function switchTab(mode) {
-    currentMode = mode;
-    document.querySelectorAll('.nav-link').forEach(t => t.classList.remove('active'));
-    
-    if (mode === 'ventas') {
-        document.getElementById('nav-ventas').classList.add('active');
-        document.getElementById('tabVentas').classList.remove('d-none');
-        document.getElementById('tabMaquila').classList.add('d-none');
-    } else {
-        document.getElementById('nav-maquila').classList.add('active');
-        document.getElementById('tabVentas').classList.add('d-none');
-        document.getElementById('tabMaquila').classList.remove('d-none');
-    }
-    try { cancelarEdicion(mode); limpiarFiltro(false); } catch(e) {}
-}
-
-function toggleExplore() {
-    const check = document.getElementById('chkExplore');
-    const fields = document.getElementById('exploreFields');
-    if(check && fields) check.checked ? fields.classList.remove('d-none') : fields.classList.add('d-none');
-}
-
-function toggleExploreHoy() {
-    const chk = document.getElementById('chkExploreHoy');
-    const dateInput = document.getElementById('txtFechaPromesa');
-    if (chk && dateInput) {
-        if (chk.checked) { dateInput.value = ''; dateInput.disabled = true; } 
-        else { dateInput.disabled = false; }
-    }
-}
-
-function toggleMalibu() {
-    const check = document.getElementById('chkMalibu');
-    const fields = document.getElementById('malibuFields');
-    if(check && fields) check.checked ? fields.classList.remove('d-none') : fields.classList.add('d-none');
-}
-
-function togglePendiente(mode) {
-    const val = mode === 'venta' ? document.getElementById('cmbStatus').value : document.getElementById('maqStatus').value;
-    const div = mode === 'venta' ? document.getElementById('divFechaPendienteVenta') : document.getElementById('divFechaPendienteMaq');
-    if (val === 'Pendiente') div.classList.remove('d-none');
-    else div.classList.add('d-none');
-}
-
-function toggleCasado() {
-    const chk = document.getElementById('chkCasado');
-    const divOpts = document.getElementById('divCasadoOptions');
-    if(chk && divOpts) {
-        chk.checked ? divOpts.classList.remove('d-none') : divOpts.classList.add('d-none');
-        calcularMatematica();
-    }
-}
-
-function toggleTipoPagoMaquila() {
-    const isPack = document.getElementById('maqTipoPack').checked;
-    const packContainer = document.getElementById('maqPackContainer');
-    const pctContainer = document.getElementById('maqPorcentajeContainer');
-    
-    if(isPack) {
-        packContainer.classList.remove('d-none'); pctContainer.classList.add('d-none');
-    } else {
-        packContainer.classList.add('d-none'); pctContainer.classList.remove('d-none');
-    }
-    calcularMaquila();
-}
-
-function calcularMiVolumen(item) {
-    if (item.type !== 'venta') return 0;
-    let monto = parseFloat(item.monto) || 0;
-    let numVend = parseInt(item.num_vendedores) || 1;
-    let liner = parseInt(item.es_liner) === 1 ? 1 : 0;
-    
-    let partesTotales = numVend + liner;
-    let volumenPorPersona = monto / partesTotales; 
-
-    let esCasado = parseInt(item.es_casado) === 1;
-    let tipoCasado = item.tipo_casado || 'Comisión'; 
-    let nombreUsuario = currentUserNombre; 
-    let listaVendedores = (item.vendedores || "").toLowerCase();
-    let nombreLiner = (item.nombre_liner || "").toLowerCase();
-    
-    let participeDirectamente = listaVendedores.includes(nombreUsuario) || nombreLiner.includes(nombreUsuario);
-    let miVolumen = 0;
-
-    if (participeDirectamente) {
-        miVolumen = volumenPorPersona;
-        if (esCasado && (tipoCasado === 'Volumen' || tipoCasado === 'Ambas')) miVolumen = miVolumen / 2;
-    } else {
-        if (esCasado && (tipoCasado === 'Volumen' || tipoCasado === 'Ambas')) miVolumen = volumenPorPersona / 2;
-        else miVolumen = 0;
-    }
-    return miVolumen;
-}
-
-function renderVendedoresInputs() {
-    const cmb = document.getElementById('cmbNumVendedores');
-    if(!cmb) return;
-    const num = parseInt(cmb.value);
-    const container = document.getElementById('containerVendedores');
-    let html = '';
-    for(let i=1; i<=num; i++) {
-        html += `<label class="form-label text-muted small">Nombre Vendedor ${i}</label><input type="text" class="form-control mb-2 form-control-sm" id="vend_${i}" placeholder="Nombre...">`;
-    }
-    container.innerHTML = html;
-    calcularMatematica(); 
-}
-
-function toggleLiner() {
-    const chk = document.getElementById('chkLiner');
-    const input = document.getElementById('txtLinerName');
-    if(chk && input) { chk.checked ? input.classList.remove('d-none') : input.classList.add('d-none'); calcularMatematica(); }
-}
-
-function calcularMatematica() {
-    const txtMonto = document.getElementById('txtMonto');
-    if(!txtMonto) return;
-
-    const monto = parseFloat(txtMonto.value) || 0;
-    const importe = monto * 0.86207;
-    document.getElementById('txtImporteBase').value = importe.toFixed(2);
-
-    const radioNew = document.getElementById('radioNew');
-    let tasa = (radioNew && radioNew.checked) ? 9.0 : 8.0;
-
-    if (document.getElementById('chkMSI').checked) tasa -= 1.5;
-    if (document.getElementById('chkLiner').checked) tasa -= 3.5;
-
-    let dineroPorcentajeTotal = importe * (tasa / 100);
-
-    const numVendedores = parseInt(document.getElementById('cmbNumVendedores').value) || 1;
-    let miParteDelPorcentaje = dineroPorcentajeTotal / numVendedores;
-
-    if (document.getElementById('chkCasado').checked) {
-        const tipoCasado = document.getElementById('cmbTipoCasado').value;
-        if (tipoCasado === 'Comisión' || tipoCasado === 'Ambas') {
-            miParteDelPorcentaje = miParteDelPorcentaje / 2;
-        }
-    }
-
-    const pack = document.getElementById('cmbPack').value;
-    let bonusPack = 0;
-    switch (pack) {
-        case 'Full': bonusPack = 150.88; break;
-        case '1/2': bonusPack = 150.88 / 2; break;
-        case '1/3': bonusPack = 150.88 / 3; break;
-        case '1/4': bonusPack = 150.88 / 4; break;
-        default: bonusPack = 0; break;
-    }
-
-    let ingresoBrutoIndividual = miParteDelPorcentaje + bonusPack;
-
-    // 1. Gastos ANTES de impuestos
-    let gastosAntesImpuestos = 0;
-    gastosAntesImpuestos += parseFloat(document.getElementById('txtRegalos').value) || 0;
-    gastosAntesImpuestos += parseFloat(document.getElementById('txtDonativos').value) || 0;
-    gastosAntesImpuestos += parseFloat(document.getElementById('txtMoveIn').value) || 0;
-    
-    const bonusWeeks = parseInt(document.getElementById('cmbBonusWeeks').value) || 0;
-    gastosAntesImpuestos += (bonusWeeks * 20);
-
-    let miParteGastosAntes = gastosAntesImpuestos / numVendedores;
-    
-    // 2. Base Gravable Real
-    let baseParaImpuestosYReserva = ingresoBrutoIndividual - miParteGastosAntes;
-
-    // 3. Impuestos
-    const impuestoPorcentaje = parseFloat(document.getElementById('txtImpuestosPorcentaje').value) || 0;
-    let deduccionImpuestos = 0;
-    if (impuestoPorcentaje > 0 && baseParaImpuestosYReserva > 0) {
-        deduccionImpuestos = baseParaImpuestosYReserva * (impuestoPorcentaje / 100);
-    }
-
-    // 4. Reserva
-    let deduccionReserva = 0;
-    if (document.getElementById('chkReserva').checked && baseParaImpuestosYReserva > 0) {
-        deduccionReserva = baseParaImpuestosYReserva * 0.10;
-    }
-
-    // 5. Restar Impuestos y Reserva
-    let subtotalPostImpuestos = baseParaImpuestosYReserva - deduccionImpuestos - deduccionReserva;
-
-    // 6. Gastos Fijos Operativos
-    let gastosDespuesImpuestos = 20; // Meseros
-    if (document.getElementById('chkAntilavado').checked) gastosDespuesImpuestos += 10;
-    if (document.getElementById('chkExploreForm').checked) gastosDespuesImpuestos += 10;
-    if (document.getElementById('chkRCI') && document.getElementById('chkRCI').checked) gastosDespuesImpuestos += 10;
-
-    let miParteGastosDespues = gastosDespuesImpuestos / numVendedores;
-    let pagoNetoFinal = subtotalPostImpuestos - miParteGastosDespues;
-    
-    document.getElementById('txtPagoTotal').value = pagoNetoFinal.toFixed(2);
-}
-
-function calcularMaquila() {
-    const isPack = document.getElementById('maqTipoPack').checked;
-    let importeBase = 0;
-
-    if (isPack) {
-        const pack = document.getElementById('maqPack').value;
-        if (pack === 'Full') importeBase = 150.88;
-        else if (pack === '1/2') importeBase = 150.88 / 2; 
-    } else {
-        const vol = parseFloat(document.getElementById('maqVolumen').value) || 0;
-        const pct = parseFloat(document.getElementById('maqPorcentaje').value) || 0;
-        importeBase = vol * (pct / 100);
-    }
-
-    let deduccionReserva = 0;
-    if (document.getElementById('maqReserva').checked) deduccionReserva = importeBase * 0.10;
-
-    const impPct = parseFloat(document.getElementById('maqImpuestos').value) || 0;
-    let deduccionImpuestos = importeBase * (impPct / 100);
-
-    let pagoNeto = importeBase - deduccionReserva - deduccionImpuestos;
-    document.getElementById('maqPago').value = pagoNeto.toFixed(2);
-}
-
-function actualizarTotalesMesActual() {
-    const hoy = new Date();
-    const mesActual = hoy.getMonth(); 
-    const anioActual = hoy.getFullYear();
-    const nombresMeses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-    
-    let volMes = 0, comisionMes = 0, exploreMes = 0, malibuMes = 0;
-    let volYTD = 0, comisionYTD = 0, exploreYTD = 0, malibuYTD = 0;
-
-    allDataGlobal.forEach(item => {
-        if (item.status === 'Cerrada' && item.fecha) {
-            let [yyyy, mm, dd] = item.fecha.split('-');
-            let añoVenta = parseInt(yyyy);
-            let mesVenta = parseInt(mm) - 1;
-
-            // Lógica YEAR TO DATE (Todo el año en curso)
-            if (añoVenta === anioActual) {
-                comisionYTD += (parseFloat(item.pago_total) || 0);
-                
-                if (item.type === 'venta') {
-                    volYTD += calcularMiVolumen(item);
-                    
-                    let esExplore = parseInt(item.es_explore_package) === 1;
-                    let esExploreHoy = parseInt(item.explore_es_hoy) === 1;
-                    let numVend = parseInt(item.num_vendedores) || 1;
-                    
-                    if (esExplore && esExploreHoy) {
-                        exploreYTD += ( (225 * 0.77) / numVend );
-                    }
-                    if (parseInt(item.es_malibu) === 1 && parseFloat(item.monto_malibu) > 0) {
-                        malibuYTD += parseFloat(item.monto_malibu);
-                    }
-                }
-            }
-
-            // Lógica MONTH TO DATE (Mes en curso)
-            if (añoVenta === anioActual && mesVenta === mesActual) {
-                comisionMes += (parseFloat(item.pago_total) || 0);
-
-                if (item.type === 'venta') {
-                    volMes += calcularMiVolumen(item);
-
-                    let esExplore = parseInt(item.es_explore_package) === 1;
-                    let esExploreHoy = parseInt(item.explore_es_hoy) === 1;
-                    let numVend = parseInt(item.num_vendedores) || 1;
-
-                    if (esExplore && esExploreHoy) {
-                        exploreMes += ( (225 * 0.77) / numVend );
-                    }
-                    if (parseInt(item.es_malibu) === 1 && parseFloat(item.monto_malibu) > 0) {
-                        malibuMes += parseFloat(item.monto_malibu);
-                    }
-                }
-            }
-        }
-    });
-
-    const f = (v) => `$${v.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-    
-    // --- ASIGNACIÓN YTD (Muestra TODO) ---
-    const lblYTD = document.getElementById('lblYTDVolumen');
-    if(lblYTD) lblYTD.innerText = f(volYTD);
-    
-    const lblYTDCom = document.getElementById('lblYTDComision');
-    if(lblYTDCom) lblYTDCom.innerText = f(comisionYTD);
-    
-    const blockExpYTD = document.getElementById('ytdBlockExplore');
-    if (blockExpYTD) {
-        if (exploreYTD > 0) { blockExpYTD.classList.replace('d-none', 'd-flex'); document.getElementById('ytdExplore').innerText = f(exploreYTD); } 
-        else { blockExpYTD.classList.replace('d-flex', 'd-none'); }
-    }
-
-    const blockMalYTD = document.getElementById('ytdBlockMalibu');
-    if (blockMalYTD) {
-        if (malibuYTD > 0) { blockMalYTD.classList.replace('d-none', 'd-flex'); document.getElementById('ytdMalibu').innerText = f(malibuYTD); } 
-        else { blockMalYTD.classList.replace('d-flex', 'd-none'); }
-    }
-
-    // --- ASIGNACIÓN MTD ---
-    const lblMesNombre = document.getElementById('lblMesActualNombre');
-    if(lblMesNombre) lblMesNombre.innerText = nombresMeses[mesActual];
-
-    const lblVol = document.getElementById('mesVolumen');
-    if(lblVol) lblVol.innerText = f(volMes);
-    
-    const lblCom = document.getElementById('mesComision');
-    if(lblCom) lblCom.innerText = f(comisionMes);
-    
-    const blockExp = document.getElementById('mesBlockExplore');
-    if (blockExp) {
-        if (exploreMes > 0) { blockExp.classList.replace('d-none', 'd-flex'); document.getElementById('mesExplore').innerText = f(exploreMes); } 
-        else { blockExp.classList.replace('d-flex', 'd-none'); }
-    }
-
-    const blockMal = document.getElementById('mesBlockMalibu');
-    if (blockMal) {
-        if (malibuMes > 0) { blockMal.classList.replace('d-none', 'd-flex'); document.getElementById('mesMalibu').innerText = f(malibuMes); } 
-        else { blockMal.classList.replace('d-flex', 'd-none'); }
-    }
-}
-
-function actualizarTableroFinanciero(inicio = null, fin = null) {
-    const lblTotal = document.getElementById('lblTotalCobrar');
-    const lblVolumen = document.getElementById('lblTotalVolumen');
-    const lblExplore = document.getElementById('lblTotalExplore');
-    const lblRango = document.getElementById('lblRangoFechas');
-
-    const blockDeducciones = document.getElementById('blockDeduccionesCalculadora');
-    const lineaBonusWks = document.getElementById('lineaBonusWeeks');
-    const lineaMeseros = document.getElementById('lineaMeseros');
-
-    if (!inicio || !fin) {
-        if (lblTotal) lblTotal.innerText = '$0.00';
-        if (lblVolumen) lblVolumen.innerText = '$0.00';
-        if (lblExplore) lblExplore.innerText = '$0.00';
-        if (lblRango) lblRango.innerText = 'Selecciona un rango de fechas';
-        if (blockDeducciones) blockDeducciones.classList.add('d-none');
-        return; 
-    }
-
-    let granTotalComision = 0, granTotalVolumen = 0, granTotalExplore = 0, granTotalMalibu = 0;
-    let totalBonusWks = 0, totalMeserosFijos = 0;
-
-    filteredData.forEach(item => {
-        if (item.status === 'Cerrada') {
-            granTotalComision += (parseFloat(item.pago_total) || 0);
-
-            if (item.type === 'venta') {
-                granTotalVolumen += calcularMiVolumen(item);
-                let numVend = parseInt(item.num_vendedores) || 1;
-
-                let esExplore = parseInt(item.es_explore_package) === 1;
-                let esExploreHoy = parseInt(item.explore_es_hoy) === 1;
-
-                if (esExplore && esExploreHoy) {
-                    let bonoNeto = 225 * 0.77; 
-                    granTotalExplore += (bonoNeto / numVend);
-                }
-
-                if (parseInt(item.es_malibu) === 1 && parseFloat(item.monto_malibu) > 0) {
-                    granTotalMalibu += parseFloat(item.monto_malibu);
-                }
-
-                let bwks = parseInt(item.bonus_weeks) || 0;
-                totalBonusWks += (bwks * 20) / numVend;
-
-                let fijosItem = 20;
-                if(parseInt(item.deduccion_antilavado) === 1) fijosItem += 10;
-                if(parseInt(item.deduccion_explore) === 1) fijosItem += 10;
-                if(parseInt(item.deduccion_rci) === 1) fijosItem += 10;
-                totalMeserosFijos += (fijosItem / numVend);
-            }
-        }
-    });
-
-    const fm = (v) => `$${v.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-
-    if (lblTotal) lblTotal.innerText = fm(granTotalComision);
-    if (lblVolumen) lblVolumen.innerText = fm(granTotalVolumen);
-    if (lblExplore) lblExplore.innerText = fm(granTotalExplore);
-    
-    const blockMalibu = document.getElementById('blockTotalMalibu');
-    const lblMalibu = document.getElementById('lblTotalMalibu');
-    if (granTotalMalibu > 0) {
-        if(blockMalibu) blockMalibu.classList.replace('d-none', 'd-flex');
-        if(lblMalibu) lblMalibu.innerText = fm(granTotalMalibu);
-    } else {
-        if(blockMalibu) blockMalibu.classList.replace('d-flex', 'd-none');
-    }
-
-    if (totalBonusWks > 0 || totalMeserosFijos > 0) {
-        blockDeducciones.classList.remove('d-none');
-        
-        if (totalBonusWks > 0) {
-            lineaBonusWks.classList.remove('d-none');
-            document.getElementById('calcBonusWeeks').innerText = fm(totalBonusWks);
-        } else {
-            lineaBonusWks.classList.add('d-none');
-        }
-
-        if (totalMeserosFijos > 0) {
-            lineaMeseros.classList.remove('d-none');
-            document.getElementById('calcMeseros').innerText = fm(totalMeserosFijos);
-        } else {
-            lineaMeseros.classList.add('d-none');
-        }
-    } else {
-        blockDeducciones.classList.add('d-none');
-    }
-
-    if (lblRango) lblRango.innerText = `Del ${inicio} al ${fin}`;
-}
-
 async function cargarDatosUnificados() {
     try {
         const resVentas = await fetch(`${BASE_URL}/api/ventas`, { headers: { 'Authorization': localStorage.getItem('paycheckToken') } });
@@ -659,8 +103,13 @@ function renderTable() {
 
         let badgeColor = item.status === 'Cerrada' ? 'bg-success' : (item.status === 'Cancelada' || item.status === 'Caída' ? 'bg-danger' : 'bg-warning text-dark');
         
+        let pt = parseFloat(item.pago_total) || 0;
+        let esDeuda = item.status === 'Caída' && pt < 0;
+
         let statusBlockPC = `<span class="badge ${badgeColor} rounded-pill">${item.status}</span>`;
-        if(item.status === 'Pendiente' && item.fecha_pendiente) {
+        if (esDeuda) {
+            statusBlockPC += `<div class="small text-danger mt-1 fw-bold" style="font-size:0.75rem"><i class="bi bi-exclamation-octagon-fill me-1"></i>Deuda</div>`;
+        } else if(item.status === 'Pendiente' && item.fecha_pendiente) {
             statusBlockPC += `<div class="small text-muted mt-1 fw-bold" style="font-size:0.75rem"><i class="bi bi-clock-history me-1"></i>${item.fecha_pendiente}</div>`;
         }
 
@@ -673,12 +122,19 @@ function renderTable() {
             if (item.es_malibu === 1) exploreStar += '<i class="bi bi-star-fill ms-1" style="font-size: 0.85rem; color: #800000;" title="Bono Malibu"></i>';
         }
         
+        let tempStatus = item.status;
+        item.status = 'Cerrada'; 
         let miVolumenDisplay = item.type === 'venta' ? calcularMiVolumen(item) : 0;
+        item.status = tempStatus; 
+        
         let miVolFormatted = miVolumenDisplay.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        let pagoTotalFormatted = (parseFloat(item.pago_total) || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        let originalPago = Math.abs(pt).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
         let esPorcentaje = item.tipo_pago === 'porcentaje' || (parseFloat(item.maq_volumen) > 0);
         let volMaquilaFormatted = (parseFloat(item.maq_volumen) || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+        let volHtmlPC = '', volHtmlMobile = '';
+        let pagoHtmlPC = '', pagoHtmlMobile = '';
 
         if (item.type === 'venta') {
             const tipoSocioDisplay = item.tipo_socio ? item.tipo_socio : 'N/A';
@@ -686,30 +142,59 @@ function renderTable() {
                 <div>${iconType} <span class="fw-bold text-dark">${item.cliente_nombre || '--'}</span></div>
                 <div class="small text-muted">${item.nacionalidad || ''} | ${tipoSocioDisplay}</div> 
             `;
-            montosCombinadosPC = `
-                <div class="fw-bold text-success" title="Total del Contrato: $${(item.monto || 0).toLocaleString()}">$${miVolFormatted} <span class="small text-muted fw-normal">Mi Vol.</span></div>
-                <div class="fw-bold text-primary mt-1 pt-1 border-top" style="font-size:0.95rem">$${pagoTotalFormatted} <span class="small text-muted fw-normal">Neto</span></div>
-            `;
+            
+            if (item.status === 'Caída') {
+                volHtmlPC = `<div class="fw-bold text-muted" title="Volumen Perdido"><del class="text-danger">$${miVolFormatted}</del> <span class="small fw-normal">Mi Vol.</span></div>`;
+                volHtmlMobile = `<span class="fw-bold text-muted" style="font-size: 0.85rem;"><del class="text-danger">Vol: $${miVolFormatted}</del></span>`;
+            } else {
+                volHtmlPC = `<div class="fw-bold text-primary" title="Total del Contrato: $${(item.monto || 0).toLocaleString()}">$${miVolFormatted} <span class="small text-muted fw-normal">Mi Vol.</span></div>`;
+                volHtmlMobile = `<span class="fw-bold text-primary" style="font-size: 0.85rem;" title="Total Contrato: $${(item.monto || 0).toLocaleString()}">Mi Vol: $${miVolFormatted}</span>`;
+            }
         } else {
             detalleHTML = `
                 <div>${iconType} <span class="fw-bold text-dark">${item.nombre_socio || '--'}</span></div>
                 <div class="small text-muted">${esPorcentaje ? (item.maq_porcentaje || 0) + '% del Vol' : 'Pack: ' + (item.pack_nivel || 'None')}</div>
             `;
-            montosCombinadosPC = `
-                <div class="fw-bold text-info" style="font-size:0.85rem">${esPorcentaje ? '$' + volMaquilaFormatted + ' <span class="small text-muted fw-normal">Vol.</span>' : '<span class="text-muted small">--</span>'}</div>
-                <div class="fw-bold text-success mt-1 pt-1 border-top">$${pagoTotalFormatted} <span class="small text-muted fw-normal">Total</span></div>
-            `;
+            if (item.status === 'Cancelada') {
+                volHtmlPC = `<div class="fw-bold text-muted" style="font-size:0.85rem">${esPorcentaje ? '<del class="text-danger">$' + volMaquilaFormatted + '</del> <span class="small fw-normal">Vol.</span>' : '<span class="text-muted small">--</span>'}</div>`;
+                volHtmlMobile = esPorcentaje ? `<span class="fw-bold text-muted" style="font-size: 0.85rem;"><del class="text-danger">Vol: $${volMaquilaFormatted}</del></span>` : '';
+            } else {
+                volHtmlPC = `<div class="fw-bold text-primary" style="font-size:0.85rem">${esPorcentaje ? '$' + volMaquilaFormatted + ' <span class="small text-muted fw-normal">Vol.</span>' : '<span class="text-muted small">--</span>'}</div>`;
+                volHtmlMobile = esPorcentaje ? `<span class="fw-bold text-primary" style="font-size: 0.85rem;">Vol: $${volMaquilaFormatted}</span>` : '';
+            }
         }
+
+        if (esDeuda) {
+            pagoHtmlPC = `
+                <div class="fw-bold text-success mt-1 pt-1 border-top" style="font-size:0.85rem">$${originalPago} <span class="small text-muted fw-normal">Cobrado</span></div>
+                <div class="fw-bold text-danger" style="font-size:0.95rem">-$${originalPago} <span class="small fw-normal">Deuda</span></div>`;
+            pagoHtmlMobile = `
+                <div class="d-flex flex-column align-items-end mt-1">
+                    <span class="fw-bold text-success" style="font-size: 0.8rem;">$${originalPago} <span class="small text-muted fw-normal">Cobrado</span></span>
+                    <span class="fw-bold text-danger" style="font-size: 1.25rem;">-$${originalPago}</span>
+                </div>`;
+        } else if (item.status === 'Cerrada') {
+            if (pt < 0) {
+                pagoHtmlPC = `<div class="fw-bold text-danger mt-1 pt-1 border-top" style="font-size:0.95rem">-$${originalPago} <span class="small text-muted fw-normal">Neto</span></div>`;
+                pagoHtmlMobile = `<span class="fw-bold text-danger" style="font-size: 1.25rem;">-$${originalPago}</span>`;
+            } else {
+                pagoHtmlPC = `<div class="fw-bold text-success mt-1 pt-1 border-top" style="font-size:0.95rem">$${originalPago} <span class="small text-muted fw-normal">Neto</span></div>`;
+                pagoHtmlMobile = `<span class="fw-bold text-success" style="font-size: 1.25rem;">$${originalPago}</span>`;
+            }
+        } else {
+            pagoHtmlPC = `<div class="fw-bold text-muted mt-1 pt-1 border-top" style="font-size:0.95rem">$0.00 <span class="small text-muted fw-normal">Neto</span></div>`;
+            pagoHtmlMobile = `<span class="fw-bold text-muted" style="font-size: 1.25rem;">$0.00</span>`;
+        }
+
+        montosCombinadosPC = volHtmlPC + pagoHtmlPC;
 
         let mobileCol = `
             <div class="d-md-none d-flex flex-column align-items-end justify-content-center">
                 ${item.status !== 'Cerrada' ? `<span class="badge ${badgeColor} mb-1" style="font-size:0.65rem;">${item.status}</span>` : ''}
+                ${esDeuda ? `<span class="badge bg-danger mb-1" style="font-size:0.65rem;">Deuda Activa</span>` : ''}
                 
-                ${item.type === 'venta' 
-                    ? `<span class="fw-bold text-info" style="font-size: 0.85rem;" title="Total Contrato: $${(item.monto || 0).toLocaleString()}">Mi Vol: $${miVolFormatted}</span>` 
-                    : (esPorcentaje ? `<span class="fw-bold text-info" style="font-size: 0.85rem;">Vol: $${volMaquilaFormatted}</span>` : '')
-                }
-                <span class="fw-bold text-success" style="font-size: 1.25rem;" title="Comisión / Pago Neto">$${pagoTotalFormatted}</span>
+                ${volHtmlMobile}
+                ${pagoHtmlMobile}
                 
                 <div class="btn-group mt-2">
                     <button onclick="verDetalle('${item.type}', '${itemId}')" class="btn btn-outline-dark py-1 px-3 shadow-sm"><i class="bi bi-eye-fill"></i></button>
@@ -754,11 +239,20 @@ function verDetalle(type, id) {
     const modalBody = document.getElementById('modalCuerpo');
     modalTitle.innerHTML = `<i class="bi bi-file-earmark-text me-2"></i>Ficha Técnica: #${item.contrato}`;
 
+    let pt = parseFloat(item.pago_total) || 0;
+    let esDeuda = item.status === 'Caída' && pt < 0;
+    
+    let pagoColor = pt < 0 ? 'text-danger' : 'text-success';
+    let signo = pt < 0 ? '-' : '';
+    let pagoTotalFormatted = signo + '$' + Math.abs(pt).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
     const fm = (val) => val ? `$${parseFloat(val).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : '$0.00';
     const badgeStatus = item.status === 'Cerrada' ? 'bg-success' : (item.status === 'Caída' || item.status === 'Cancelada' ? 'bg-danger' : 'bg-warning text-dark');
 
     let statusBlock = `<span class="badge ${badgeStatus} fs-6 mb-1">${item.status}</span>`;
-    if(item.status === 'Pendiente' && item.fecha_pendiente) {
+    if (esDeuda) {
+        statusBlock += `<div class="text-danger fw-bold small mt-1"><i class="bi bi-exclamation-octagon-fill me-1"></i>Deuda Generada</div>`;
+    } else if (item.status === 'Pendiente' && item.fecha_pendiente) {
         statusBlock += `<div class="text-warning fw-bold small mt-1"><i class="bi bi-calendar-event me-1"></i>Cierre: ${item.fecha_pendiente}</div>`;
     }
 
@@ -777,7 +271,11 @@ function verDetalle(type, id) {
         }
 
         const reservaTxt = (item.es_reserva === 1) ? '10%' : 'No';
+        
+        let tempStatus = item.status;
+        item.status = 'Cerrada'; 
         let miVolumen = calcularMiVolumen(item);
+        item.status = tempStatus;
 
         html = `
             <div class="container-fluid px-0">
@@ -790,11 +288,11 @@ function verDetalle(type, id) {
                      <div class="col-md-5"><h6 class="text-primary fw-bold text-uppercase small mb-2">Equipo de Ventas</h6><div class="detail-card p-3"><div class="text-dark fw-bold">${item.vendedores || 'No asignado'}</div></div></div>
                 </div>
                 
-                <h6 class="text-primary fw-bold text-uppercase small mb-2 mt-4">Resumen Financiero</h6>
+                <h6 class="text-primary fw-bold text-uppercase small mb-2 mt-4">Resumen Financiero Histórico</h6>
                 <div class="detail-card p-3 mb-3" style="background-color: #f0fdf4; border-color: #bbf7d0;">
                      <div class="d-flex flex-column flex-md-row text-center justify-content-between gap-3">
                         <div class="flex-fill">
-                            <small class="d-block text-success fw-bold text-uppercase">Mi Volumen</small>
+                            <small class="d-block text-success fw-bold text-uppercase">Volumen Generado</small>
                             <span class="fs-3 fw-bold text-dark text-break" style="letter-spacing: -1px;">${fm(miVolumen)}</span>
                             <div class="small text-muted mt-1" style="font-size: 0.75rem; line-height: 1;">Total: ${fm(item.monto)}</div>
                         </div>
@@ -803,8 +301,8 @@ function verDetalle(type, id) {
                         <div class="d-md-none border-bottom border-success-subtle w-100"></div>
 
                         <div class="flex-fill">
-                            <small class="d-block text-success fw-bold text-uppercase">Pago Neto</small>
-                            <span class="fs-3 fw-bold text-dark text-break" style="letter-spacing: -1px;">${fm(item.pago_total)}</span>
+                            <small class="d-block ${pagoColor} fw-bold text-uppercase">Estatus de Pago</small>
+                            <span class="fs-3 fw-bold ${pagoColor} text-break" style="letter-spacing: -1px;">${pagoTotalFormatted}</span>
                         </div>
                         
                         <div class="d-none d-md-block border-end border-success-subtle"></div>
@@ -828,7 +326,7 @@ function verDetalle(type, id) {
                     <div class="col-6 col-md-4"><div class="p-2 border rounded bg-white"><small class="d-block text-muted">Move In</small><strong class="text-dark text-break">${fm(item.monto_movein)}</strong></div></div>
                     <div class="col-6 col-md-4"><div class="p-2 border rounded bg-white"><small class="d-block text-primary">Reserva</small><strong class="text-primary">${reservaTxt}</strong></div></div>
                     <div class="col-6 col-md-4"><div class="p-2 border rounded bg-white"><small class="d-block text-danger">Impuestos</small><strong class="text-danger">${item.porcentaje_impuestos || 0}%</strong></div></div>
-                    <div class="col-6 col-md-4"><div class="p-2 border rounded bg-white"><small class="d-block text-success">Bonus Weeks</small><strong class="text-success">${item.bonus_weeks}</strong></div></div>
+                    <div class="col-6 col-md-4"><div class="p-2 border rounded bg-white border-danger-subtle shadow-sm"><small class="d-block text-danger fw-bold">Chargeback</small><strong class="text-danger">${fm(item.monto_chargeback || 0)}</strong></div></div>
                 </div>
                 
                 <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center">
@@ -878,8 +376,8 @@ function verDetalle(type, id) {
                     </div>
                     <div class="col-md-6 mb-2">
                         <div class="p-3 border border-success-subtle rounded bg-success-subtle h-100 shadow-sm text-center">
-                            <small class="d-block text-success text-uppercase fw-bold mb-1">Pago Neto</small>
-                            <strong class="fs-3 text-success">${fm(item.pago_total)}</strong>
+                            <small class="d-block ${pagoColor} text-uppercase fw-bold mb-1">Pago Neto</small>
+                            <strong class="fs-3 ${pagoColor}">${pagoTotalFormatted}</strong>
                         </div>
                     </div>
                 </div>
@@ -912,6 +410,7 @@ function iniciarEdicion(type, id) {
     if (type === 'maquila' && currentMode !== 'maquila') switchTab('maquila');
 
     editId = String(item._id || item.id);
+    window.isEditingLoad = true;
 
     if (type === 'venta') {
         document.getElementById('txtFecha').value = item.fecha;
@@ -940,8 +439,14 @@ function iniciarEdicion(type, id) {
         }
 
         document.getElementById('txtMonto').value = item.monto || 0;
-        document.getElementById('txtPagoTotal').value = item.pago_total || 0;
         document.getElementById('cmbStatus').value = item.status;
+        
+        let pt = parseFloat(item.pago_total) || 0;
+        let cmbLiq = document.getElementById('cmbLiquidacionCaida');
+        if(cmbLiq) {
+            cmbLiq.value = (item.status === 'Caída' && pt < 0) ? 'liquidada' : 'no_liquidada';
+        }
+        
         document.getElementById('cmbPack').value = item.pack_nivel;
         
         if(item.nacionalidad === 'Mexicano') document.getElementById('nacMexicano').checked = true;
@@ -985,9 +490,13 @@ function iniciarEdicion(type, id) {
         document.getElementById('txtMoveIn').value = item.monto_movein || 0;
         document.getElementById('cmbBonusWeeks').value = item.bonus_weeks || 0;
         
+        const txtChargeback = document.getElementById('txtChargeback');
+        if(txtChargeback) txtChargeback.value = item.monto_chargeback || '';
+
         document.getElementById('txtComentarios').value = item.comentarios || '';
         document.getElementById('txtFechaPendienteVenta').value = item.fecha_pendiente || '';
-        togglePendiente('venta');
+        
+        handleStatusChange('venta');
 
         document.getElementById('btnGuardarVenta').innerHTML = '<i class="bi bi-pencil-square fs-5"></i><span>ACTUALIZAR DATOS</span>';
         document.getElementById('btnCancelarEditVenta').classList.remove('d-none');
@@ -1016,17 +525,19 @@ function iniciarEdicion(type, id) {
         document.getElementById('maqImpuestos').value = item.maq_impuestos || '';
 
         document.getElementById('txtFechaPendienteMaq').value = item.fecha_pendiente || '';
-        togglePendiente('maquila');
+        handleStatusChange('maquila');
         
         calcularMaquila(); 
 
         document.getElementById('btnGuardarMaquila').innerHTML = '<i class="bi bi-pencil-square fs-5"></i><span>ACTUALIZAR DATOS</span>';
         document.getElementById('btnCancelarEditMaquila').classList.remove('d-none');
     }
+    window.isEditingLoad = false;
 }
 
 function cancelarEdicion(mode) {
     editId = null;
+    window.isEditingLoad = true;
     if (mode === 'ventas') {
         document.getElementById('frmVenta').reset();
         document.getElementById('txtFecha').valueAsDate = new Date();
@@ -1047,7 +558,13 @@ function cancelarEdicion(mode) {
         const chkMalibu = document.getElementById('chkMalibu');
         if(chkMalibu) { chkMalibu.checked = false; toggleMalibu(); }
 
-        togglePendiente('venta');
+        let cmbLiq = document.getElementById('cmbLiquidacionCaida');
+        if(cmbLiq) cmbLiq.value = 'no_liquidada';
+        
+        const cb = document.getElementById('txtChargeback');
+        if(cb) cb.value = '';
+
+        handleStatusChange('venta');
         calcularMatematica();
     } else {
         document.getElementById('frmMaquila').reset();
@@ -1056,8 +573,9 @@ function cancelarEdicion(mode) {
         document.getElementById('btnCancelarEditMaquila').classList.add('d-none');
         document.getElementById('maqTipoPack').checked = true;
         toggleTipoPagoMaquila();
-        togglePendiente('maquila');
+        handleStatusChange('maquila');
     }
+    window.isEditingLoad = false;
 }
 
 async function guardarVenta() {
@@ -1074,11 +592,19 @@ async function guardarVenta() {
 
     const valorFechaPromesa = document.getElementById('chkExploreHoy').checked ? '' : document.getElementById('txtFechaPromesa').value;
 
+    let pagoTotalLimpio = document.getElementById('txtPagoTotal').value.replace('$', '').replace('-', '');
+    let pagoTotalNumerico = parseFloat(pagoTotalLimpio) || 0;
+    
+    if (document.getElementById('txtPagoTotal').value.includes('-')) {
+        pagoTotalNumerico = -Math.abs(pagoTotalNumerico);
+    }
+
     const payload = {
         cliente: document.getElementById('txtCliente').value,
         contrato: document.getElementById('txtContrato').value,
         monto: parseFloat(document.getElementById('txtMonto').value) || 0,
         status: document.getElementById('cmbStatus').value,
+        liquidacion: document.getElementById('cmbLiquidacionCaida') ? document.getElementById('cmbLiquidacionCaida').value : 'no_liquidada',
         fecha: document.getElementById('txtFecha').value,
         promesa: valorFechaPromesa,
         promesa_pago: valorFechaPromesa,
@@ -1107,16 +633,21 @@ async function guardarVenta() {
         monto_donativos: parseFloat(document.getElementById('txtDonativos').value) || 0,
         monto_movein: parseFloat(document.getElementById('txtMoveIn').value) || 0,
         bonus_weeks: parseInt(document.getElementById('cmbBonusWeeks').value) || 0,
+        monto_chargeback: parseFloat(document.getElementById('txtChargeback') ? document.getElementById('txtChargeback').value : 0) || 0,
         nacionalidad: document.querySelector('input[name="nacionalidad"]:checked').value,
-        pago_total: parseFloat(document.getElementById('txtPagoTotal').value) || 0,
+        pago_total: pagoTotalNumerico, 
         comentarios: document.getElementById('txtComentarios').value,
         fecha_pendiente: document.getElementById('txtFechaPendienteVenta').value
     };
 
     const oldItem = editId ? allDataGlobal.find(x => String(x._id || x.id) === String(editId) && x.type === 'venta') : null;
 
-    if (payload.status === 'Caída' || payload.status === 'Cancelada') {
-        payload.pago_total = 0; 
+    if (payload.status === 'Caída') {
+        if (!payload.monto && oldItem) {
+            payload.monto = oldItem.monto;
+        }
+    } else if (payload.status === 'Cancelada') {
+        payload.pago_total = 0;
         if (!payload.monto && oldItem) {
             payload.monto = oldItem.monto;
         }
@@ -1271,8 +802,8 @@ function verificarAlertas() {
             if (diffDays >= 0 && diffDays % 7 === 0) {
                 hayAlertas = true;
                 let monto = parseFloat(item.pago_total) || 0;
-                totalEnElAire += monto;
-                alertasHTML += generarCardAlerta(item.type, item, monto, diffDays === 0 ? 'HOY' : `Hace ${diffDays} días`);
+                totalEnElAire += Math.abs(monto);
+                alertasHTML += generarCardAlerta(item.type, item, Math.abs(monto), diffDays === 0 ? 'HOY' : `Hace ${diffDays} días`);
             }
         }
 

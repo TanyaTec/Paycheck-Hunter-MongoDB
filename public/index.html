@@ -17,264 +17,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    
+
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
-    <style>
-        :root {
-            --primary-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            --primary-color: #0f172a;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --accent-blue: #00c6ff;
-            --accent-dark-blue: #0072ff;
-        }
+    <link rel="stylesheet" href="css/style.css?v=1.0">
 
-        body { 
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            background-size: 20px 20px, 100% 100%;
-            background-attachment: fixed;
-            font-family: 'Inter', sans-serif; 
-            color: #f8fafc;
-            padding-bottom: 80px;
-            overflow-x: hidden; 
-        }
-
-        .card-custom, .modal-content {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            color: var(--text-main);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 32px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-
-        /* CIRUGÍA UX: Verde Ejecutivo Restaurado Permanentemente */
-        .text-success { color: #166534 !important; } 
-        .bg-success { background: #166534 !important; color: #ffffff !important; border: none !important; }
-        .bg-success-subtle { background-color: #d1fae5 !important; color: #065f46 !important; }
-        .border-success { border-color: #166534 !important; }
-        .border-success-subtle { border-color: #a7f3d0 !important; }
-
-        .btn-outline-dark, .btn-light.text-dark { border-color: #0f172a !important; color: #0f172a !important; }
-        .btn-outline-dark:hover { background-color: #0f172a !important; color: #ffffff !important; }
-
-        .rocket-icon {
-            background: linear-gradient(135deg, #ffffff 0%, #73c8ff 25%, #0056b3 50%, #00c6ff 75%, #ffffff 100%);
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent; 
-            background-clip: text;
-            display: inline-block;
-            filter: drop-shadow(0px 8px 16px rgba(0, 198, 255, 0.4));
-        }
-
-        .spotlight { background: radial-gradient(circle, rgba(0, 198, 255, 0.15) 0%, rgba(255, 255, 255, 0) 70%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
-        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-12px); } }
-        .animate-float { animation: float 4s ease-in-out infinite; }
-
-        .form-control, .form-select { border-radius: 12px; border: 1px solid #e2e8f0; font-size: 0.95rem; color: var(--text-main); transition: border-color 0.3s, box-shadow 0.3s; }
-        .form-control:focus, .form-select:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 0.25rem rgba(0, 198, 255, 0.25); }
-        
-        /* Botón CTA Premium (Elegante, VIP, Dark Gold - UNA SOLA LÍNEA) */
-        .btn-premium-cta {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            color: #fbbf24 !important;
-            font-weight: 800;
-            font-size: 0.85rem;
-            border: 1px solid rgba(251, 191, 36, 0.5);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-            transition: all 0.3s ease;
-            letter-spacing: 1px;
-            padding: 0.6rem 1.5rem;
-            border-radius: 50px;
-            white-space: nowrap; 
-        }
-        .btn-premium-cta:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(251, 191, 36, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            background: linear-gradient(135deg, #1e293b 0%, #1e293b 100%);
-            color: #ffffff !important;
-            border-color: #fbbf24;
-        }
-
-        .btn-gradient { 
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); 
-            color: white; 
-            border: 1px solid rgba(255,255,255,0.1); 
-            font-weight: 700; 
-            transition: transform 0.2s, box-shadow 0.2s; 
-        }
-        .btn-gradient:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 10px 20px -10px rgba(15, 23, 42, 0.8); 
-            color: white;
-        }
-        
-        .brand-text { 
-            font-family: 'Inter', sans-serif;
-            font-weight: 900;
-            font-size: 2.1rem;
-            letter-spacing: -1px;
-            text-transform: uppercase;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #0072ff 100%); 
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent; 
-            background-clip: text; 
-            display: inline-block;
-        }
-        
-        label { font-weight: 700; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
-
-        .nav-tabs { border-bottom: 2px solid #e2e8f0; position: relative; z-index: 10; }
-        .nav-tabs .nav-link { color: #64748b; font-weight: 700; border: none; padding: 15px 10px; border-radius: 0; cursor: pointer; transition: color 0.3s; }
-        .nav-tabs .nav-link.active { color: var(--primary-color); border-bottom: 3px solid var(--primary-color); background: transparent; }
-
-        .swal2-popup { font-size: 0.85rem !important; border-radius: 20px !important; width: 90% !important; max-width: 400px !important; }
-        #loginScreen.d-none { display: none !important; }
-
-        .login-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            color: var(--text-main);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 32px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255,255,255,0.5);
-            width: 100%;
-            max-width: 420px;
-            padding: 2.5rem !important; 
-        }
-        
-        .google-btn-wrapper {
-            background: rgba(0, 198, 255, 0.05);
-            border: 1px solid rgba(0, 198, 255, 0.4);
-            border-radius: 50px;
-            padding: 8px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 198, 255, 0.15);
-            display: inline-block;
-            animation: pulse-login 2.5s infinite; 
-        }
-        .google-btn-wrapper:hover {
-            border-color: var(--accent-dark-blue);
-            box-shadow: 0 8px 25px rgba(0, 114, 255, 0.25);
-            background: rgba(0, 114, 255, 0.05);
-            transform: translateY(-2px);
-        }
-        @keyframes pulse-login {
-            0% { box-shadow: 0 0 0 0 rgba(0, 198, 255, 0.4); }
-            70% { box-shadow: 0 0 0 12px rgba(0, 198, 255, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(0, 198, 255, 0); }
-        }
-
-        .glass-nav {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 24px;
-            padding: 0.75rem 1.25rem;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        }
-        .nav-wrapper {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .nav-brand-group { display: flex; align-items: center; gap: 0.5rem; }
-
-        .nav-brand-text {
-            font-family: 'Inter', sans-serif;
-            font-weight: 900;
-            font-size: 1.2rem;
-            letter-spacing: -0.5px;
-            text-transform: uppercase;
-            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 20%, #94a3b8 35%, #ffffff 42%, #cbd5e1 65%, #94a3b8 80%, #ffffff 86%, #e2e8f0 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .user-pill {
-            display: flex;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 50px;
-            padding: 0.35rem; 
-            gap: 0.5rem;
-        }
-        .avatar-container { 
-            width: 36px; 
-            height: 36px; 
-            border-radius: 50%; 
-            overflow: hidden; 
-            border: 2px solid #fbbf24; 
-            box-shadow: 0 0 10px rgba(251, 191, 36, 0.2); 
-        }
-
-        .user-img { width: 100%; height: 100%; object-fit: cover; }
-        .user-initial { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--accent-dark-blue); color: white; font-weight: 900; font-size: 1rem; }
-        
-        .btn-logout {
-            background: rgba(255, 255, 255, 0.1);
-            color: #f8fafc;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-        .btn-logout:hover { 
-            background: rgba(255, 255, 255, 0.2); 
-            color: white; 
-            transform: scale(1.1); 
-            box-shadow: 0 0 12px rgba(255, 255, 255, 0.2); 
-        }
-
-        /* Botón flotante móvil emparejado al diseño Dark Premium */
-        .fab-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            color: #fbbf24;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            border: 1px solid rgba(251, 191, 36, 0.5);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            z-index: 1000;
-        }
-        .fab-btn:hover {
-            transform: translateY(-5px);
-            color: #ffffff;
-            border-color: #fbbf24;
-            box-shadow: 0 12px 30px rgba(251, 191, 36, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-        }
-
-        @media (max-width: 768px) {
-            label, .form-label, .small, small, .badge { font-size: 0.85rem !important; }
-            .form-control, .form-select, .input-group-text { font-size: 1rem !important; padding: 0.6rem 0.75rem !important; }
-            .form-control-sm, .form-select-sm { font-size: 0.95rem !important; padding: 0.5rem 0.6rem !important; height: auto !important; }
-            .form-check-label { font-size: 0.95rem !important; margin-left: 0.3rem; }
-            .form-check-input { transform: scale(1.2); }
-            .form-control.d-flex.align-items-center { height: auto !important; padding: 0.6rem !important; }
-            .row.g-3 > div { margin-bottom: 0.5rem; }
-            
-            .fab-btn { bottom: 20px; right: 20px; width: 55px; height: 55px; font-size: 1.6rem; }
-        }
-    </style>
 </head>
 <body>
 
@@ -361,9 +108,15 @@
         <div class="p-2 p-md-3 rounded-4 shadow-sm mb-4" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px);">
             <div class="row align-items-center m-0">
                 
-                <div class="col-12 col-lg-9 border-lg-end border-secondary border-opacity-25 px-0 px-md-3">
+                <div class="col-12 px-0 px-md-3">
+                    
+                    <style>
+                        @media (max-width: 575.98px) {
+                            .hide-bonus-mobile { display: none !important; }
+                        }
+                    </style>
 
-                    <div class="row align-items-center mb-2">
+                    <div class="row align-items-center mb-3">
                         <div class="col-12 col-sm-3 text-start mb-2 mb-sm-0">
                             <h6 class="text-uppercase fw-bold mb-0" style="letter-spacing: 0.5px; font-size: 0.65rem; color: #38bdf8;">
                                 <i class="bi bi-calendar3 me-1"></i> Year To Date
@@ -371,23 +124,21 @@
                         </div>
                         <div class="col-12 col-sm-9">
                             <div class="row gy-2 gy-sm-0">
-                                <div class="col-12 col-sm-4 d-flex flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start text-start">
-                                    <small class="text-uppercase fw-bold mb-1" style="font-size: 0.65rem; color: #cbd5e1;">Volumen</small>
+                                <div class="col-12 col-sm-3 d-flex flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start text-start">
+                                    <small class="text-uppercase fw-bold mb-1 d-block" style="font-size: 0.65rem; color: #cbd5e1;">Volumen</small>
                                     <span class="fw-bold text-white" style="font-size: 0.95rem; line-height: 1;" id="lblYTDVolumen">$0.00</span>
                                 </div>
-                                <div class="col-12 col-sm-4 d-flex flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start text-start">
-                                    <small class="text-uppercase fw-bold mb-1" style="font-size: 0.65rem; color: #cbd5e1;">Pago Neto</small>
+                                <div class="col-12 col-sm-3 d-flex flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start text-start">
+                                    <small class="text-uppercase fw-bold mb-1 d-block" style="font-size: 0.65rem; color: #cbd5e1;">Pago Neto</small>
                                     <span class="fw-bold" style="color: #166534; font-size: 0.95rem; line-height: 1;" id="lblYTDComision">$0.00</span>
                                 </div>
-                                <div class="col-12 col-sm-4 text-start d-flex flex-column gap-1">
-                                    <div id="ytdBlockExplore" class="d-none w-100 d-flex flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start">
-                                        <small class="text-uppercase fw-bold text-info mb-1" style="font-size: 0.65rem;">Explore</small>
-                                        <span class="fw-bold text-info" style="font-size: 0.85rem; line-height: 1;" id="ytdExplore">$0.00</span>
-                                    </div>
-                                    <div id="ytdBlockMalibu" class="d-none w-100 d-flex flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start mt-1 mt-sm-0">
-                                        <small class="text-uppercase fw-bold mb-1" style="color: #fbbf24; font-size: 0.65rem;">Malibu</small>
-                                        <span class="fw-bold" style="color: #fbbf24; font-size: 0.85rem; line-height: 1;" id="ytdMalibu">$0.00</span>
-                                    </div>
+                                <div id="ytdBlockExplore" class="col-12 col-sm-3 d-none flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start text-start hide-bonus-mobile">
+                                    <small class="text-uppercase fw-bold mb-1 d-block" style="font-size: 0.65rem; color: #7dd3fc;">Explore</small>
+                                    <span class="fw-bold text-white" style="font-size: 0.95rem; line-height: 1;" id="ytdExplore">$0.00</span>
+                                </div>
+                                <div id="ytdBlockMalibu" class="col-12 col-sm-3 d-none flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start text-start hide-bonus-mobile">
+                                    <small class="text-uppercase fw-bold mb-1 d-block" style="font-size: 0.65rem; color: #fbbf24;">Malibu</small>
+                                    <span class="fw-bold text-white" style="font-size: 0.95rem; line-height: 1;" id="ytdMalibu">$0.00</span>
                                 </div>
                             </div>
                         </div>
@@ -395,7 +146,7 @@
 
                     <div class="border-top border-secondary border-opacity-25 my-2 w-100"></div>
 
-                    <div class="row align-items-start align-items-sm-center">
+                    <div class="row align-items-start align-items-sm-center pt-2">
                         <div class="col-12 col-sm-3 text-start mb-2 mb-sm-0 pt-1 pt-sm-0">
                             <h6 class="text-uppercase fw-bold mb-1 mb-sm-0" style="letter-spacing: 0.5px; font-size: 0.65rem; color: #fbbf24;">
                                 <i class="bi bi-fire me-1"></i> Month To Date
@@ -405,37 +156,27 @@
                         
                         <div class="col-12 col-sm-9">
                             <div class="row gy-2 gy-sm-0">
-                                <div class="col-12 col-sm-4 d-flex flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start text-start">
-                                    <small class="text-uppercase fw-bold mb-1" style="font-size: 0.65rem; color: #cbd5e1;">Volumen</small>
+                                <div class="col-12 col-sm-3 d-flex flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start text-start">
+                                    <small class="text-uppercase fw-bold mb-1 d-block" style="font-size: 0.65rem; color: #cbd5e1;">Volumen</small>
                                     <span class="fw-bold text-white" style="font-size: 0.95rem; line-height: 1;" id="mesVolumen">$0.00</span>
                                 </div>
-                                
-                                <div class="col-12 col-sm-4 d-flex flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start text-start">
-                                    <small class="text-uppercase fw-bold mb-1" style="font-size: 0.65rem; color: #cbd5e1;">Pago Neto</small>
+                                <div class="col-12 col-sm-3 d-flex flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start text-start">
+                                    <small class="text-uppercase fw-bold mb-1 d-block" style="font-size: 0.65rem; color: #cbd5e1;">Pago Neto</small>
                                     <span class="fw-bold" style="color: #166534; font-size: 0.95rem; line-height: 1;" id="mesComision">$0.00</span>
                                 </div>
-
-                                <div class="col-12 col-sm-4 text-start d-flex flex-column gap-1">
-                                    <div id="mesBlockExplore" class="d-none w-100 d-flex flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start">
-                                        <small class="text-uppercase fw-bold text-info mb-1" style="font-size: 0.65rem;">Explore</small>
-                                        <span class="fw-bold text-info" style="font-size: 0.85rem; line-height: 1;" id="mesExplore">$0.00</span>
-                                    </div>
-                                    <div id="mesBlockMalibu" class="d-none w-100 d-flex flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start mt-1 mt-sm-0">
-                                        <small class="text-uppercase fw-bold mb-1" style="color: #fbbf24; font-size: 0.65rem;">Malibu</small>
-                                        <span class="fw-bold" style="color: #fbbf24; font-size: 0.85rem; line-height: 1;" id="mesMalibu">$0.00</span>
-                                    </div>
+                                <div id="mesBlockExplore" class="col-12 col-sm-3 d-none flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start text-start hide-bonus-mobile">
+                                    <small class="text-uppercase fw-bold mb-1 d-block" style="font-size: 0.65rem; color: #7dd3fc;">Explore</small>
+                                    <span class="fw-bold text-white" style="font-size: 0.95rem; line-height: 1;" id="mesExplore">$0.00</span>
+                                </div>
+                                <div id="mesBlockMalibu" class="col-12 col-sm-3 d-none flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start text-start hide-bonus-mobile">
+                                    <small class="text-uppercase fw-bold mb-1 d-block" style="font-size: 0.65rem; color: #fbbf24;">Malibu</small>
+                                    <span class="fw-bold text-white" style="font-size: 0.95rem; line-height: 1;" id="mesMalibu">$0.00</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-12 col-lg-3 text-center mt-3 mt-lg-0 d-none d-lg-flex align-items-center justify-content-center">
-                    <button class="btn-premium-cta d-flex align-items-center justify-content-center gap-2 text-nowrap w-100" onclick="mostrarFormulario()" style="max-width: 200px;">
-                        <i class="bi bi-plus-lg fs-6"></i> 
-                        <span>NUEVA VENTA</span>
-                    </button>
-                </div>
             </div>
         </div>
 
@@ -476,9 +217,11 @@
                                 <h6 class="text-uppercase text-muted fw-bold small mb-0" style="letter-spacing: 1.5px;">Volumen Rango</h6>
                                 <h3 class="fw-bold mb-0" id="lblTotalVolumen" style="color: var(--primary-color); letter-spacing: -1px;">$0.00</h3>
                             </div>
+                            
                             <div class="border-top pt-2 w-100 d-md-none opacity-50"></div>
+                            
                             <div>
-                                <h6 class="text-uppercase text-muted fw-bold small mb-0 mt-1" style="letter-spacing: 1.5px;">Comisión Total</h6>
+                                <h6 class="text-uppercase text-dark fw-bold small mb-0" style="letter-spacing: 1.5px;">Comisión Total</h6>
                                 <h2 class="fw-bold text-success mb-0" id="lblTotalCobrar" style="letter-spacing: -1.5px;">$0.00</h2>
                             </div>
                             
@@ -592,17 +335,34 @@
                             </div>
                             <div class="col-md-4 col-12"><label class="form-label text-dark">Socio</label><div class="d-flex gap-3 mt-1"><div class="form-check"><input class="form-check-input" type="radio" name="tipoSocio" id="radioNew" value="New" checked onchange="calcularMatematica()"><label class="form-check-label text-dark fw-semibold">New (9%)</label></div><div class="form-check"><input class="form-check-input" type="radio" name="tipoSocio" id="radioUpgrade" value="Upgrade" onchange="calcularMatematica()"><label class="form-check-label text-dark fw-semibold">Upgrade (8%)</label></div></div></div>
                         </div>
+                        
                         <div class="row g-3 mb-3">
                             <div class="col-md-3 col-12"><label class="form-label">Monto Venta (USD)</label><div class="input-group shadow-sm"><span class="input-group-text bg-light text-muted border-secondary-subtle">$</span><input type="number" class="form-control fw-bold text-dark fs-5 border-secondary-subtle" id="txtMonto" required oninput="calcularMatematica()"></div></div>
                             <div class="col-md-3 col-12"><label class="form-label text-primary fw-bold" style="font-size: 0.7rem;">Importe Base (-13.79%)</label><div class="input-group shadow-sm"><span class="input-group-text bg-primary-subtle text-primary">$</span><input type="text" class="form-control bg-white fw-bold text-primary" id="txtImporteBase" readonly></div></div>
-                            <div class="col-md-3 col-6"><label class="form-label">Status</label><select class="form-select shadow-sm" id="cmbStatus" onchange="togglePendiente('venta')"><option value="Cerrada">✅ Cerrada</option><option value="Pendiente">⏳ Pendiente</option><option value="Caída">❌ Caída</option></select><div id="divFechaPendienteVenta" class="d-none mt-2"><input type="date" class="form-control form-control-sm border-warning shadow-sm" id="txtFechaPendienteVenta"></div></div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Status</label>
+                                <select class="form-select shadow-sm" id="cmbStatus" onchange="handleStatusChange('venta')">
+                                    <option value="Cerrada">✅ Cerrada</option>
+                                    <option value="Pendiente">⏳ Pendiente</option>
+                                    <option value="Caída">❌ Caída</option>
+                                </select>
+                                <div id="divFechaPendienteVenta" class="d-none mt-2"><input type="date" class="form-control form-control-sm border-warning shadow-sm" id="txtFechaPendienteVenta"></div>
+                                <div id="divCaidaOpciones" class="d-none mt-2 p-2 bg-danger-subtle border border-danger rounded shadow-sm">
+                                    <label class="form-label text-danger fw-bold small mb-1">Estado de Liquidación</label>
+                                    <select class="form-select form-select-sm border-danger text-danger fw-bold" id="cmbLiquidacionCaida" onchange="calcularMatematica()">
+                                        <option value="no_liquidada">No Pagada (Ceros)</option>
+                                        <option value="liquidada">Pagada (Genera Deuda -)</option>
+                                    </select>
+                                </div>
+                            </div>
                             <div class="col-md-3 col-6"><label class="form-label">Pack</label><select class="form-select shadow-sm" id="cmbPack" onchange="calcularMatematica()"><option value="None">None</option><option value="Full">Full</option><option value="1/2">1/2</option><option value="1/3">1/3</option><option value="1/4">1/4</option></select></div>
                         </div>
+
                         <div class="row g-3 mb-3 mx-0"><div class="col-12"><div class="bg-light p-2 rounded border shadow-sm d-flex flex-wrap gap-3 align-items-center px-3"><span class="text-muted small fw-bold">OPCIONES:</span><div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" id="chkAmex" onchange="calcularMatematica()"><label class="form-check-label fw-bold text-primary" for="chkAmex">AMEX</label></div><div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" id="chkMSI" onchange="calcularMatematica()"><label class="form-check-label fw-bold text-info" for="chkMSI">6MSI (-1.5%)</label></div></div></div></div>
                         
                         <div class="row g-3 mb-4 bg-light p-3 rounded mx-0 border border-danger-subtle shadow-sm">
                             <div class="col-12 mb-0"><span class="text-danger fw-bold small text-uppercase"><i class="bi bi-dash-circle me-1"></i>Deducciones Variables</span></div>
-                            <div class="col-6 col-md-2">
+                            <div class="col-6 col-sm-4 col-lg">
                                 <label class="form-label text-primary small fw-bold mb-1 text-truncate w-100" for="chkReserva" style="cursor: pointer;">Reserva (-10%)</label>
                                 <div class="form-control form-control-sm border-primary d-flex align-items-center justify-content-center bg-white" style="height: 31px;">
                                     <div class="form-check form-switch mb-0 ps-0 d-flex justify-content-center">
@@ -610,23 +370,23 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-6 col-md-2">
+                            <div class="col-6 col-sm-4 col-lg">
                                 <label class="form-label text-danger small fw-bold mb-1 text-truncate w-100">Impuestos %</label>
                                 <input type="number" class="form-control form-control-sm border-danger text-center fw-bold text-danger shadow-sm" id="txtImpuestosPorcentaje" oninput="calcularMatematica()" style="height: 31px;" placeholder="Ej. 20">
                             </div>
-                            <div class="col-6 col-md-2">
+                            <div class="col-6 col-sm-4 col-lg">
                                 <label class="form-label text-muted small fw-bold mb-1 text-truncate w-100">Regalos ($)</label>
                                 <input type="number" class="form-control form-control-sm text-center shadow-sm" id="txtRegalos" oninput="calcularMatematica()" style="height: 31px;" placeholder="0">
                             </div>
-                            <div class="col-6 col-md-2">
+                            <div class="col-6 col-sm-4 col-lg">
                                 <label class="form-label text-muted small fw-bold mb-1 text-truncate w-100">Donativos ($)</label>
                                 <input type="number" class="form-control form-control-sm text-center shadow-sm" id="txtDonativos" oninput="calcularMatematica()" style="height: 31px;" placeholder="0">
                             </div>
-                            <div class="col-6 col-md-2">
+                            <div class="col-6 col-sm-4 col-lg">
                                 <label class="form-label text-muted small fw-bold mb-1 text-truncate w-100">Move In ($)</label>
                                 <input type="number" class="form-control form-control-sm text-center shadow-sm" id="txtMoveIn" oninput="calcularMatematica()" style="height: 31px;" placeholder="0">
                             </div>
-                            <div class="col-6 col-md-2">
+                            <div class="col-6 col-sm-4 col-lg">
                                 <label class="form-label text-success fw-bold small mb-1 text-truncate w-100">Bonus Wk</label>
                                 <select class="form-select form-select-sm border-success text-success fw-bold text-center shadow-sm" id="cmbBonusWeeks" onchange="calcularMatematica()" style="height: 31px;">
                                     <option value="0">0</option>
@@ -640,11 +400,15 @@
                                     <option value="8">8</option>
                                 </select>
                             </div>
+                            <div class="col-6 col-sm-4 col-lg">
+                                <label class="form-label text-muted small fw-bold mb-1 text-truncate w-100" title="Cobro Chargeback Anterior">Chargeback ($)</label>
+                                <input type="number" class="form-control form-control-sm text-center shadow-sm" id="txtChargeback" oninput="calcularMatematica()" style="height: 31px;" placeholder="0">
+                            </div>
                         </div>
 
                         <div class="row g-3 mb-3 mx-0">
                             <div class="col-12 d-flex flex-wrap gap-3">
-                                <div class="form-check"><input class="form-check-input" type="checkbox" id="chkMeseros" checked disabled><label class="form-check-label text-dark fw-bold small">Meseros <span class="badge bg-light text-dark border ms-1">-$20</span></label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="chkMeseros" checked onchange="calcularMatematica()"><label class="form-check-label text-dark fw-bold small">Meseros <span class="badge bg-light text-dark border ms-1">-$20</span></label></div>
                                 <div class="form-check"><input class="form-check-input" type="checkbox" id="chkAntilavado" onchange="calcularMatematica()"><label class="form-check-label text-dark small fw-semibold">Antilavado <span class="badge bg-light text-dark border ms-1">-$10</span></label></div>
                                 <div class="form-check"><input class="form-check-input" type="checkbox" id="chkExploreForm" onchange="calcularMatematica()"><label class="form-check-label text-dark small fw-semibold">Explore Form <span class="badge bg-light text-dark border ms-1">-$10</span></label></div>
                                 <div class="form-check"><input class="form-check-input" type="checkbox" id="chkRCI" onchange="calcularMatematica()"><label class="form-check-label text-dark small fw-semibold">RCI Form <span class="badge bg-light text-dark border ms-1">-$10</span></label></div>
@@ -654,8 +418,8 @@
                         <div class="row g-3 mb-4 mx-0 justify-content-center justify-content-md-end">
                             <div class="col-md-6 px-0">
                                 <div class="p-4 bg-white border border-success-subtle rounded-4 shadow text-center" style="background: linear-gradient(to right, #f0fdf4, #ffffff);">
-                                    <label class="small fw-bold text-uppercase mb-2 d-block text-success opacity-75" style="letter-spacing: 1px;">Pago Neto Final</label>
-                                    <div class="d-flex align-items-center justify-content-center text-success"><span class="fs-1 fw-bold me-1">$</span><input type="text" class="form-control-plaintext fw-bold text-success text-center p-0 fs-1" id="txtPagoTotal" readonly style="width: auto; letter-spacing: -1px;" value="0.00"></div>
+                                    <label class="small fw-bold text-uppercase mb-2 d-block text-success opacity-75" style="letter-spacing: 1px;">Cálculo Neto Guardado</label>
+                                    <div class="d-flex align-items-center justify-content-center text-success"><span class="fs-1 fw-bold me-1"></span><input type="text" class="form-control-plaintext fw-bold text-success text-center p-0 fs-1" id="txtPagoTotal" readonly style="width: auto; letter-spacing: -1px;" value="$0.00"></div>
                                 </div>
                             </div>
                         </div>
@@ -696,7 +460,7 @@
                             <div class="col-md-6 col-12"><label class="form-label">Vendedores Involucrados</label><input type="text" class="form-control" id="maqVendedores"></div>
                             <div class="col-md-6 col-12">
                                 <label class="form-label">Status</label>
-                                <select class="form-select" id="maqStatus" onchange="togglePendiente('maquila')">
+                                <select class="form-select" id="maqStatus" onchange="handleStatusChange('maquila')">
                                     <option value="Cerrada">✅ Cerrada</option>
                                     <option value="Pendiente">⏳ Pendiente</option>
                                     <option value="Cancelada">🚫 Cancelada</option>
@@ -802,8 +566,11 @@
 
     </div>
 
-    <div id="fabMobile" class="fab-btn d-md-none" onclick="mostrarFormulario()">
-        <i class="bi bi-plus"></i>
+    <div id="fabMobile" onclick="mostrarFormulario()" title="Nueva Venta" 
+         style="position: fixed; bottom: 25px; right: 25px; width: 65px; height: 65px; border-radius: 50%; background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%); color: #ffffff; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); z-index: 1050; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease;" 
+         onmouseover="this.style.transform='scale(1.1) translateY(-2px)'; this.style.boxShadow='0 6px 15px rgba(0, 0, 0, 0.4)';" 
+         onmouseout="this.style.transform='scale(1) translateY(0)'; this.style.boxShadow='0 4px 10px rgba(0, 0, 0, 0.3)';">
+        <i class="bi bi-plus-lg" style="font-size: 2.4rem; -webkit-text-stroke: 2px white; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));"></i>
     </div>
 
     <div class="modal fade" id="modalDetalle" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content"><div class="modal-header bg-light border-0"><h5 class="modal-title fw-bold text-primary" id="modalTitulo">Detalle</h5><button class="btn-close shadow-none" data-bs-dismiss="modal"></button></div><div class="modal-body p-4" id="modalCuerpo"></div><div class="modal-footer border-0 bg-light"><button class="btn btn-dark rounded-pill px-4 fw-bold shadow-sm" data-bs-dismiss="modal">Cerrar</button></div></div></div></div>
@@ -825,7 +592,9 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
-    <script src="js/app.js?v=enterpriseUX_vFINAL"></script>
+    <script src="js/core.js?v=1.2"></script>
+    <script src="js/math.js?v=1.2"></script>
+    <script src="js/app.js?v=1.2"></script>
     
     <script>
         document.getElementById('txtFecha').valueAsDate = new Date();
