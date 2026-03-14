@@ -98,86 +98,92 @@
             </div>
         </nav>
 
-        <div class="mb-4 text-start">
-            <h1 class="fw-bold text-white mb-1" style="line-height: 1.1; font-size: 1.8rem; letter-spacing: -0.5px;">
-                Hola, <span id="userGreetingName" class="text-white">Closer</span> <i class="bi bi-patch-check-fill ms-1" style="font-size: 1.1rem; color: #fbbf24; filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.4));" title="Cuenta VIP Verificada"></i>
-            </h1>
-            <p class="text-white-50 mb-0" style="font-size: 0.95rem; letter-spacing: 0.5px; font-weight: 600;">Te damos la bienvenida a tu centro de mando financiero.</p>
-        </div>
+        <div class="row align-items-center mb-4 gy-3">
+            
+            <div class="col-12 col-lg-5 text-start">
+                <h1 class="fw-bold text-white mb-1" style="line-height: 1.1; font-size: 1.8rem; letter-spacing: -0.5px;">
+                    Hola, <span id="userGreetingName" class="text-white">Closer</span> <i class="bi bi-patch-check-fill ms-1" style="font-size: 1.1rem; color: #fbbf24; filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.4));" title="Cuenta VIP Verificada"></i>
+                </h1>
+                <p class="text-white-50 mb-0" style="font-size: 0.95rem; letter-spacing: 0.5px; font-weight: 600;">Te damos la bienvenida a tu centro de mando financiero.</p>
+            </div>
 
-        <div class="p-2 p-md-3 rounded-4 shadow-sm mb-4" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px);">
-            <div class="row align-items-center m-0">
-                
-                <div class="col-12 px-0 px-md-3">
-                    
-                    <style>
-                        @media (max-width: 575.98px) {
-                            .hide-bonus-mobile { display: none !important; }
-                        }
-                    </style>
-
-                    <div class="row align-items-center mb-3">
-                        <div class="col-12 col-sm-3 text-start mb-2 mb-sm-0">
-                            <h6 class="text-uppercase fw-bold mb-0" style="letter-spacing: 0.5px; font-size: 0.65rem; color: #38bdf8;">
-                                <i class="bi bi-calendar3 me-1"></i> Year To Date
-                            </h6>
-                        </div>
-                        <div class="col-12 col-sm-9">
-                            <div class="row gy-2 gy-sm-0">
-                                <div class="col-12 col-sm-3 d-flex flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start text-start">
-                                    <small class="text-uppercase fw-bold mb-1 d-block" style="font-size: 0.65rem; color: #cbd5e1;">Volumen</small>
-                                    <span class="fw-bold text-white" style="font-size: 0.95rem; line-height: 1;" id="lblYTDVolumen">$0.00</span>
-                                </div>
-                                <div class="col-12 col-sm-3 d-flex flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start text-start">
-                                    <small class="text-uppercase fw-bold mb-1 d-block" style="font-size: 0.65rem; color: #cbd5e1;">Pago Neto</small>
-                                    <span class="fw-bold" style="color: #166534; font-size: 0.95rem; line-height: 1;" id="lblYTDComision">$0.00</span>
-                                </div>
-                                <div id="ytdBlockExplore" class="col-12 col-sm-3 d-none flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start text-start hide-bonus-mobile">
-                                    <small class="text-uppercase fw-bold mb-1 d-block" style="font-size: 0.65rem; color: #7dd3fc;">Explore</small>
-                                    <span class="fw-bold text-white" style="font-size: 0.95rem; line-height: 1;" id="ytdExplore">$0.00</span>
-                                </div>
-                                <div id="ytdBlockMalibu" class="col-12 col-sm-3 d-none flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start text-start hide-bonus-mobile">
-                                    <small class="text-uppercase fw-bold mb-1 d-block" style="font-size: 0.65rem; color: #fbbf24;">Malibu</small>
-                                    <span class="fw-bold text-white" style="font-size: 0.95rem; line-height: 1;" id="ytdMalibu">$0.00</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="border-top border-secondary border-opacity-25 my-2 w-100"></div>
-
-                    <div class="row align-items-start align-items-sm-center pt-2">
-                        <div class="col-12 col-sm-3 text-start mb-2 mb-sm-0 pt-1 pt-sm-0">
-                            <h6 class="text-uppercase fw-bold mb-1 mb-sm-0" style="letter-spacing: 0.5px; font-size: 0.65rem; color: #fbbf24;">
-                                <i class="bi bi-fire me-1"></i> Month To Date
-                            </h6>
-                            <div class="text-white-50 text-capitalize mt-1 d-none d-sm-block" style="font-size: 0.6rem; font-weight: 600; line-height: 1;" id="lblMesActualNombre"></div>
-                        </div>
+            <div class="col-12 col-lg-7">
+                <div class="p-2 p-md-2 rounded-4 shadow-sm m-0" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px);">
+                    <div class="row align-items-center m-0">
                         
-                        <div class="col-12 col-sm-9">
-                            <div class="row gy-2 gy-sm-0">
-                                <div class="col-12 col-sm-3 d-flex flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start text-start">
-                                    <small class="text-uppercase fw-bold mb-1 d-block" style="font-size: 0.65rem; color: #cbd5e1;">Volumen</small>
-                                    <span class="fw-bold text-white" style="font-size: 0.95rem; line-height: 1;" id="mesVolumen">$0.00</span>
+                        <div class="col-12 px-0 px-md-2">
+                            
+                            <style>
+                                @media (max-width: 575.98px) {
+                                    .hide-bonus-mobile { display: none !important; }
+                                }
+                            </style>
+
+                            <div class="row align-items-center mb-2">
+                                <div class="col-12 col-sm-3 text-start mb-1 mb-sm-0">
+                                    <h6 class="text-uppercase fw-bold mb-0" style="letter-spacing: 0.5px; font-size: 0.6rem; color: #38bdf8;">
+                                        <i class="bi bi-calendar3 me-1"></i> Year To Date
+                                    </h6>
                                 </div>
-                                <div class="col-12 col-sm-3 d-flex flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start text-start">
-                                    <small class="text-uppercase fw-bold mb-1 d-block" style="font-size: 0.65rem; color: #cbd5e1;">Pago Neto</small>
-                                    <span class="fw-bold" style="color: #166534; font-size: 0.95rem; line-height: 1;" id="mesComision">$0.00</span>
-                                </div>
-                                <div id="mesBlockExplore" class="col-12 col-sm-3 d-none flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start text-start hide-bonus-mobile">
-                                    <small class="text-uppercase fw-bold mb-1 d-block" style="font-size: 0.65rem; color: #7dd3fc;">Explore</small>
-                                    <span class="fw-bold text-white" style="font-size: 0.95rem; line-height: 1;" id="mesExplore">$0.00</span>
-                                </div>
-                                <div id="mesBlockMalibu" class="col-12 col-sm-3 d-none flex-row flex-sm-column justify-content-between align-items-center align-items-sm-start text-start hide-bonus-mobile">
-                                    <small class="text-uppercase fw-bold mb-1 d-block" style="font-size: 0.65rem; color: #fbbf24;">Malibu</small>
-                                    <span class="fw-bold text-white" style="font-size: 0.95rem; line-height: 1;" id="mesMalibu">$0.00</span>
+                                <div class="col-12 col-sm-9">
+                                    <div class="row gy-1 gy-sm-0">
+                                        <div class="col-12 col-sm d-flex flex-row flex-sm-column justify-content-between align-items-center align-items-sm-end text-start text-sm-end">
+                                            <small class="text-uppercase fw-bold mb-1 d-block" style="font-size: 0.55rem; color: #cbd5e1;">Volumen</small>
+                                            <span class="fw-bold text-white" style="font-size: 0.85rem; line-height: 1;" id="lblYTDVolumen">$0.00</span>
+                                        </div>
+                                        <div class="col-12 col-sm d-flex flex-row flex-sm-column justify-content-between align-items-center align-items-sm-end text-start text-sm-end">
+                                            <small class="text-uppercase fw-bold mb-1 d-block" style="font-size: 0.55rem; color: #cbd5e1;">Pago Neto</small>
+                                            <span class="fw-bold" style="color: #a7ffc7; font-size: 0.85rem; line-height: 1;" id="lblYTDComision">$0.00</span>
+                                        </div>
+                                        <div id="ytdBlockExplore" class="col-12 col-sm d-none flex-row flex-sm-column justify-content-between align-items-center align-items-sm-end text-start text-sm-end hide-bonus-mobile">
+                                            <small class="text-uppercase fw-bold mb-1 d-block" style="font-size: 0.55rem; color: #c6eafb;">Explore</small>
+                                            <span class="fw-bold" style="color: #c6eafb; font-size: 0.85rem; line-height: 1;" id="ytdExplore">$0.00</span>
+                                        </div>
+                                        <div id="ytdBlockMalibu" class="col-12 col-sm d-none flex-row flex-sm-column justify-content-between align-items-center align-items-sm-end text-start text-sm-end hide-bonus-mobile">
+                                            <small class="text-uppercase fw-bold mb-1 d-block" style="font-size: 0.55rem; color: #fbbf24;">Malibu</small>
+                                            <span class="fw-bold text-white" style="font-size: 0.85rem; line-height: 1;" id="ytdMalibu">$0.00</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+
+                            <div class="border-top border-secondary border-opacity-25 my-1 w-100"></div>
+
+                            <div class="row align-items-start align-items-sm-center pt-1">
+                                <div class="col-12 col-sm-3 text-start mb-1 mb-sm-0 pt-1 pt-sm-0">
+                                    <h6 class="text-uppercase fw-bold mb-1 mb-sm-0" style="letter-spacing: 0.5px; font-size: 0.6rem; color: #fbbf24;">
+                                        <i class="bi bi-fire me-1"></i> Month To Date
+                                    </h6>
+                                    <div class="text-white-50 text-capitalize mt-1 d-none d-sm-block" style="font-size: 0.55rem; font-weight: 600; line-height: 1;" id="lblMesActualNombre"></div>
+                                </div>
+                                
+                                <div class="col-12 col-sm-9">
+                                    <div class="row gy-1 gy-sm-0">
+                                        <div class="col-12 col-sm d-flex flex-row flex-sm-column justify-content-between align-items-center align-items-sm-end text-start text-sm-end">
+                                            <small class="text-uppercase fw-bold mb-1 d-block" style="font-size: 0.55rem; color: #cbd5e1;">Volumen</small>
+                                            <span class="fw-bold text-white" style="font-size: 0.85rem; line-height: 1;" id="mesVolumen">$0.00</span>
+                                        </div>
+                                        <div class="col-12 col-sm d-flex flex-row flex-sm-column justify-content-between align-items-center align-items-sm-end text-start text-sm-end">
+                                            <small class="text-uppercase fw-bold mb-1 d-block" style="font-size: 0.55rem; color: #cbd5e1;">Pago Neto</small>
+                                            <span class="fw-bold" style="color: #a7ffc7; font-size: 0.85rem; line-height: 1;" id="mesComision">$0.00</span>
+                                        </div>
+                                        <div id="mesBlockExplore" class="col-12 col-sm d-none flex-row flex-sm-column justify-content-between align-items-center align-items-sm-end text-start text-sm-end hide-bonus-mobile">
+                                            <small class="text-uppercase fw-bold mb-1 d-block" style="font-size: 0.55rem; color: #c6eafb;">Explore</small>
+                                            <span class="fw-bold" style="color: #c6eafb; font-size: 0.85rem; line-height: 1;" id="mesExplore">$0.00</span>
+                                        </div>
+                                        <div id="mesBlockMalibu" class="col-12 col-sm d-none flex-row flex-sm-column justify-content-between align-items-center align-items-sm-end text-start text-sm-end hide-bonus-mobile">
+                                            <small class="text-uppercase fw-bold mb-1 d-block" style="font-size: 0.55rem; color: #fbbf24;">Malibu</small>
+                                            <span class="fw-bold text-white" style="font-size: 0.85rem; line-height: 1;" id="mesMalibu">$0.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
-
             </div>
+
         </div>
 
         <div id="alertasContainer" class="mb-4 d-none">
@@ -241,7 +247,7 @@
                             <div id="blockTotalMalibu" class="d-none w-100 flex-column align-items-center align-items-md-end mt-2">
                                 <div class="border-top pt-2 w-100 d-md-none opacity-50 mb-1"></div>
                                 <h6 class="text-uppercase fw-bold small mb-0 mt-1" style="letter-spacing: 1.5px; color: #800000;">Bono Malibu</h6>
-                                <h4 class="fw-bold mb-0" id="lblTotalMalibu" style="letter-spacing: -1px; color: #800000;">$0.00</h4>
+                                <h4 class="fw-bold mb-0" id="lblTotalMalibu" style="letter-spacing: -1px; color: #806b00;">$0.00</h4>
                             </div>
                         </div>
                     </div>
@@ -291,13 +297,15 @@
             
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="fw-bold text-white mb-0" style="letter-spacing: -0.5px;"><i class="bi bi-clipboard2-data-fill me-2 text-info"></i>Nueva Operación</h4>
-                <button class="btn btn-outline-light rounded-pill px-3 fw-bold shadow-sm" onclick="ocultarFormulario()">
-                    <i class="bi bi-arrow-left me-1"></i> <span class="d-none d-md-inline">Volver</span>
-                </button>
             </div>
 
-            <div class="card card-custom p-3 p-md-4 mb-4">
-                <ul class="nav nav-tabs mb-4 w-100 d-flex flex-nowrap">
+            <div class="card card-custom p-3 p-md-4 mb-4 position-relative">
+                
+                <button type="button" onclick="ocultarFormulario()" class="btn btn-light position-absolute d-flex align-items-center justify-content-center shadow-sm" style="top: 15px; right: 15px; width: 36px; height: 36px; border-radius: 50%; z-index: 100; border: 1px solid rgba(0,0,0,0.1);" title="Cerrar Formulario">
+                    <i class="bi bi-x-lg text-secondary" style="font-size: 1.1rem; -webkit-text-stroke: 1px;"></i>
+                </button>
+
+                <ul class="nav nav-tabs mb-4 w-100 d-flex flex-nowrap pe-5">
                     <li class="nav-item flex-fill"><button type="button" class="nav-link w-100 active" id="nav-ventas" onclick="switchTab('ventas')"><i class="bi bi-graph-up-arrow me-1"></i> Ventas</button></li>
                     <li class="nav-item flex-fill"><button type="button" class="nav-link w-100" id="nav-maquila" onclick="switchTab('maquila')"><i class="bi bi-file-earmark-text me-1"></i> Paperwork</button></li>
                 </ul>
@@ -440,7 +448,11 @@
                         </div>
 
                         <div class="mt-2 pb-2 d-grid gap-2 d-md-flex justify-content-md-end">
-                            <button id="btnCancelarEditVenta" onclick="cancelarEdicion('ventas')" class="btn btn-light border border-danger-subtle text-danger px-4 py-2 rounded-pill fw-bold shadow-sm d-none">CANCELAR</button>
+                            
+                            <button type="button" onclick="ocultarFormulario()" class="btn btn-light border border-secondary-subtle text-secondary px-4 py-2 rounded-pill fw-bold shadow-sm" id="btnCerrarFormVenta">CANCELAR</button>
+                            
+                            <button id="btnCancelarEditVenta" onclick="cancelarEdicion('ventas')" class="btn btn-light border border-danger-subtle text-danger px-4 py-2 rounded-pill fw-bold shadow-sm d-none">CANCELAR EDICIÓN</button>
+                            
                             <button id="btnGuardarVenta" onclick="guardarVenta()" class="btn-gradient px-5 py-3 rounded-pill shadow d-flex align-items-center justify-content-center gap-2" style="font-size: 1.05rem;"><i class="bi bi-floppy-fill"></i> GUARDAR VENTA</button>
                         </div>
                     </form>
@@ -547,7 +559,11 @@
                         </div>
 
                         <div class="mt-4 pb-2 d-grid gap-2 d-md-flex justify-content-md-end">
-                            <button id="btnCancelarEditMaquila" onclick="cancelarEdicion('maquila')" class="btn btn-light border border-danger-subtle text-danger px-4 py-2 rounded-pill fw-bold shadow-sm d-none">CANCELAR</button>
+                            
+                            <button type="button" onclick="ocultarFormulario()" class="btn btn-light border border-secondary-subtle text-secondary px-4 py-2 rounded-pill fw-bold shadow-sm" id="btnCerrarFormMaq">CANCELAR</button>
+                            
+                            <button id="btnCancelarEditMaquila" onclick="cancelarEdicion('maquila')" class="btn btn-light border border-danger-subtle text-danger px-4 py-2 rounded-pill fw-bold shadow-sm d-none">CANCELAR EDICIÓN</button>
+                            
                             <button id="btnGuardarMaquila" onclick="guardarMaquila()" class="btn btn-secondary px-5 py-3 rounded-pill shadow d-flex align-items-center justify-content-center gap-2" style="background: linear-gradient(135deg, #166534 0%, #0f172a 100%); border:none; font-size: 1.05rem; font-weight: 700;"><i class="bi bi-floppy-fill"></i> GUARDAR PAPERWORK</button>
                         </div>
                     </form>

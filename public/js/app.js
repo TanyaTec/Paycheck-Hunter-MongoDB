@@ -207,11 +207,17 @@ function renderTable() {
             </div>
         `;
 
-       const fila = `
+        let mobileNameDisplay = item.type === 'venta' ? (item.cliente_nombre || '--') : (item.nombre_socio || '--');
+
+        const fila = `
             <tr>
                 <td class="align-middle">
                     <div class="fw-bold text-dark">${item.fecha || '--'}</div>
                     <div class="small text-muted">#${item.contrato || 'N/A'}${exploreStar}</div>
+                    
+                    <div class="d-md-none fw-bold text-dark mt-1" style="font-size: 0.85rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; white-space: normal; padding-right: 10px;" title="${mobileNameDisplay}">
+                        <i class="bi bi-person-fill text-muted me-1"></i>${mobileNameDisplay}
+                    </div>
                     ${item.type === 'venta' ? `<div class="d-md-none text-secondary fw-bold mt-1" style="font-size: 0.75rem;">${item.nacionalidad || ''}</div>` : ''}
                     <div class="d-md-none mt-1 small">${iconType}</div>
                 </td>

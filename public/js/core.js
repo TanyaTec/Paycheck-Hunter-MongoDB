@@ -6,7 +6,7 @@ let editId = null;
 let allDataGlobal = []; 
 let filteredData = [];  
 let currentPage = 1;
-const itemsPerPage = 10;
+const itemsPerPage = 20;
 window.isEditingLoad = false;
 
 let currentUserNombre = "";
