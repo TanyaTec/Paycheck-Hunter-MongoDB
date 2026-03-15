@@ -322,18 +322,32 @@ function actualizarTableroFinanciero(inicio = null, fin = null) {
     const blockTotalCash = document.getElementById('blockTotalCash');
     const lblTotalCash = document.getElementById('lblTotalCash');
 
+    // CONSTANTES NUEVAS PARA LA MAGIA UI
+    const placeholder = document.getElementById('placeholderCalculadora');
+    const resultados = document.getElementById('resultadosCalculadora');
+
+    // ESCENARIO 1: NO HAY FECHAS (Estado Limpio / Inicial)
     if (!inicio || !fin) {
         if (lblTotalCobrar) lblTotalCobrar.innerText = '$0.00';
         if (lblVolumen) lblVolumen.innerText = '$0.00';
         if (lblExplore) lblExplore.innerText = '$0.00';
-        if (lblRango) lblRango.innerText = 'Selecciona un rango de fechas';
+        if (lblRango) {
+            lblRango.innerText = 'Esperando fechas...';
+            lblRango.classList.replace('text-dark', 'text-muted');
+        }
         if (blockDeducciones) blockDeducciones.classList.add('d-none');
         
         if (blockTotalCash) { blockTotalCash.classList.remove('d-flex'); blockTotalCash.classList.add('d-none'); }
         if (lblTotalCash) lblTotalCash.innerText = '$0.00';
+
+        // MAGIA UI: Mostrar Placeholder, Ocultar Resultados
+        if (placeholder) { placeholder.classList.remove('d-none'); placeholder.classList.add('d-flex'); }
+        if (resultados) { resultados.classList.remove('d-flex'); resultados.classList.add('d-none'); }
+
         return; 
     }
 
+    // ESCENARIO 2: SÍ HAY FECHAS (Empieza el cálculo)
     let granTotalComision = 0, granTotalVolumen = 0, granTotalExplore = 0, granTotalMalibu = 0, granTotalCash = 0;
     let totalBonusWks = 0, totalMeserosFijos = 0;
 
@@ -430,5 +444,12 @@ function actualizarTableroFinanciero(inicio = null, fin = null) {
         blockDeducciones.classList.add('d-none');
     }
 
-    if (lblRango) lblRango.innerText = `Del ${inicio} al ${fin}`;
+    if (lblRango) {
+        lblRango.innerText = `Del ${inicio} al ${fin}`;
+        lblRango.classList.replace('text-muted', 'text-dark');
+    }
+
+    // MAGIA UI FINAL: Ocultar Placeholder, Mostrar Resultados Calculados
+    if (placeholder) { placeholder.classList.remove('d-flex'); placeholder.classList.add('d-none'); }
+    if (resultados) { resultados.classList.remove('d-none'); resultados.classList.add('d-flex'); }
 }
