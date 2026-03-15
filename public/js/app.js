@@ -7,13 +7,29 @@ async function cargarDatosUnificados() {
         const resMaquilas = await fetch(`${BASE_URL}/api/maquilas`, { headers: { 'Authorization': localStorage.getItem('paycheckToken') } });
         const jsonMaquilas = await resMaquilas.json();
 
-        const dataV = jsonVentas.data || [];
+        const dataVRaw = jsonVentas.data || [];
         const dataM = jsonMaquilas.data || [];
 
+        // CIRUGÍA DE EXTRACCIÓN: Filtramos a los infiltrados de Cash
+        const isCash = (v) => (v.cliente === 'BONO CASH' || v.cliente_nombre === 'BONO CASH');
+        
+        // Ventas puras en dólares
+        const dataV = dataVRaw.filter(v => !isCash(v));
+        // Bonos aislados en pesos
+        const dataCashInVentas = dataVRaw.filter(v => isCash(v));
+        
         const ventasEtiquetadas = dataV.map(v => ({ ...v, type: 'venta' }));
         const maquilasEtiquetadas = dataM.map(m => ({ ...m, type: 'maquila' }));
+        
+        // Le devolvemos su identidad de "bono_cash" y recuperamos los pesos del escondite
+        const cashEtiquetados = dataCashInVentas.map(c => ({ 
+            ...c, 
+            type: 'bono_cash',
+            monto_mxn: parseFloat(c.monto) || 0 
+        }));
 
-        allDataGlobal = [...ventasEtiquetadas, ...maquilasEtiquetadas];
+        // Unimos todos para la lógica interna
+        allDataGlobal = [...ventasEtiquetadas, ...maquilasEtiquetadas, ...cashEtiquetados];
         allDataGlobal.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
 
         filteredData = allDataGlobal; 
@@ -59,7 +75,10 @@ function buscarContrato() {
         return;
     }
 
+    // Buscamos solo en Ventas y Maquilas (Ignoramos el Cash porque no es un contrato buscable)
     filteredData = allDataGlobal.filter(item => {
+        if (item.type === 'bono_cash') return false; // Ignora los bonos cash en la búsqueda
+        
         const cliente = (item.cliente_nombre || '').toLowerCase();
         const socio = (item.nombre_socio || '').toLowerCase();
         const contrato = (item.contrato || '').toLowerCase();
@@ -77,7 +96,9 @@ function limpiarBuscador() {
 }
 
 function cambiarPagina(direction) {
-    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+    // Calculamos el total de páginas ignorando los bonos cash en el conteo de la tabla
+    const dataVisualizable = filteredData.filter(item => item.type !== 'bono_cash');
+    const totalPages = Math.ceil(dataVisualizable.length / itemsPerPage);
     const newPage = parseInt(currentPage) + parseInt(direction);
     if (newPage > 0 && newPage <= totalPages) { currentPage = newPage; renderTable(); }
 }
@@ -87,13 +108,16 @@ function renderTable() {
     if(!tbody) return;
     tbody.innerHTML = '';
     
+    // Excluimos los bonos cash de la tabla de contratos
+    const dataParaTabla = filteredData.filter(item => item.type !== 'bono_cash');
+    
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    const pageData = filteredData.slice(startIndex, endIndex);
+    const pageData = dataParaTabla.slice(startIndex, endIndex);
 
-    document.getElementById('pageInfo').innerText = `Mostrando ${filteredData.length > 0 ? startIndex + 1 : 0} - ${Math.min(endIndex, filteredData.length)} de ${filteredData.length}`;
+    document.getElementById('pageInfo').innerText = `Mostrando ${dataParaTabla.length > 0 ? startIndex + 1 : 0} - ${Math.min(endIndex, dataParaTabla.length)} de ${dataParaTabla.length}`;
     document.getElementById('btnPrev').disabled = currentPage === 1;
-    document.getElementById('btnNext').disabled = endIndex >= filteredData.length;
+    document.getElementById('btnNext').disabled = endIndex >= dataParaTabla.length;
 
     if (pageData.length === 0) { document.getElementById('emptyState').classList.remove('d-none'); return; }
     document.getElementById('emptyState').classList.add('d-none');
@@ -643,7 +667,8 @@ async function guardarVenta() {
         nacionalidad: document.querySelector('input[name="nacionalidad"]:checked').value,
         pago_total: pagoTotalNumerico, 
         comentarios: document.getElementById('txtComentarios').value,
-        fecha_pendiente: document.getElementById('txtFechaPendienteVenta').value
+        fecha_pendiente: document.getElementById('txtFechaPendienteVenta').value,
+        tipo: 'venta' // Aseguramos el tipo para el backend
     };
 
     const oldItem = editId ? allDataGlobal.find(x => String(x._id || x.id) === String(editId) && x.type === 'venta') : null;
@@ -688,7 +713,8 @@ async function guardarMaquila() {
         maq_volumen: parseFloat(document.getElementById('maqVolumen').value) || 0,
         maq_porcentaje: parseFloat(document.getElementById('maqPorcentaje').value) || 0,
         maq_reserva: document.getElementById('maqReserva').checked ? 1 : 0,
-        maq_impuestos: parseFloat(document.getElementById('maqImpuestos').value) || 0
+        maq_impuestos: parseFloat(document.getElementById('maqImpuestos').value) || 0,
+        tipo: 'maquila'
     };
 
     const oldItem = editId ? allDataGlobal.find(x => String(x._id || x.id) === String(editId) && x.type === 'maquila') : null;
@@ -730,7 +756,7 @@ async function enviarDatos(url, method, data, mode) {
         });
         const result = await res.json();
         
-        if (result.message) {
+        if (result.message || res.ok) {
             let tipoAccion = mode === 'ventas' 
                 ? (editId ? 'update_venta' : 'nueva_venta') 
                 : (editId ? 'update_maquila' : 'nueva_maquila');
@@ -738,7 +764,7 @@ async function enviarDatos(url, method, data, mode) {
             detonarCelebracion(tipoAccion);
             cargarDatosUnificados(); 
         } else { 
-            Swal.fire('Error', result.error, 'error'); 
+            Swal.fire('Error', result.error || 'Error desconocido del servidor', 'error'); 
         }
     } catch (e) { 
         Swal.fire('Error', 'Problema de conexión', 'error'); 
@@ -751,7 +777,7 @@ function eliminarItem(type, id) {
         return;
     }
 
-    const endpointType = type === 'venta' ? 'ventas' : 'maquilas';
+    const endpointType = (type === 'venta' || type === 'bono_cash') ? 'ventas' : 'maquilas';
 
     Swal.fire({
         title: '¿Eliminar registro?',
@@ -924,7 +950,7 @@ async function resolverExplore(id, accion) {
         });
         const result = await res.json();
         
-        if (result.message) {
+        if (result.message || res.ok) {
             Swal.close();
             if (accion === 'pagado') {
                 detonarCelebracion('pago_explore');
@@ -938,4 +964,72 @@ async function resolverExplore(id, accion) {
     } catch (e) { 
         Swal.fire('Error', 'Problema de conexión', 'error'); 
     }
+}
+
+// ==========================================
+// LEDGER DE CASH (HISTORIAL Y EDICIÓN)
+// ==========================================
+function abrirHistorialCash() {
+    const lista = document.getElementById('listaHistorialCash');
+    if (!lista) return;
+
+    const cashItems = allDataGlobal.filter(item => item.type === 'bono_cash');
+    
+    if (cashItems.length === 0) {
+        lista.innerHTML = '<div class="text-center text-muted p-4 small"><i class="bi bi-inbox fs-1 d-block mb-2 opacity-50"></i>No hay bonos registrados aún.</div>';
+    } else {
+        let html = '';
+        cashItems.forEach(item => {
+            const monto = parseFloat(item.monto_mxn) || parseFloat(item.monto) || 0;
+            const id = item._id || item.id;
+            html += `
+                <div class="d-flex justify-content-between align-items-center p-3 border rounded-3 mb-2 bg-light shadow-sm">
+                    <div>
+                        <div class="fw-bold text-dark small"><i class="bi bi-calendar-event me-1"></i>${item.fecha}</div>
+                        <div class="text-success fw-bold fs-5 mt-1">$${monto.toLocaleString('en-US', {minimumFractionDigits:2})} <span class="small text-muted fw-normal" style="font-size:0.7rem;">MXN</span></div>
+                    </div>
+                    <div class="btn-group shadow-sm rounded-pill">
+                        <button class="btn btn-sm btn-white border-secondary-subtle px-3" onclick="editarBonoCash('${id}')" title="Editar"><i class="bi bi-pencil-fill text-primary"></i></button>
+                        <button class="btn btn-sm btn-white border-secondary-subtle px-3" onclick="eliminarItem('bono_cash', '${id}')" title="Borrar"><i class="bi bi-trash-fill text-danger"></i></button>
+                    </div>
+                </div>
+            `;
+        });
+        lista.innerHTML = html;
+    }
+
+    const modal = new bootstrap.Modal(document.getElementById('modalHistorialCash'));
+    modal.show();
+}
+
+function editarBonoCash(id) {
+    const item = allDataGlobal.find(x => String(x._id || x.id) === String(id) && x.type === 'bono_cash');
+    if (!item) return;
+
+    // 1. Ocultar el Ledger
+    const modalHistorialEl = document.getElementById('modalHistorialCash');
+    const modalHistorial = bootstrap.Modal.getInstance(modalHistorialEl);
+    if (modalHistorial) modalHistorial.hide();
+
+    // 2. Preparar el Modal de Ingreso con los datos
+    document.getElementById('txtFechaCash').value = item.fecha;
+    document.getElementById('txtMontoCash').value = item.monto_mxn || item.monto;
+    
+    // 3. Variable secreta para saber que editamos
+    window.editIdCash = String(id);
+    
+    // 4. Cambiar estilo del botón a "Modo Edición"
+    const btnGuardar = document.querySelector('#modalCash button.btn.py-3');
+    if(btnGuardar) {
+        btnGuardar.innerHTML = '<i class="bi bi-pencil-square me-1"></i> ACTUALIZAR CASH';
+        btnGuardar.classList.replace('text-dark', 'text-white');
+        btnGuardar.style.background = 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)';
+        btnGuardar.style.border = 'none';
+    }
+
+    // 5. Mostrar Modal de Cash (con delay sutil para transición suave)
+    setTimeout(() => {
+        const modalCash = new bootstrap.Modal(document.getElementById('modalCash'));
+        modalCash.show();
+    }, 300);
 }

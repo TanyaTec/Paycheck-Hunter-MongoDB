@@ -1,0 +1,86 @@
+/**
+ * modal-cash.js
+ * Lógica para la UI de opciones y registro del Bono Cash
+ */
+
+// 1. Ejecutar acción de la cortina (Bottom Sheet)
+function execAction(event, type) {
+    if(event) { event.preventDefault(); event.stopPropagation(); }
+    
+    const offcanvasElement = document.getElementById('menuBottomSheet');
+    if(offcanvasElement) {
+        const bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasElement) || new bootstrap.Offcanvas(offcanvasElement);
+        bsOffcanvas.hide();
+    }
+    
+    setTimeout(() => {
+        if (type === 'venta') {
+            if (typeof mostrarFormulario === 'function') mostrarFormulario();
+            if (typeof switchTab === 'function') switchTab('ventas');
+        } else if (type === 'maquila') {
+            if (typeof mostrarFormulario === 'function') mostrarFormulario();
+            if (typeof switchTab === 'function') switchTab('maquila');
+        } else if (type === 'cash') {
+            abrirModalCash();
+        }
+    }, 300);
+}
+
+// 2. Preparar y abrir la bóveda
+function abrirModalCash() {
+    document.getElementById('txtFechaCash').valueAsDate = new Date();
+    document.getElementById('txtMontoCash').value = '';
+    const modal = new bootstrap.Modal(document.getElementById('modalCash'));
+    modal.show();
+}
+
+// 3. Procesar y guardar el dinero
+function guardarBonoCash() {
+    // Extraemos los valores exactos
+    const montoRaw = document.getElementById('txtMontoCash').value;
+    const monto = parseFloat(montoRaw);
+    const fecha = document.getElementById('txtFechaCash').value;
+
+    // Validación de seguridad
+    if(isNaN(monto) || monto <= 0) {
+        Swal.fire({ icon: 'warning', title: 'Atención', text: 'Ingresa un monto mayor a cero válido.'});
+        return;
+    }
+    if(!fecha) {
+        Swal.fire({ icon: 'warning', title: 'Atención', text: 'Selecciona una fecha válida.'});
+        return;
+    }
+    
+    // Ocultar modal
+    bootstrap.Modal.getInstance(document.getElementById('modalCash')).hide();
+    
+    // ==========================================
+    // ESTRUCTURA DE DATOS PARA LA BASE DE DATOS
+    // ==========================================
+    const registroBono = {
+        id: 'bono_' + Date.now(),
+        tipo: 'bono_cash',
+        fecha: fecha,
+        monto: monto,
+        timestamp: new Date().toISOString()
+    };
+
+    console.log("Listo para enviar a la base de datos:", registroBono);
+
+    // TODO: Aquí conectaremos tu función para guardar (ej. guardarEnFirebase(registroBono))
+
+    // Celebración visual
+    Swal.fire({ 
+        icon: 'success', 
+        title: '¡Cash Registrado!', 
+        text: `Se procesó tu bono de $${monto.toFixed(2)} USD.`, 
+        confirmButtonColor: '#0f172a' 
+    });
+    
+    if(typeof confetti === 'function') {
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#fde047', '#facc15', '#ffffff'] });
+    }
+
+    // TODO: Actualizar el Dashboard YTD/MTD
+    // if (typeof actualizarDashboard === 'function') actualizarDashboard();
+}

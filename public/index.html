@@ -19,10 +19,74 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <link rel="stylesheet" href="css/style.css?v=1.2">
 
-    <link rel="stylesheet" href="css/style.css?v=1.0">
+    <style>
+        #fabMobile {
+            position: fixed; bottom: 25px; right: 25px; z-index: 2000;
+        }
+        
+        .fab-main {
+            width: 65px; height: 65px; border-radius: 50%;
+            background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+            color: white; display: flex; align-items: center; justify-content: center;
+            font-size: 2.2rem; cursor: pointer; box-shadow: 0 8px 25px rgba(2, 132, 199, 0.4);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); position: relative; z-index: 2;
+        }
+        .fab-main:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(2, 132, 199, 0.5); }
+        .fab-main:active { transform: scale(0.95); }
+        .fab-main.active { transform: rotate(45deg); background: #0f172a; box-shadow: 0 8px 25px rgba(15, 23, 42, 0.5); }
+        .fab-main .main-icon { -webkit-text-stroke: 2px white; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); transition: all 0.3s ease; }
+        .fab-main.active .main-icon { -webkit-text-stroke: 1px white; filter: none; }
 
+        .premium-fab-menu {
+            position: absolute;
+            bottom: 85px; right: 0; width: 260px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 20px; padding: 10px;
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.05);
+            opacity: 0; visibility: hidden;
+            transform: translateY(20px) scale(0.95);
+            transform-origin: bottom right; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1;
+        }
+
+        .premium-fab-menu.active { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
+
+        .premium-fab-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 12px; border-radius: 14px;
+            cursor: pointer; transition: background 0.2s;
+            border: none; background: transparent; width: 100%; text-align: left;
+        }
+        
+        .premium-fab-item:hover { background: rgba(0,0,0,0.04); }
+        .premium-fab-item:active { transform: scale(0.98); }
+
+        .premium-fab-item .icon-box {
+            width: 40px; height: 40px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;
+        }
+        
+        /* Color especial para el texto del Cash en MXN */
+        .text-cash-mxn { color: #f8eebd !important; }
+
+        @media (max-width: 768px) {
+            #fabMobile { bottom: 20px; right: 20px; }
+            .fab-main { width: 55px; height: 55px; font-size: 1.8rem; }
+            .premium-fab-menu { bottom: 75px; width: 250px; }
+            .hide-bonus-mobile { display: none !important; }
+        }
+
+        /* EFECTO CLICKABLE PARA EL CASH */
+        .cash-clickable { cursor: pointer; transition: transform 0.2s ease, opacity 0.2s ease; }
+        .cash-clickable:hover { transform: scale(1.05); opacity: 0.8; }
+        .cash-clickable:active { transform: scale(0.95); }
+    </style>
 </head>
+
 <body>
 
     <div id="loginScreen" class="w-100" style="position: fixed; top: 0; bottom: 0; left: 0; right: 0; z-index: 9999; overflow-y: auto;">
@@ -53,14 +117,7 @@
                              data-auto_select="true"
                              data-auto_prompt="false">
                         </div>
-                        <div class="g_id_signin"
-                             data-type="standard"
-                             data-shape="pill"
-                             data-theme="outline"
-                             data-text="continue_with"
-                             data-size="large"
-                             data-width="260">
-                        </div>
+                        <div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="continue_with" data-size="large" data-width="260"></div>
                     </div>
                 </div>
 
@@ -91,15 +148,12 @@
                         <img src="" id="userProfilePic" class="user-img d-none" alt="Avatar" referrerpolicy="no-referrer">
                         <div id="userInitials" class="user-initial d-none">C</div>
                     </div>
-                    <button onclick="cerrarSesion()" class="btn-logout" title="Cerrar Sesión">
-                        <i class="bi bi-power fs-6 fw-bold"></i>
-                    </button>
+                    <button onclick="cerrarSesion()" class="btn-logout" title="Cerrar Sesión"><i class="bi bi-power fs-6 fw-bold"></i></button>
                 </div>
             </div>
         </nav>
 
         <div class="row align-items-center mb-4 gy-3">
-            
             <div class="col-12 col-lg-5 text-start">
                 <h1 class="fw-bold text-white mb-1" style="line-height: 1.1; font-size: 1.8rem; letter-spacing: -0.5px;">
                     Hola, <span id="userGreetingName" class="text-white">Closer</span> <i class="bi bi-patch-check-fill ms-1" style="font-size: 1.1rem; color: #fbbf24; filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.4));" title="Cuenta VIP Verificada"></i>
@@ -110,15 +164,8 @@
             <div class="col-12 col-lg-7">
                 <div class="p-2 p-md-2 rounded-4 shadow-sm m-0" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px);">
                     <div class="row align-items-center m-0">
-                        
                         <div class="col-12 px-0 px-md-2">
                             
-                            <style>
-                                @media (max-width: 575.98px) {
-                                    .hide-bonus-mobile { display: none !important; }
-                                }
-                            </style>
-
                             <div class="row align-items-center mb-2">
                                 <div class="col-12 col-sm-3 text-start mb-1 mb-sm-0">
                                     <h6 class="text-uppercase fw-bold mb-0" style="letter-spacing: 0.5px; font-size: 0.6rem; color: #38bdf8;">
@@ -142,6 +189,10 @@
                                         <div id="ytdBlockMalibu" class="col-12 col-sm d-none flex-row flex-sm-column justify-content-between align-items-center align-items-sm-end text-start text-sm-end hide-bonus-mobile">
                                             <small class="text-uppercase fw-bold mb-1 d-block" style="font-size: 0.55rem; color: #fbbf24;">Malibu</small>
                                             <span class="fw-bold text-white" style="font-size: 0.85rem; line-height: 1;" id="ytdMalibu">$0.00</span>
+                                        </div>
+                                        <div id="ytdBlockCash" class="col-12 col-sm d-none flex-row flex-sm-column justify-content-between align-items-center align-items-sm-end text-start text-sm-end hide-bonus-mobile cash-clickable" onclick="abrirHistorialCash()" title="Ver historial de Cash">
+                                            <small class="text-uppercase fw-bold mb-1 d-block" style="font-size: 0.55rem; color: #f8eebd;">Cash (MXN)</small>
+                                            <span class="fw-bold text-cash-mxn" style="font-size: 0.85rem; line-height: 1;" id="ytdCash">$0.00</span>
                                         </div>
                                     </div>
                                 </div>
@@ -175,23 +226,22 @@
                                             <small class="text-uppercase fw-bold mb-1 d-block" style="font-size: 0.55rem; color: #fbbf24;">Malibu</small>
                                             <span class="fw-bold text-white" style="font-size: 0.85rem; line-height: 1;" id="mesMalibu">$0.00</span>
                                         </div>
+                                        <div id="mesBlockCash" class="col-12 col-sm d-none flex-row flex-sm-column justify-content-between align-items-center align-items-sm-end text-start text-sm-end hide-bonus-mobile cash-clickable" onclick="abrirHistorialCash()" title="Ver historial de Cash">
+                                            <small class="text-uppercase fw-bold mb-1 d-block" style="font-size: 0.55rem; color: #f8eebd;">Cash (MXN)</small>
+                                            <span class="fw-bold text-cash-mxn" style="font-size: 0.85rem; line-height: 1;" id="mesCash">$0.00</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
 
-        <div id="alertasContainer" class="mb-4 d-none">
-            <div id="alertasLista"></div>
-        </div>
+        <div id="alertasContainer" class="mb-4 d-none"><div id="alertasLista"></div></div>
 
         <div id="vistaDashboard">
-            
             <div class="card p-3 p-md-4 border-0 shadow-lg mb-4" style="background: #ffffff; border-radius: 28px; color: #0f172a; border-top: 4px solid var(--primary-color) !important;">
                 <div class="row align-items-stretch">
                     <div class="col-md-7 mb-4 mb-md-0 border-md-end border-light-subtle d-md-flex flex-md-column py-md-2">
@@ -223,9 +273,7 @@
                                 <h6 class="text-uppercase text-muted fw-bold small mb-0" style="letter-spacing: 1.5px;">Volumen Rango</h6>
                                 <h3 class="fw-bold mb-0" id="lblTotalVolumen" style="color: var(--primary-color); letter-spacing: -1px;">$0.00</h3>
                             </div>
-                            
                             <div class="border-top pt-2 w-100 d-md-none opacity-50"></div>
-                            
                             <div>
                                 <h6 class="text-uppercase text-dark fw-bold small mb-0" style="letter-spacing: 1.5px;">Comisión Total</h6>
                                 <h2 class="fw-bold text-success mb-0" id="lblTotalCobrar" style="letter-spacing: -1.5px;">$0.00</h2>
@@ -248,6 +296,12 @@
                                 <div class="border-top pt-2 w-100 d-md-none opacity-50 mb-1"></div>
                                 <h6 class="text-uppercase fw-bold small mb-0 mt-1" style="letter-spacing: 1.5px; color: #800000;">Bono Malibu</h6>
                                 <h4 class="fw-bold mb-0" id="lblTotalMalibu" style="letter-spacing: -1px; color: #806b00;">$0.00</h4>
+                            </div>
+
+                            <div id="blockTotalCash" class="d-none w-100 flex-column align-items-center align-items-md-end mt-2 p-2 rounded-3 cash-clickable" style="background-color: rgba(253, 224, 71, 0.05); border: 1px solid rgba(250, 204, 21, 0.3);" onclick="abrirHistorialCash()" title="Ver historial de Cash">
+                                <div class="border-top pt-2 w-100 d-md-none opacity-50 mb-1"></div>
+                                    <h6 class="text-uppercase fw-bold small mb-0 mt-1" style="letter-spacing: 1.5px; color: #a16207;">Total Cash (MX)</h6>
+                                    <h4 class="fw-bold mb-0" id="lblTotalCash" style="letter-spacing: -1px; color: #854d0e;">$0.00</h4>
                             </div>
                         </div>
                     </div>
@@ -294,13 +348,10 @@
         </div>
 
         <div id="vistaFormulario" class="d-none">
-            
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="fw-bold text-white mb-0" style="letter-spacing: -0.5px;"><i class="bi bi-clipboard2-data-fill me-2 text-info"></i>Nueva Operación</h4>
             </div>
-
             <div class="card card-custom p-3 p-md-4 mb-4 position-relative">
-                
                 <button type="button" onclick="ocultarFormulario()" class="btn btn-light position-absolute d-flex align-items-center justify-content-center shadow-sm" style="top: 15px; right: 15px; width: 36px; height: 36px; border-radius: 50%; z-index: 100; border: 1px solid rgba(0,0,0,0.1);" title="Cerrar Formulario">
                     <i class="bi bi-x-lg text-secondary" style="font-size: 1.1rem; -webkit-text-stroke: 1px;"></i>
                 </button>
@@ -320,8 +371,7 @@
                                     <div class="flex-grow-1"><div class="form-check bg-white border p-2 rounded shadow-sm"><input class="form-check-input border-secondary" type="checkbox" id="chkLiner" onchange="toggleLiner()"><label class="form-check-label fw-bold text-dark small">Liner (-3.5%)</label></div><input type="text" class="form-control form-control-sm mt-1 d-none" id="txtLinerName" placeholder="Nombre Liner"></div>
                                     <div class="flex-grow-1">
                                         <div class="form-check bg-white border p-2 rounded shadow-sm">
-                                            <input class="form-check-input border-secondary" type="checkbox" id="chkCasado" onchange="toggleCasado()">
-                                            <label class="form-check-label fw-bold text-dark small">Casado</label>
+                                            <input class="form-check-input border-secondary" type="checkbox" id="chkCasado" onchange="toggleCasado()"><label class="form-check-label fw-bold text-dark small">Casado</label>
                                         </div>
                                         <div id="divCasadoOptions" class="d-none mt-2 p-2 bg-white border rounded shadow-sm">
                                             <input type="text" class="form-control form-control-sm mb-2" id="txtCasadoName" placeholder="Nombre Casado">
@@ -357,10 +407,7 @@
                                 <div id="divFechaPendienteVenta" class="d-none mt-2"><input type="date" class="form-control form-control-sm border-warning shadow-sm" id="txtFechaPendienteVenta"></div>
                                 <div id="divCaidaOpciones" class="d-none mt-2 p-2 bg-danger-subtle border border-danger rounded shadow-sm">
                                     <label class="form-label text-danger fw-bold small mb-1">Estado de Liquidación</label>
-                                    <select class="form-select form-select-sm border-danger text-danger fw-bold" id="cmbLiquidacionCaida" onchange="calcularMatematica()">
-                                        <option value="no_liquidada">No Pagada (Ceros)</option>
-                                        <option value="liquidada">Pagada (Genera Deuda -)</option>
-                                    </select>
+                                    <select class="form-select form-select-sm border-danger text-danger fw-bold" id="cmbLiquidacionCaida" onchange="calcularMatematica()"><option value="no_liquidada">No Pagada (Ceros)</option><option value="liquidada">Pagada (Genera Deuda -)</option></select>
                                 </div>
                             </div>
                             <div class="col-md-3 col-6"><label class="form-label">Pack</label><select class="form-select shadow-sm" id="cmbPack" onchange="calcularMatematica()"><option value="None">None</option><option value="Full">Full</option><option value="1/2">1/2</option><option value="1/3">1/3</option><option value="1/4">1/4</option></select></div>
@@ -370,48 +417,13 @@
                         
                         <div class="row g-3 mb-4 bg-light p-3 rounded mx-0 border border-danger-subtle shadow-sm">
                             <div class="col-12 mb-0"><span class="text-danger fw-bold small text-uppercase"><i class="bi bi-dash-circle me-1"></i>Deducciones Variables</span></div>
-                            <div class="col-6 col-sm-4 col-lg">
-                                <label class="form-label text-primary small fw-bold mb-1 text-truncate w-100" for="chkReserva" style="cursor: pointer;">Reserva (-10%)</label>
-                                <div class="form-control form-control-sm border-primary d-flex align-items-center justify-content-center bg-white" style="height: 31px;">
-                                    <div class="form-check form-switch mb-0 ps-0 d-flex justify-content-center">
-                                        <input class="form-check-input ms-0 mt-0 border-primary" type="checkbox" role="switch" id="chkReserva" onchange="calcularMatematica()" style="cursor: pointer; transform: scale(1.1);">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-sm-4 col-lg">
-                                <label class="form-label text-danger small fw-bold mb-1 text-truncate w-100">Impuestos %</label>
-                                <input type="number" class="form-control form-control-sm border-danger text-center fw-bold text-danger shadow-sm" id="txtImpuestosPorcentaje" oninput="calcularMatematica()" style="height: 31px;" placeholder="Ej. 20">
-                            </div>
-                            <div class="col-6 col-sm-4 col-lg">
-                                <label class="form-label text-muted small fw-bold mb-1 text-truncate w-100">Regalos ($)</label>
-                                <input type="number" class="form-control form-control-sm text-center shadow-sm" id="txtRegalos" oninput="calcularMatematica()" style="height: 31px;" placeholder="0">
-                            </div>
-                            <div class="col-6 col-sm-4 col-lg">
-                                <label class="form-label text-muted small fw-bold mb-1 text-truncate w-100">Donativos ($)</label>
-                                <input type="number" class="form-control form-control-sm text-center shadow-sm" id="txtDonativos" oninput="calcularMatematica()" style="height: 31px;" placeholder="0">
-                            </div>
-                            <div class="col-6 col-sm-4 col-lg">
-                                <label class="form-label text-muted small fw-bold mb-1 text-truncate w-100">Move In ($)</label>
-                                <input type="number" class="form-control form-control-sm text-center shadow-sm" id="txtMoveIn" oninput="calcularMatematica()" style="height: 31px;" placeholder="0">
-                            </div>
-                            <div class="col-6 col-sm-4 col-lg">
-                                <label class="form-label text-success fw-bold small mb-1 text-truncate w-100">Bonus Wk</label>
-                                <select class="form-select form-select-sm border-success text-success fw-bold text-center shadow-sm" id="cmbBonusWeeks" onchange="calcularMatematica()" style="height: 31px;">
-                                    <option value="0">0</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
-                                    <option value="6">6</option>
-                                    <option value="7">7</option>
-                                    <option value="8">8</option>
-                                </select>
-                            </div>
-                            <div class="col-6 col-sm-4 col-lg">
-                                <label class="form-label text-muted small fw-bold mb-1 text-truncate w-100" title="Cobro Chargeback Anterior">Chargeback ($)</label>
-                                <input type="number" class="form-control form-control-sm text-center shadow-sm" id="txtChargeback" oninput="calcularMatematica()" style="height: 31px;" placeholder="0">
-                            </div>
+                            <div class="col-6 col-sm-4 col-lg"><label class="form-label text-primary small fw-bold mb-1 text-truncate w-100" for="chkReserva" style="cursor: pointer;">Reserva (-10%)</label><div class="form-control form-control-sm border-primary d-flex align-items-center justify-content-center bg-white" style="height: 31px;"><div class="form-check form-switch mb-0 ps-0 d-flex justify-content-center"><input class="form-check-input ms-0 mt-0 border-primary" type="checkbox" role="switch" id="chkReserva" onchange="calcularMatematica()" style="cursor: pointer; transform: scale(1.1);"></div></div></div>
+                            <div class="col-6 col-sm-4 col-lg"><label class="form-label text-danger small fw-bold mb-1 text-truncate w-100">Impuestos %</label><input type="number" class="form-control form-control-sm border-danger text-center fw-bold text-danger shadow-sm" id="txtImpuestosPorcentaje" oninput="calcularMatematica()" style="height: 31px;" placeholder="Ej. 20"></div>
+                            <div class="col-6 col-sm-4 col-lg"><label class="form-label text-muted small fw-bold mb-1 text-truncate w-100">Regalos ($)</label><input type="number" class="form-control form-control-sm text-center shadow-sm" id="txtRegalos" oninput="calcularMatematica()" style="height: 31px;" placeholder="0"></div>
+                            <div class="col-6 col-sm-4 col-lg"><label class="form-label text-muted small fw-bold mb-1 text-truncate w-100">Donativos ($)</label><input type="number" class="form-control form-control-sm text-center shadow-sm" id="txtDonativos" oninput="calcularMatematica()" style="height: 31px;" placeholder="0"></div>
+                            <div class="col-6 col-sm-4 col-lg"><label class="form-label text-muted small fw-bold mb-1 text-truncate w-100">Move In ($)</label><input type="number" class="form-control form-control-sm text-center shadow-sm" id="txtMoveIn" oninput="calcularMatematica()" style="height: 31px;" placeholder="0"></div>
+                            <div class="col-6 col-sm-4 col-lg"><label class="form-label text-success fw-bold small mb-1 text-truncate w-100">Bonus Wk</label><select class="form-select form-select-sm border-success text-success fw-bold text-center shadow-sm" id="cmbBonusWeeks" onchange="calcularMatematica()" style="height: 31px;"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></div>
+                            <div class="col-6 col-sm-4 col-lg"><label class="form-label text-muted small fw-bold mb-1 text-truncate w-100" title="Cobro Chargeback Anterior">Chargeback ($)</label><input type="number" class="form-control form-control-sm text-center shadow-sm" id="txtChargeback" oninput="calcularMatematica()" style="height: 31px;" placeholder="0"></div>
                         </div>
 
                         <div class="row g-3 mb-3 mx-0">
@@ -439,20 +451,14 @@
                             </div>
                             <div class="col-md-3 col-12">
                                 <div class="form-check mt-1"><input class="form-check-input" type="checkbox" id="chkMalibu" onchange="toggleMalibu()" style="border-color: #800000;"><label class="form-check-label fw-bold" style="color: #800000;">¿Malibu?</label></div>
-                                <div id="malibuFields" class="d-none p-3 rounded-4 mt-2 shadow-sm" style="background-color: #fff0f0; border: 1px solid #fecaca;">
-                                    <label class="small fw-bold" style="color: #800000;">Bono Efectivo ($)</label>
-                                    <input type="number" class="form-control form-control-sm" id="txtMalibuMonto" placeholder="Ej. 200" style="border-color: #fca5a5;">
-                                </div>
+                                <div id="malibuFields" class="d-none p-3 rounded-4 mt-2 shadow-sm" style="background-color: #fff0f0; border: 1px solid #fecaca;"><label class="small fw-bold" style="color: #800000;">Bono Efectivo ($)</label><input type="number" class="form-control form-control-sm" id="txtMalibuMonto" placeholder="Ej. 200" style="border-color: #fca5a5;"></div>
                             </div>
                             <div class="col-md-6 col-12"><label class="form-label text-muted small fw-bold">Comentarios</label><textarea class="form-control shadow-sm" id="txtComentarios" rows="2"></textarea></div>
                         </div>
 
                         <div class="mt-2 pb-2 d-grid gap-2 d-md-flex justify-content-md-end">
-                            
                             <button type="button" onclick="ocultarFormulario()" class="btn btn-light border border-secondary-subtle text-secondary px-4 py-2 rounded-pill fw-bold shadow-sm" id="btnCerrarFormVenta">CANCELAR</button>
-                            
                             <button id="btnCancelarEditVenta" onclick="cancelarEdicion('ventas')" class="btn btn-light border border-danger-subtle text-danger px-4 py-2 rounded-pill fw-bold shadow-sm d-none">CANCELAR EDICIÓN</button>
-                            
                             <button id="btnGuardarVenta" onclick="guardarVenta()" class="btn-gradient px-5 py-3 rounded-pill shadow d-flex align-items-center justify-content-center gap-2" style="font-size: 1.05rem;"><i class="bi bi-floppy-fill"></i> GUARDAR VENTA</button>
                         </div>
                     </form>
@@ -472,11 +478,7 @@
                             <div class="col-md-6 col-12"><label class="form-label">Vendedores Involucrados</label><input type="text" class="form-control" id="maqVendedores"></div>
                             <div class="col-md-6 col-12">
                                 <label class="form-label">Status</label>
-                                <select class="form-select" id="maqStatus" onchange="handleStatusChange('maquila')">
-                                    <option value="Cerrada">✅ Cerrada</option>
-                                    <option value="Pendiente">⏳ Pendiente</option>
-                                    <option value="Cancelada">🚫 Cancelada</option>
-                                </select>
+                                <select class="form-select" id="maqStatus" onchange="handleStatusChange('maquila')"><option value="Cerrada">✅ Cerrada</option><option value="Pendiente">⏳ Pendiente</option><option value="Cancelada">🚫 Cancelada</option></select>
                                 <div id="divFechaPendienteMaq" class="d-none mt-2"><input type="date" class="form-control form-control-sm border-warning shadow-sm" id="txtFechaPendienteMaq"></div>
                             </div>
                         </div>
@@ -485,64 +487,26 @@
                             <div class="col-12">
                                 <label class="form-label fw-bold text-primary small text-uppercase">Método de Pago Acordado</label>
                                 <div class="d-flex flex-wrap gap-3 p-3 rounded-3 border bg-light shadow-sm">
-                                    <div class="form-check">
-                                        <input class="form-check-input border-primary" type="radio" name="maqTipoPago" id="maqTipoPack" value="pack" checked onchange="toggleTipoPagoMaquila()">
-                                        <label class="form-check-label fw-bold text-dark">Por Pack ($150.88)</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input border-primary" type="radio" name="maqTipoPago" id="maqTipoPorcentaje" value="porcentaje" onchange="toggleTipoPagoMaquila()">
-                                        <label class="form-check-label fw-bold text-dark">Por Porcentaje (%)</label>
-                                    </div>
+                                    <div class="form-check"><input class="form-check-input border-primary" type="radio" name="maqTipoPago" id="maqTipoPack" value="pack" checked onchange="toggleTipoPagoMaquila()"><label class="form-check-label fw-bold text-dark">Por Pack ($150.88)</label></div>
+                                    <div class="form-check"><input class="form-check-input border-primary" type="radio" name="maqTipoPago" id="maqTipoPorcentaje" value="porcentaje" onchange="toggleTipoPagoMaquila()"><label class="form-check-label fw-bold text-dark">Por Porcentaje (%)</label></div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="row g-3 mb-3" id="maqPackContainer">
-                            <div class="col-md-4 col-12">
-                                <label class="form-label">Nivel de Pack</label>
-                                <select class="form-select border-primary shadow-sm" id="maqPack" onchange="calcularMaquila()">
-                                    <option value="None" selected>None</option>
-                                    <option value="Full">Full ($150.88)</option>
-                                    <option value="1/2">1/2 ($75.44)</option>
-                                </select>
-                            </div>
+                            <div class="col-md-4 col-12"><label class="form-label">Nivel de Pack</label><select class="form-select border-primary shadow-sm" id="maqPack" onchange="calcularMaquila()"><option value="None" selected>None</option><option value="Full">Full ($150.88)</option><option value="1/2">1/2 ($75.44)</option></select></div>
                         </div>
 
                         <div class="row g-3 mb-3 d-none mx-0 bg-info-subtle p-3 rounded-4 border border-info shadow-sm" id="maqPorcentajeContainer">
-                            <div class="col-md-6 col-12">
-                                <label class="form-label text-dark fw-bold small">Volumen Venta <span class="badge bg-light text-muted fw-normal ms-1 border">No suma a KPI</span></label>
-                                <div class="input-group shadow-sm">
-                                    <span class="input-group-text bg-white border-info">$</span>
-                                    <input type="number" class="form-control border-info fw-bold" id="maqVolumen" placeholder="Ej. 10000" oninput="calcularMaquila()">
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-12">
-                                <label class="form-label text-dark fw-bold small">Porcentaje Ofrecido</label>
-                                <div class="input-group shadow-sm">
-                                    <input type="number" step="0.1" class="form-control border-info fw-bold text-center" id="maqPorcentaje" placeholder="Ej. 1.5" oninput="calcularMaquila()">
-                                    <span class="input-group-text bg-info text-dark border-info fw-bold">%</span>
-                                </div>
-                            </div>
+                            <div class="col-md-6 col-12"><label class="form-label text-dark fw-bold small">Volumen Venta <span class="badge bg-light text-muted fw-normal ms-1 border">No suma a KPI</span></label><div class="input-group shadow-sm"><span class="input-group-text bg-white border-info">$</span><input type="number" class="form-control border-info fw-bold" id="maqVolumen" placeholder="Ej. 10000" oninput="calcularMaquila()"></div></div>
+                            <div class="col-md-6 col-12"><label class="form-label text-dark fw-bold small">Porcentaje Ofrecido</label><div class="input-group shadow-sm"><input type="number" step="0.1" class="form-control border-info fw-bold text-center" id="maqPorcentaje" placeholder="Ej. 1.5" oninput="calcularMaquila()"><span class="input-group-text bg-info text-dark border-info fw-bold">%</span></div></div>
                         </div>
 
                         <div class="bg-light p-3 rounded-4 border border-danger-subtle mb-4 mt-2 shadow-sm">
                             <div class="text-danger fw-bold small text-uppercase mb-3"><i class="bi bi-dash-circle me-1"></i>Deducciones Aplicables</div>
                             <div class="row g-3">
-                                <div class="col-6 col-md-6">
-                                    <label class="form-label text-primary small fw-bold mb-1 text-truncate w-100" for="maqReserva" style="cursor: pointer;">Fondo Reserva (-10%)</label>
-                                    <div class="form-control border-primary d-flex align-items-center justify-content-center bg-white shadow-sm" style="height: 42px;">
-                                        <div class="form-check form-switch mb-0 ps-0 d-flex justify-content-center">
-                                            <input class="form-check-input ms-0 mt-0 border-primary" type="checkbox" role="switch" id="maqReserva" onchange="calcularMaquila()" style="cursor: pointer; transform: scale(1.4);">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-6 col-md-6">
-                                    <label class="form-label text-danger small fw-bold mb-1 text-truncate w-100">Impuestos a Retener</label>
-                                    <div class="input-group shadow-sm" style="height: 42px;">
-                                        <input type="number" class="form-control border-danger h-100 text-center fw-bold text-danger" id="maqImpuestos" placeholder="Ej. 20" oninput="calcularMaquila()">
-                                        <span class="input-group-text bg-danger text-white border-danger fw-bold h-100">%</span>
-                                    </div>
-                                </div>
+                                <div class="col-6 col-md-6"><label class="form-label text-primary small fw-bold mb-1 text-truncate w-100" for="maqReserva" style="cursor: pointer;">Fondo Reserva (-10%)</label><div class="form-control border-primary d-flex align-items-center justify-content-center bg-white shadow-sm" style="height: 42px;"><div class="form-check form-switch mb-0 ps-0 d-flex justify-content-center"><input class="form-check-input ms-0 mt-0 border-primary" type="checkbox" role="switch" id="maqReserva" onchange="calcularMaquila()" style="cursor: pointer; transform: scale(1.4);"></div></div></div>
+                                <div class="col-6 col-md-6"><label class="form-label text-danger small fw-bold mb-1 text-truncate w-100">Impuestos a Retener</label><div class="input-group shadow-sm" style="height: 42px;"><input type="number" class="form-control border-danger h-100 text-center fw-bold text-danger" id="maqImpuestos" placeholder="Ej. 20" oninput="calcularMaquila()"><span class="input-group-text bg-danger text-white border-danger fw-bold h-100">%</span></div></div>
                             </div>
                         </div>
 
@@ -550,20 +514,14 @@
                             <div class="col-md-6 px-0">
                                 <div class="p-4 bg-white border border-success-subtle rounded-4 shadow text-center" style="background: linear-gradient(to right, #f0fdf4, #ffffff);">
                                     <label class="small fw-bold text-uppercase mb-2 d-block text-success opacity-75" style="letter-spacing: 1px;">Pago Neto Paperwork</label>
-                                    <div class="d-flex align-items-center justify-content-center text-success">
-                                        <span class="fs-1 fw-bold me-1">$</span>
-                                        <input type="text" class="form-control-plaintext fw-bold text-success text-center p-0 fs-1" id="maqPago" readonly style="width: auto; letter-spacing: -1px;" value="0.00">
-                                    </div>
+                                    <div class="d-flex align-items-center justify-content-center text-success"><span class="fs-1 fw-bold me-1">$</span><input type="text" class="form-control-plaintext fw-bold text-success text-center p-0 fs-1" id="maqPago" readonly style="width: auto; letter-spacing: -1px;" value="0.00"></div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="mt-4 pb-2 d-grid gap-2 d-md-flex justify-content-md-end">
-                            
                             <button type="button" onclick="ocultarFormulario()" class="btn btn-light border border-secondary-subtle text-secondary px-4 py-2 rounded-pill fw-bold shadow-sm" id="btnCerrarFormMaq">CANCELAR</button>
-                            
                             <button id="btnCancelarEditMaquila" onclick="cancelarEdicion('maquila')" class="btn btn-light border border-danger-subtle text-danger px-4 py-2 rounded-pill fw-bold shadow-sm d-none">CANCELAR EDICIÓN</button>
-                            
                             <button id="btnGuardarMaquila" onclick="guardarMaquila()" class="btn btn-secondary px-5 py-3 rounded-pill shadow d-flex align-items-center justify-content-center gap-2" style="background: linear-gradient(135deg, #166534 0%, #0f172a 100%); border:none; font-size: 1.05rem; font-weight: 700;"><i class="bi bi-floppy-fill"></i> GUARDAR PAPERWORK</button>
                         </div>
                     </form>
@@ -572,21 +530,67 @@
         </div>
 
         <div class="mt-5 pt-4 pb-2 border-top border-secondary-subtle d-flex flex-column justify-content-center align-items-center" style="opacity: 0.7;">
-            <a href="https://tanyateclab.com" target="_blank" rel="noopener noreferrer" class="mb-2" style="transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                <img src="img/TanyaTec-Lab-removebg.png" alt="TanyaTec Lab" style="height: 65px; filter: drop-shadow(0px 2px 5px rgba(0,0,0,0.5));">
-            </a>
-            <small class="text-white fw-bold text-center" style="letter-spacing: 1px; font-size: 0.65rem;">
-                &copy; 2026 <a href="https://tanyateclab.com" target="_blank" rel="noopener noreferrer" class="text-white text-decoration-none">TANYATEC LAB</a>. ALL RIGHTS RESERVED.
-            </small>
+            <a href="https://tanyateclab.com" target="_blank" rel="noopener noreferrer" class="mb-2" style="transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"><img src="img/TanyaTec-Lab-removebg.png" alt="TanyaTec Lab" style="height: 65px; filter: drop-shadow(0px 2px 5px rgba(0,0,0,0.5));"></a>
+            <small class="text-white fw-bold text-center" style="letter-spacing: 1px; font-size: 0.65rem;">&copy; 2026 <a href="https://tanyateclab.com" target="_blank" rel="noopener noreferrer" class="text-white text-decoration-none">TANYATEC LAB</a>. ALL RIGHTS RESERVED.</small>
         </div>
-
     </div>
 
-    <div id="fabMobile" onclick="mostrarFormulario()" title="Nueva Venta" 
-         style="position: fixed; bottom: 25px; right: 25px; width: 65px; height: 65px; border-radius: 50%; background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%); color: #ffffff; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); z-index: 1050; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease;" 
-         onmouseover="this.style.transform='scale(1.1) translateY(-2px)'; this.style.boxShadow='0 6px 15px rgba(0, 0, 0, 0.4)';" 
-         onmouseout="this.style.transform='scale(1) translateY(0)'; this.style.boxShadow='0 4px 10px rgba(0, 0, 0, 0.3)';">
-        <i class="bi bi-plus-lg" style="font-size: 2.4rem; -webkit-text-stroke: 2px white; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));"></i>
+    <div id="fabMobile">
+        <div class="premium-fab-menu" id="premiumFabMenu">
+            <div class="px-2 pb-2 mb-2 border-bottom border-secondary-subtle">
+                <span class="text-uppercase fw-bold text-muted" style="font-size: 0.65rem; letter-spacing: 1px;">¿Qué deseas registrar?</span>
+            </div>
+            
+            <button class="premium-fab-item" onclick="execAction(event, 'venta')">
+                <div class="icon-box bg-primary bg-opacity-10 text-primary"><i class="bi bi-graph-up-arrow"></i></div>
+                <div><div class="fw-bold text-dark" style="font-size: 0.95rem; line-height: 1.2;">Nueva Venta</div><div class="text-muted" style="font-size: 0.75rem;">Contrato cerrado</div></div>
+            </button>
+
+            <button class="premium-fab-item" onclick="execAction(event, 'maquila')">
+                <div class="icon-box bg-success bg-opacity-10 text-success"><i class="bi bi-file-earmark-text"></i></div>
+                <div><div class="fw-bold text-dark" style="font-size: 0.95rem; line-height: 1.2;">Paperwork</div><div class="text-muted" style="font-size: 0.75rem;">Cálculo de maquila</div></div>
+            </button>
+
+            <button class="premium-fab-item" onclick="execAction(event, 'cash')" style="background-color: rgba(254, 252, 232, 0.7); margin-top: 4px;">
+                <div class="icon-box bg-warning bg-opacity-25 text-warning-emphasis border border-warning-subtle"><i class="bi bi-cash-stack"></i></div>
+                <div><div class="fw-bold" style="color: #854d0e; font-size: 0.95rem; line-height: 1.2;">Bono Cash (MXN)</div><div class="text-muted" style="font-size: 0.75rem;">Efectivo en pesos</div></div>
+            </button>
+        </div>
+        <div class="fab-main shadow-lg" onclick="togglePremiumMenu(event)"><i class="bi bi-plus-lg main-icon"></i></div>
+    </div>
+
+    <div class="modal fade" id="modalCash" tabindex="-1" style="z-index: 1055;">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 24px; background: #ffffff;">
+                <div class="modal-header border-0 bg-light rounded-top-4 pb-2 px-4 pt-4">
+                    <h5 class="modal-title fw-bold" style="color: #854d0e;">
+                        <i class="bi bi-cash-stack me-2 text-warning"></i>Bono Cash (MXN)
+                    </h5>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="frmBonoCash" onsubmit="return false;">
+                        <div class="mb-3">
+                            <label class="form-label text-muted fw-bold small">Fecha del Bono</label>
+                            <input type="date" class="form-control shadow-sm border-light-subtle" id="txtFechaCash" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label text-muted fw-bold small">Monto en Pesos</label>
+                            <div class="input-group shadow-sm">
+                                <span class="input-group-text bg-warning-subtle text-warning-emphasis border-warning-subtle fw-bold">$</span>
+                                <input type="number" class="form-control border-warning-subtle fw-bold text-dark fs-4" id="txtMontoCash" placeholder="Ej. 3000" required>
+                                <span class="input-group-text bg-light text-muted border-warning-subtle fw-bold">MXN</span>
+                            </div>
+                        </div>
+                        <div class="d-grid">
+                            <button type="button" class="btn py-3 rounded-pill fw-bold shadow-sm text-dark" onclick="guardarBonoCash()" style="background: linear-gradient(135deg, #fde047 0%, #facc15 100%); border: 1px solid #facc15;">
+                                <i class="bi bi-floppy-fill me-1"></i> GUARDAR CASH
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="modal fade" id="modalDetalle" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content"><div class="modal-header bg-light border-0"><h5 class="modal-title fw-bold text-primary" id="modalTitulo">Detalle</h5><button class="btn-close shadow-none" data-bs-dismiss="modal"></button></div><div class="modal-body p-4" id="modalCuerpo"></div><div class="modal-footer border-0 bg-light"><button class="btn btn-dark rounded-pill px-4 fw-bold shadow-sm" data-bs-dismiss="modal">Cerrar</button></div></div></div></div>
@@ -604,6 +608,23 @@
         </div>
     </div>
 
+    <div class="modal fade" id="modalHistorialCash" tabindex="-1" style="z-index: 1055;">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 24px; background: #ffffff;">
+                <div class="modal-header border-0 bg-light rounded-top-4 pb-2 px-4 pt-4">
+                    <h5 class="modal-title fw-bold" style="color: #854d0e;">
+                        <i class="bi bi-clock-history me-2 text-warning"></i>Historial Cash
+                    </h5>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4 pt-2">
+                    <div id="listaHistorialCash" class="d-flex flex-column gap-2 mt-2">
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -616,6 +637,92 @@
         document.getElementById('txtFecha').valueAsDate = new Date();
         document.getElementById('maqFecha').valueAsDate = new Date();
         setTimeout(() => { if(typeof renderVendedoresInputs === 'function') renderVendedoresInputs(); }, 100);
+
+        function togglePremiumMenu(event) {
+            if(event) { event.preventDefault(); event.stopPropagation(); }
+            const menu = document.getElementById('premiumFabMenu');
+            const btn = document.querySelector('.fab-main');
+            if(menu && btn) {
+                menu.classList.toggle('active');
+                btn.classList.toggle('active');
+            }
+        }
+
+        document.addEventListener('click', function(event) {
+            const fab = document.getElementById('fabMobile');
+            const menu = document.getElementById('premiumFabMenu');
+            const btn = document.querySelector('.fab-main');
+            if (fab && !fab.contains(event.target)) {
+                if (menu && menu.classList.contains('active')) {
+                    menu.classList.remove('active');
+                    btn.classList.remove('active');
+                }
+            }
+        });
+
+        function execAction(event, type) {
+            if(event) { event.preventDefault(); event.stopPropagation(); }
+            
+            const menu = document.getElementById('premiumFabMenu');
+            const btn = document.querySelector('.fab-main');
+            if(menu && btn) {
+                menu.classList.remove('active');
+                btn.classList.remove('active');
+            }
+            
+            setTimeout(() => {
+                if (type === 'venta') {
+                    if (typeof mostrarFormulario === 'function') mostrarFormulario();
+                    if (typeof switchTab === 'function') switchTab('ventas');
+                } else if (type === 'maquila') {
+                    if (typeof mostrarFormulario === 'function') mostrarFormulario();
+                    if (typeof switchTab === 'function') switchTab('maquila');
+                } else if (type === 'cash') {
+                    abrirModalCash();
+                }
+            }, 150); 
+        }
+
+        function abrirModalCash() {
+            document.getElementById('txtFechaCash').valueAsDate = new Date();
+            document.getElementById('txtMontoCash').value = '';
+            
+            // LIMPIEZA: Si el usuario venía de "Editar", reseteamos el botón al modo "Nuevo"
+            window.editIdCash = null;
+            const btnGuardar = document.querySelector('#modalCash button.btn.py-3');
+            if(btnGuardar) {
+                btnGuardar.innerHTML = '<i class="bi bi-floppy-fill me-1"></i> GUARDAR CASH';
+                btnGuardar.classList.replace('text-white', 'text-dark');
+                btnGuardar.style.background = 'linear-gradient(135deg, #fde047 0%, #facc15 100%)';
+                btnGuardar.style.border = '1px solid #facc15';
+            }
+
+            const modal = new bootstrap.Modal(document.getElementById('modalCash'));
+            modal.show();
+        }
+
+        function guardarBonoCash() {
+            const montoRaw = document.getElementById('txtMontoCash').value;
+            const monto = parseFloat(montoRaw);
+            const fecha = document.getElementById('txtFechaCash').value;
+
+            // Validación UX anti-errores
+            if(isNaN(monto) || monto <= 0) {
+                Swal.fire({ icon: 'warning', title: 'Atención', text: 'Ingresa un monto mayor a cero válido.'});
+                return;
+            }
+            if(!fecha) {
+                Swal.fire({ icon: 'warning', title: 'Atención', text: 'Selecciona una fecha válida.'});
+                return;
+            }
+            
+            // CONEXIÓN AL BACKEND: Enviamos los datos a la función de core.js
+            if (typeof guardarBonoCashEnFirebase === 'function') {
+                guardarBonoCashEnFirebase(monto, fecha);
+            } else {
+                Swal.fire({ icon: 'error', title: 'Error interno', text: 'No se encontró la conexión con la base de datos.'});
+            }
+        }
     </script>
 </body>
 </html>

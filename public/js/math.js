@@ -98,14 +98,12 @@ function calcularMatematica() {
 
     let miParteGastosDespues = gastosDespuesImpuestos / numVendedores;
     
-    // CIRUGÍA: Chargeback manual restado al total
     let chargebackManual = parseFloat(document.getElementById('txtChargeback') ? document.getElementById('txtChargeback').value : 0) || 0;
     let pagoNetoFinal = subtotalPostImpuestos - miParteGastosDespues - chargebackManual;
 
     const status = document.getElementById('cmbStatus').value;
     const cmbLiq = document.getElementById('cmbLiquidacionCaida');
 
-    // Mantenemos el cálculo como negativo visualmente solo para indicar que es un valor en contra
     if (status === 'Caída' && cmbLiq && cmbLiq.value === 'liquidada') {
         pagoNetoFinal = -Math.abs(pagoNetoFinal); 
     } else if (status === 'Caída' || status === 'Cancelada') {
@@ -156,10 +154,28 @@ function actualizarTotalesMesActual() {
     const anioActual = hoy.getFullYear();
     const nombresMeses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
     
-    let volMes = 0, comisionMes = 0, exploreMes = 0, malibuMes = 0;
-    let volYTD = 0, comisionYTD = 0, exploreYTD = 0, malibuYTD = 0;
+    let volMes = 0, comisionMes = 0, exploreMes = 0, malibuMes = 0, cashMes = 0;
+    let volYTD = 0, comisionYTD = 0, exploreYTD = 0, malibuYTD = 0, cashYTD = 0;
+
+    // CIRUGÍA: Blindaje universal para valores que vienen de la Base de Datos
+    const isTrue = (val) => val == 1 || val === true || val === 'true' || val === '1';
 
     allDataGlobal.forEach(item => {
+        if (item.type === 'bono_cash' && item.fecha) {
+            let [yyyy, mm, dd] = item.fecha.split('-');
+            let añoBono = parseInt(yyyy);
+            let mesBono = parseInt(mm) - 1;
+            let montoCash = parseFloat(item.monto_mxn) || 0;
+
+            if (añoBono === anioActual) {
+                cashYTD += montoCash;
+                if (mesBono === mesActual) {
+                    cashMes += montoCash;
+                }
+            }
+            return; 
+        }
+
         let esCerrada = item.status === 'Cerrada';
         let pagoBD = parseFloat(item.pago_total) || 0;
         let esDeuda = item.status === 'Caída' && pagoBD < 0;
@@ -170,30 +186,36 @@ function actualizarTotalesMesActual() {
             let mesVenta = parseInt(mm) - 1;
 
             if (añoVenta === anioActual) {
-                comisionYTD += pagoBD;
+                comisionYTD += esDeuda ? Math.abs(pagoBD) : pagoBD;
                 
                 if (esCerrada && item.type === 'venta') {
                     volYTD += calcularMiVolumen(item);
-                    let esExplore = parseInt(item.es_explore_package) === 1;
-                    let esExploreHoy = parseInt(item.explore_es_hoy) === 1;
                     let numVend = parseInt(item.num_vendedores) || 1;
                     
-                    if (esExplore && esExploreHoy) exploreYTD += ( (225 * 0.77) / numVend );
-                    if (parseInt(item.es_malibu) === 1 && parseFloat(item.monto_malibu) > 0) malibuYTD += parseFloat(item.monto_malibu);
+                    // Blindaje aplicado a Explore y Malibu
+                    if (isTrue(item.es_explore_package) && isTrue(item.explore_es_hoy)) {
+                        exploreYTD += ( (225 * 0.77) / numVend );
+                    }
+                    if (isTrue(item.es_malibu) && parseFloat(item.monto_malibu) > 0) {
+                        malibuYTD += parseFloat(item.monto_malibu);
+                    }
                 }
             }
 
             if (añoVenta === anioActual && mesVenta === mesActual) {
-                comisionMes += pagoBD;
+                comisionMes += esDeuda ? Math.abs(pagoBD) : pagoBD;
 
                 if (esCerrada && item.type === 'venta') {
                     volMes += calcularMiVolumen(item);
-                    let esExplore = parseInt(item.es_explore_package) === 1;
-                    let esExploreHoy = parseInt(item.explore_es_hoy) === 1;
                     let numVend = parseInt(item.num_vendedores) || 1;
 
-                    if (esExplore && esExploreHoy) exploreMes += ( (225 * 0.77) / numVend );
-                    if (parseInt(item.es_malibu) === 1 && parseFloat(item.monto_malibu) > 0) malibuMes += parseFloat(item.monto_malibu);
+                    // Blindaje aplicado a Explore y Malibu
+                    if (isTrue(item.es_explore_package) && isTrue(item.explore_es_hoy)) {
+                        exploreMes += ( (225 * 0.77) / numVend );
+                    }
+                    if (isTrue(item.es_malibu) && parseFloat(item.monto_malibu) > 0) {
+                        malibuMes += parseFloat(item.monto_malibu);
+                    }
                 }
             }
         }
@@ -213,16 +235,35 @@ function actualizarTotalesMesActual() {
         comisionYTD < 0 ? lblYTDCom.classList.replace('text-success', 'text-danger') : lblYTDCom.classList.replace('text-danger', 'text-success');
     }
     
+    // CIRUGÍA UI: Usar remove/add en lugar de replace para evitar bloqueos visuales
     const blockExpYTD = document.getElementById('ytdBlockExplore');
     if (blockExpYTD) {
-        if (exploreYTD > 0) { blockExpYTD.classList.replace('d-none', 'd-flex'); document.getElementById('ytdExplore').innerText = formatCurr(exploreYTD); } 
-        else { blockExpYTD.classList.replace('d-flex', 'd-none'); }
+        if (exploreYTD > 0) { 
+            blockExpYTD.classList.remove('d-none'); blockExpYTD.classList.add('d-flex'); 
+            document.getElementById('ytdExplore').innerText = formatCurr(exploreYTD); 
+        } else { 
+            blockExpYTD.classList.remove('d-flex'); blockExpYTD.classList.add('d-none'); 
+        }
     }
 
     const blockMalYTD = document.getElementById('ytdBlockMalibu');
     if (blockMalYTD) {
-        if (malibuYTD > 0) { blockMalYTD.classList.replace('d-none', 'd-flex'); document.getElementById('ytdMalibu').innerText = formatCurr(malibuYTD); } 
-        else { blockMalYTD.classList.replace('d-flex', 'd-none'); }
+        if (malibuYTD > 0) { 
+            blockMalYTD.classList.remove('d-none'); blockMalYTD.classList.add('d-flex'); 
+            document.getElementById('ytdMalibu').innerText = formatCurr(malibuYTD); 
+        } else { 
+            blockMalYTD.classList.remove('d-flex'); blockMalYTD.classList.add('d-none'); 
+        }
+    }
+
+    const blockCashYTD = document.getElementById('ytdBlockCash');
+    if (blockCashYTD) {
+        if (cashYTD > 0) { 
+            blockCashYTD.classList.remove('d-none'); blockCashYTD.classList.add('d-flex'); 
+            document.getElementById('ytdCash').innerText = formatCurr(cashYTD); 
+        } else { 
+            blockCashYTD.classList.remove('d-flex'); blockCashYTD.classList.add('d-none'); 
+        }
     }
 
     const lblMesNombre = document.getElementById('lblMesActualNombre');
@@ -239,14 +280,32 @@ function actualizarTotalesMesActual() {
     
     const blockExp = document.getElementById('mesBlockExplore');
     if (blockExp) {
-        if (exploreMes > 0) { blockExp.classList.replace('d-none', 'd-flex'); document.getElementById('mesExplore').innerText = formatCurr(exploreMes); } 
-        else { blockExp.classList.replace('d-flex', 'd-none'); }
+        if (exploreMes > 0) { 
+            blockExp.classList.remove('d-none'); blockExp.classList.add('d-flex'); 
+            document.getElementById('mesExplore').innerText = formatCurr(exploreMes); 
+        } else { 
+            blockExp.classList.remove('d-flex'); blockExp.classList.add('d-none'); 
+        }
     }
 
     const blockMal = document.getElementById('mesBlockMalibu');
     if (blockMal) {
-        if (malibuMes > 0) { blockMal.classList.replace('d-none', 'd-flex'); document.getElementById('mesMalibu').innerText = formatCurr(malibuMes); } 
-        else { blockMal.classList.replace('d-flex', 'd-none'); }
+        if (malibuMes > 0) { 
+            blockMal.classList.remove('d-none'); blockMal.classList.add('d-flex'); 
+            document.getElementById('mesMalibu').innerText = formatCurr(malibuMes); 
+        } else { 
+            blockMal.classList.remove('d-flex'); blockMal.classList.add('d-none'); 
+        }
+    }
+
+    const blockCashMes = document.getElementById('mesBlockCash');
+    if (blockCashMes) {
+        if (cashMes > 0) { 
+            blockCashMes.classList.remove('d-none'); blockCashMes.classList.add('d-flex'); 
+            document.getElementById('mesCash').innerText = formatCurr(cashMes); 
+        } else { 
+            blockCashMes.classList.remove('d-flex'); blockCashMes.classList.add('d-none'); 
+        }
     }
 }
 
@@ -259,6 +318,9 @@ function actualizarTableroFinanciero(inicio = null, fin = null) {
     const blockDeducciones = document.getElementById('blockDeduccionesCalculadora');
     const lineaBonusWks = document.getElementById('lineaBonusWeeks');
     const lineaMeseros = document.getElementById('lineaMeseros');
+    
+    const blockTotalCash = document.getElementById('blockTotalCash');
+    const lblTotalCash = document.getElementById('lblTotalCash');
 
     if (!inicio || !fin) {
         if (lblTotalCobrar) lblTotalCobrar.innerText = '$0.00';
@@ -266,13 +328,24 @@ function actualizarTableroFinanciero(inicio = null, fin = null) {
         if (lblExplore) lblExplore.innerText = '$0.00';
         if (lblRango) lblRango.innerText = 'Selecciona un rango de fechas';
         if (blockDeducciones) blockDeducciones.classList.add('d-none');
+        
+        if (blockTotalCash) { blockTotalCash.classList.remove('d-flex'); blockTotalCash.classList.add('d-none'); }
+        if (lblTotalCash) lblTotalCash.innerText = '$0.00';
         return; 
     }
 
-    let granTotalComision = 0, granTotalVolumen = 0, granTotalExplore = 0, granTotalMalibu = 0;
+    let granTotalComision = 0, granTotalVolumen = 0, granTotalExplore = 0, granTotalMalibu = 0, granTotalCash = 0;
     let totalBonusWks = 0, totalMeserosFijos = 0;
 
+    // Blindaje universal
+    const isTrue = (val) => val == 1 || val === true || val === 'true' || val === '1';
+
     filteredData.forEach(item => {
+        if (item.type === 'bono_cash') {
+            granTotalCash += parseFloat(item.monto_mxn) || 0;
+            return; 
+        }
+
         let esCerrada = item.status === 'Cerrada';
         let pagoBD = parseFloat(item.pago_total) || 0;
         let esDeuda = item.status === 'Caída' && pagoBD < 0; 
@@ -289,15 +362,12 @@ function actualizarTableroFinanciero(inicio = null, fin = null) {
                 granTotalVolumen += calcularMiVolumen(item);
                 let numVend = parseInt(item.num_vendedores) || 1;
 
-                let esExplore = parseInt(item.es_explore_package) === 1;
-                let esExploreHoy = parseInt(item.explore_es_hoy) === 1;
-
-                if (esExplore && esExploreHoy) {
+                if (isTrue(item.es_explore_package) && isTrue(item.explore_es_hoy)) {
                     let bonoNeto = 225 * 0.77; 
                     granTotalExplore += (bonoNeto / numVend);
                 }
 
-                if (parseInt(item.es_malibu) === 1 && parseFloat(item.monto_malibu) > 0) {
+                if (isTrue(item.es_malibu) && parseFloat(item.monto_malibu) > 0) {
                     granTotalMalibu += parseFloat(item.monto_malibu);
                 }
 
@@ -305,10 +375,10 @@ function actualizarTableroFinanciero(inicio = null, fin = null) {
                 totalBonusWks += (bwks * 20) / numVend;
 
                 let fijosItem = 0;
-                if(parseInt(item.deduccion_meseros) === 1) fijosItem += 20;
-                if(parseInt(item.deduccion_antilavado) === 1) fijosItem += 10;
-                if(parseInt(item.deduccion_explore) === 1) fijosItem += 10;
-                if(parseInt(item.deduccion_rci) === 1) fijosItem += 10;
+                if(isTrue(item.deduccion_meseros)) fijosItem += 20;
+                if(isTrue(item.deduccion_antilavado)) fijosItem += 10;
+                if(isTrue(item.deduccion_explore)) fijosItem += 10;
+                if(isTrue(item.deduccion_rci)) fijosItem += 10;
                 totalMeserosFijos += (fijosItem / numVend);
             }
         }
@@ -327,10 +397,17 @@ function actualizarTableroFinanciero(inicio = null, fin = null) {
     const blockMalibu = document.getElementById('blockTotalMalibu');
     const lblMalibu = document.getElementById('lblTotalMalibu');
     if (granTotalMalibu > 0) {
-        if(blockMalibu) blockMalibu.classList.replace('d-none', 'd-flex');
+        if(blockMalibu) { blockMalibu.classList.remove('d-none'); blockMalibu.classList.add('d-flex'); }
         if(lblMalibu) lblMalibu.innerText = fm(granTotalMalibu);
     } else {
-        if(blockMalibu) blockMalibu.classList.replace('d-flex', 'd-none');
+        if(blockMalibu) { blockMalibu.classList.remove('d-flex'); blockMalibu.classList.add('d-none'); }
+    }
+
+    if (granTotalCash > 0) {
+        if(blockTotalCash) { blockTotalCash.classList.remove('d-none'); blockTotalCash.classList.add('d-flex'); }
+        if(lblTotalCash) lblTotalCash.innerText = fm(granTotalCash);
+    } else {
+        if(blockTotalCash) { blockTotalCash.classList.remove('d-flex'); blockTotalCash.classList.add('d-none'); }
     }
 
     if (totalBonusWks > 0 || totalMeserosFijos > 0) {

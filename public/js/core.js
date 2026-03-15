@@ -16,7 +16,9 @@ const successMessages = {
     'update_venta': { icon: '📝', title: '¡Datos Actualizados!', msg: 'Los datos de la venta han sido ajustados con precisión.', btn: 'Entendido' },
     'nueva_maquila': { icon: '🤝', title: '¡Paperwork Listo!', msg: 'Un trámite menos, un paso más cerca de tu meta.', btn: '¡Excelente!' },
     'update_maquila': { icon: '📝', title: '¡Paperwork Actualizado!', msg: 'Documentación al día y en orden.', btn: 'Entendido' },
-    'pago_explore': { icon: '💰', title: '¡Explore Cobrado!', msg: 'Ese bono ya está en la bolsa. ¡Felicidades!', btn: '¡A celebrar! 🎉' }
+    'pago_explore': { icon: '💰', title: '¡Explore Cobrado!', msg: 'Ese bono ya está en la bolsa. ¡Felicidades!', btn: '¡A celebrar! 🎉' },
+    // Añadimos mensaje de éxito para Cash
+    'nuevo_cash': { icon: '💰', title: '¡Cash Registrado!', msg: 'Tu bono en efectivo ha sido guardado exitosamente.', btn: '¡Excelente!' }
 };
 
 // --- NAVEGACIÓN Y VISTAS ---
@@ -62,7 +64,7 @@ function detonarCelebracion(tipoAccion) {
 
     modal.show();
 
-    if (tipoAccion === 'nueva_venta' || tipoAccion === 'pago_explore') {
+    if (tipoAccion === 'nueva_venta' || tipoAccion === 'pago_explore' || tipoAccion === 'nuevo_cash') {
         confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#00c6ff', '#0072ff', '#fbbf24', '#ffffff'], zIndex: 10000 });
     }
 }
@@ -265,4 +267,62 @@ function toggleLiner() {
     const chk = document.getElementById('chkLiner');
     const input = document.getElementById('txtLinerName');
     if(chk && input) { chk.checked ? input.classList.remove('d-none') : input.classList.add('d-none'); calcularMatematica(); }
+}
+
+async function guardarBonoCashEnFirebase(montoMxn, fecha) {
+    const token = localStorage.getItem('paycheckToken');
+    if (!token) {
+        Swal.fire('Error', 'No estás autenticado.', 'error');
+        return;
+    }
+
+    // CABALLO DE TROYA V2
+    const registroBono = {
+        cliente: 'BONO CASH',
+        cliente_nombre: 'BONO CASH',
+        contrato: 'CASH',
+        monto: montoMxn, 
+        pago_total: 0,   
+        status: 'Cerrada',
+        nacionalidad: 'Mexicano',
+        tipo_socio: 'N/A',
+        pack_nivel: 'None',
+        fecha: fecha
+    };
+
+    // EL DETECTOR DE EDICIÓN
+    const idEdit = window.editIdCash;
+    const method = idEdit ? 'PUT' : 'POST';
+    const url = idEdit ? `${BASE_URL}/api/ventas/${idEdit}` : `${BASE_URL}/api/ventas`;
+
+    try {
+        const response = await fetch(url, { 
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify(registroBono)
+        });
+
+        if (response.ok) {
+            const modalEl = document.getElementById('modalCash');
+            if (modalEl) {
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+            }
+            
+            cargarDatosUnificados();
+            detonarCelebracion('nuevo_cash');
+
+        } else if (response.status === 403 || response.status === 401) {
+            cerrarSesion();
+        } else {
+            const err = await response.json();
+            throw new Error(err.error || 'Error al guardar el bono.');
+        }
+    } catch (error) {
+        console.error("Error guardando Bono Cash:", error);
+        Swal.fire('Error', error.message, 'error');
+    }
 }
