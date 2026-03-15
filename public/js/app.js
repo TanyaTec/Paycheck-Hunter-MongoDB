@@ -1033,3 +1033,90 @@ function editarBonoCash(id) {
         modalCash.show();
     }, 300);
 }
+
+// ==========================================
+// DESGLOSE MÓVIL (YTD / MTD)
+// ==========================================
+function abrirDesgloseMobile() {
+    // 1. Mini-escáner: Lee los valores directamente del Dashboard para no alterar la matemática
+    const getVal = (idBlock, idVal) => {
+        const block = document.getElementById(idBlock);
+        if (block && block.classList.contains('d-flex')) { // Si está visible es que es mayor a cero
+            return document.getElementById(idVal).innerText;
+        }
+        return null;
+    };
+
+    // Extraemos YTD
+    const yExplore = getVal('ytdBlockExplore', 'ytdExplore');
+    const yCash = getVal('ytdBlockCash', 'ytdCash');
+    const yMalibu = getVal('ytdBlockMalibu', 'ytdMalibu');
+
+    // Extraemos MTD
+    const mExplore = getVal('mesBlockExplore', 'mesExplore');
+    const mCash = getVal('mesBlockCash', 'mesCash');
+    const mMalibu = getVal('mesBlockMalibu', 'mesMalibu');
+
+    // 2. Constructor visual de filas
+    const buildRow = (label, value, isCash) => {
+        if (!value) return ''; // Si está en ceros, no dibuja nada (minimalismo puro)
+        
+        // Si es Cash, le damos el súper-poder de ser clickeable hacia el Ledger
+        if (isCash) {
+            return `
+                <div class="d-flex justify-content-between align-items-center p-2 cash-clickable shadow-sm" onclick="cerrarDesgloseYAbrirCash()" style="background-color: rgba(253, 224, 71, 0.15); border: 1px solid rgba(250, 204, 21, 0.4); border-radius: 10px;">
+                    <span class="text-muted small fw-bold" style="color: #a16207 !important;">
+                        <i class="bi bi-cash-stack me-1 text-warning"></i>${label} 
+                        <i class="bi bi-pencil-square ms-1 text-primary" style="font-size: 0.75rem;"></i>
+                    </span>
+                    <span class="fw-bold" style="color: #854d0e;">${value}</span>
+                </div>
+            `;
+        }
+        
+        // Iconos para Explore o Malibu
+        let icon = label === 'Explore' 
+            ? '<i class="bi bi-star-fill text-info me-1"></i>' 
+            : '<i class="bi bi-star-fill me-1" style="color:#fbbf24;"></i>';
+            
+        return `
+            <div class="d-flex justify-content-between align-items-center p-2 border-bottom border-secondary-subtle">
+                <span class="text-muted small fw-bold">${icon}${label}</span>
+                <span class="fw-bold text-dark">${value}</span>
+            </div>
+        `;
+    };
+
+    // 3. Armamos el HTML para YTD
+    let htmlYTD = '';
+    htmlYTD += buildRow('Explore', yExplore, false);
+    htmlYTD += buildRow('Cash (MXN)', yCash, true);
+    htmlYTD += buildRow('Malibu', yMalibu, false);
+    if (!htmlYTD) htmlYTD = '<div class="text-muted small text-center fst-italic py-3 border rounded bg-light">Sin bonos acumulados</div>';
+    
+    // 4. Armamos el HTML para MTD
+    let htmlMTD = '';
+    htmlMTD += buildRow('Explore', mExplore, false);
+    htmlMTD += buildRow('Cash (MXN)', mCash, true);
+    htmlMTD += buildRow('Malibu', mMalibu, false);
+    if (!htmlMTD) htmlMTD = '<div class="text-muted small text-center fst-italic py-3 border rounded bg-light">Sin bonos este mes</div>';
+
+    // 5. Inyectamos en el Modal y lo abrimos
+    document.getElementById('contenedorDesgloseYTD').innerHTML = htmlYTD;
+    document.getElementById('contenedorDesgloseMTD').innerHTML = htmlMTD;
+
+    const modal = new bootstrap.Modal(document.getElementById('modalDesgloseMobile'));
+    modal.show();
+}
+
+function cerrarDesgloseYAbrirCash() {
+    // Escondemos el modal del desglose suavemente
+    const modalEl = document.getElementById('modalDesgloseMobile');
+    const modalInstance = bootstrap.Modal.getInstance(modalEl);
+    if (modalInstance) modalInstance.hide();
+
+    // Pequeña pausa de 300ms para que termine la animación y abrimos el Ledger de Cash
+    setTimeout(() => {
+        abrirHistorialCash();
+    }, 300);
+}
