@@ -17,6 +17,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
+// CIRUGÍA: RUTA LIGERA PARA CRON-JOB (Mantiene el servidor despierto sin ahogarlo)
+app.get('/ping', (req, res) => {
+    res.status(200).send('pong');
+});
+
 // --- 1. DEFINICIÓN DE ESQUEMAS (MULTI-TENANT BLINDADO) ---
 const esquemaConfig = {
     virtuals: true,
